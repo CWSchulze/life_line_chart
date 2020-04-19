@@ -30,8 +30,6 @@ setup(
     author="Christian Schulze",
     author_email="c.w.schulze@gmail.com",
     description = "Generate ancestor (genealogy) chart",
-    long_description=open('README.md', encoding='utf-8').read(),
-    long_description_content_type='text/markdown'
     license = open('LICENSE','r').read(),
     keywords = "genealogy, gedcom, chart, ancestors",
     url = "https://github.com/CWSchulze/life_line_chart",
