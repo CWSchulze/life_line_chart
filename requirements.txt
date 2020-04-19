@@ -1,0 +1,6 @@
+svgwrite
+svgpathtools
+numpy
+wheel
+python-dateutil
+pillow
