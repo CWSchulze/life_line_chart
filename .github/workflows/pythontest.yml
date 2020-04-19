@@ -7,7 +7,7 @@ on:
   push
 
 jobs:
-  deploy:
+  test:
 
     runs-on: ubuntu-latest
 
