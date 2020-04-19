@@ -29,17 +29,24 @@ setup(
     version=__version__,
     author="Christian Schulze",
     author_email="c.w.schulze@gmail.com",
-    description = ("Generate ancestor (genealogy) chart"),
+    description = "Generate ancestor (genealogy) chart",
+    long_description=open('README.md', encoding='utf-8').read(),
+    long_description_content_type='text/markdown'
     license = open('LICENSE','r').read(),
     keywords = "genealogy, gedcom, chart, ancestors",
     url = "https://github.com/CWSchulze/life_line_chart",
     classifiers = [
         "Programming Language :: Python :: 3",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
         "Development Status :: 4 - Beta",
         "Natural Language :: German",
         "Topic :: Scientific/Engineering",
+        "Topic :: Scientific/Engineering :: Information Analysis",
+        "Topic :: Scientific/Engineering :: Visualization",
+        "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    platforms=['all'],
+     platforms="OS Independent",
     #scripts=['life_line_chart_gui.py'],
     package_data={'life_line_chart': ['*.png']},
     include_package_data=True,
@@ -52,3 +59,6 @@ setup(
 
 # to build enter:
 # python setup.py bdist_wheel
+
+# to upload to pypi
+# python setup.py sdist
