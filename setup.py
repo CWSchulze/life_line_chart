@@ -32,7 +32,7 @@ setup(
     description = ("Generate ancestor (genealogy) chart"),
     license = open('LICENSE','r').read(),
     keywords = "genealogy, gedcom, chart, ancestors",
-    #url = "https://www.tlk-thermo.com/index.php/en/dave",
+    url = "https://github.com/CWSchulze/life_line_chart",
     classifiers = [
         "Programming Language :: Python :: 3",
         "Development Status :: 4 - Beta",
