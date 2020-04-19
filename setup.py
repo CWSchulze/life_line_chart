@@ -45,7 +45,7 @@ setup(
     include_package_data=True,
     packages=setuptools.find_packages(),
 
-    install_requires=['numpy','svgwrite','svgpathtools'],
+    install_requires=['numpy', 'svgwrite', 'svgpathtools', 'python-dateutil', 'pillow'],
     ext_modules=[]
 
 )
