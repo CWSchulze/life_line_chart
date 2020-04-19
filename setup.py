@@ -3,9 +3,8 @@ from glob import glob
 #classifiers: https://pypi.org/pypi?%3Aaction=list_classifiers
 import shutil, os, sys
 
-from distutils.core import setup
+from setuptools import setup, Extension
 import shutil
-import sys
 
 
 
@@ -16,9 +15,12 @@ def read_version(filename):
     return version_numbers[0]
 __version__ = read_version('life_line_chart/__init__.py')
 
-
 try:
     shutil.rmtree('build')
+except:
+    pass
+try:
+    shutil.rmtree('dist')
 except:
     pass
 
@@ -29,8 +31,11 @@ setup(
     version=__version__,
     author="Christian Schulze",
     author_email="c.w.schulze@gmail.com",
-    description = "Generate ancestor (genealogy) chart",
-    license = open('LICENSE','r').read(),
+    description = ("Generate ancestor (genealogy) chart"),
+    description_content_type='text/plain',
+    long_description=open("README.md", "r").read(),
+    long_description_content_type="text/markdown",
+    license = "MIT License",
     keywords = "genealogy, gedcom, chart, ancestors",
     url = "https://github.com/CWSchulze/life_line_chart",
     classifiers = [
@@ -44,15 +49,12 @@ setup(
         "Topic :: Scientific/Engineering :: Visualization",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-     platforms="OS Independent",
-    #scripts=['life_line_chart_gui.py'],
+    platforms="OS Independent",
     package_data={'life_line_chart': ['*.png']},
     include_package_data=True,
     packages=setuptools.find_packages(),
-
     install_requires=['numpy', 'svgwrite', 'svgpathtools', 'python-dateutil', 'pillow'],
     ext_modules=[]
-
 )
 
 # to build enter:
@@ -60,3 +62,4 @@ setup(
 
 # to upload to pypi
 # python setup.py sdist
+# twine upload 
