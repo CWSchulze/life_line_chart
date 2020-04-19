@@ -1,17 +1,18 @@
-import pytest
+# import pytest
 from life_line_chart import GedcomParsing, InstanceContainer, GedcomIndividual, ancestor_graph_individual, ancestor_graph_family, GedcomFamily
 from life_line_chart import ReadGedcom, get_gedcom_instance_container
 import os, sys
 
+
 def test_instance_container_load():
     instances = get_gedcom_instance_container(os.path.join(os.path.dirname(__file__),'gramps_sample.ged'))
-    
+
     assert len(instances._data) == 2
     # autocreate
     i = instances[('i', '@I1@')]
     assert len(instances._data) == 3
     assert i.plain_name == 'Keith Lloyd Smith'
-    
+
     f = instances[('f', '@F1@')]
     assert len(instances._data) == 4
     assert f.wife_individual_id == '@I25@'

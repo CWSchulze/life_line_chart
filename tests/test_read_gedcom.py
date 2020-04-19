@@ -1,7 +1,8 @@
-import pytest
-from life_line_chart import GedcomParsing
+# import pytest
+# from life_line_chart import GedcomParsing
 from life_line_chart import ReadGedcom
 import os, sys
+
 
 def test_read_sample_file():
     data = ReadGedcom.read_data(os.path.join(os.path.dirname(__file__),'gramps_sample.ged'))

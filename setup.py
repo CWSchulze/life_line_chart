@@ -1,6 +1,6 @@
 import setuptools
 from glob import glob
-#classifiers: https://pypi.org/pypi?%3Aaction=list_classifiers
+# classifiers: https://pypi.org/pypi?%3Aaction=list_classifiers
 import shutil, os, sys
 
 from setuptools import setup, Extension

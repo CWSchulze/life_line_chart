@@ -1,10 +1,12 @@
 from .BaseFamily import BaseFamily
 from .GedcomParsing import get_date_dict_from_tag, _get_relevant_events, estimate_marriage_date
 
+
 class GedcomFamily(BaseFamily):
     """
     GedcomFamily class for gedcom files
     """
+
     def __init__(self, instances, database_fam, database_indi, family_id):
         BaseFamily.__init__(self, instances, family_id)
         self._database_fam = database_fam
@@ -13,7 +15,8 @@ class GedcomFamily(BaseFamily):
 
     def _initialize(self):
         BaseFamily._initialize(self)
-        self.marriage = get_date_dict_from_tag(self._database_fam[self.family_id], 'MARR')
+        self.marriage = get_date_dict_from_tag(
+            self._database_fam[self.family_id], 'MARR')
         if 'MARR' in self._database_fam[self.family_id]:
             if 'PLAC' in self._database_fam[self.family_id]['MARR']:
                 self.location = self._database_fam[self.family_id]['MARR']['PLAC']['tag_data']
@@ -22,10 +25,10 @@ class GedcomFamily(BaseFamily):
     def _get_husband_and_wife_id(self):
         """
         get the individual ids of husband wife
-        
+
         Returns:
             tuple: husband, wife
-        """        
+        """
         husb = self._database_fam[self.family_id].get('HUSB')
         wife = self._database_fam[self.family_id].get('WIFE')
         if husb:
@@ -37,10 +40,10 @@ class GedcomFamily(BaseFamily):
     def _get_children_ids(self):
         """
         get the individual ids of the children
-        
+
         Returns:
             list: list of children individual ids
-        """        
+        """
         try:
             if 'CHIL' not in self._database_fam[self.family_id]:
                 return []
@@ -51,20 +54,20 @@ class GedcomFamily(BaseFamily):
     def _get_husb_name(self):
         """
         get the husband name
-        
+
         Returns:
             str: husband name
-        """        
+        """
         return self._database_indi[self.husband_individual_id]['NAME']['tag_data']
+
     def _get_wife_name(self):
         """
         get the wife name
-        
+
         Returns:
             str: wife name
-        """        
+        """
         return self._database_indi[self.wife_individual_id]['NAME']['tag_data']
 
     husb_name = property(_get_husb_name)
-    wife_name = property(_get_wife_name)    
-
+    wife_name = property(_get_wife_name)
