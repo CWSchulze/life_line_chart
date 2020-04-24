@@ -608,8 +608,27 @@ class AncestorGraph(BaseGraph):
                         (new_x_index_after_marriage, marriage_ordinals[index]/2+marriage_ordinals[index+1]/2))
             knots.append((x_pos_list[-1][1], death_event['ordinal_value']))
 
+            Path_types = {
+                'Line': Line,
+                'CubicBezier':CubicBezier
+            }
+            # for ov, filename in graphical_individual_representation.individual.images.items():
+            #     foto_size = self._formatting['individual_foto_relative_size'] * self._formatting['relative_line_thickness'] * self._formatting['vertical_step_size']
+            #     images.append(
+            #             {
+            #                 'type': 'image',
+            #                 'config': {
+            #                     'insert': (
+            #                         _birth_position[0] - foto_size/2,
+            #                         self._map_y_position(ov) - foto_size/2),
+            #                     'size': (foto_size,foto_size),
+            #                 },
+            #                 'filename': filename
+            #             }
+            #         )
+
             # generate spline paths
-            def marriage_bezier(data, knots, flip=False):
+            def marriage_bezier(images, data, knots, flip=False):
                 """
                 tranlate event information to bezier splines
 
@@ -638,6 +657,42 @@ class AncestorGraph(BaseGraph):
                                 self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value']))
                         )
                     )
+                    if len(graphical_individual_representation.individual.images) > 0:
+                        index = 0
+                        svg_path = Path_types[data[-1][0]['type']](*data[-1][0]['arguments'])
+                        for ov, filename in graphical_individual_representation.individual.images.items():
+                            if ov >= knots[index][1] and ov <= knots[index + 1][1]:
+                                foto_size = self._formatting['individual_foto_relative_size'] * self._formatting['relative_line_thickness'] * self._formatting['vertical_step_size']
+                                foto_size_y = self._map_y_position(self._inverse_x_position(foto_size))
+                                xpos = svg_path.intersect(Line(coordinate_transformation(min(knots[index][0],knots[index + 1][0])-1, ov), coordinate_transformation(max(knots[index][0],knots[index + 1][0])+1, ov)))[0]
+                                xpos = svg_path.point(xpos[0])
+                                images.append(
+                                        {
+                                            'type': 'image',
+                                            'config': {
+                                                'insert': (
+                                                    xpos.real - foto_size/2,
+                                                    xpos.imag - foto_size/2),
+                                                'size': (foto_size,foto_size),
+                                            },
+                                            'filename': filename
+                                        }
+                                    )
+                    # for ov, filename in graphical_individual_representation.individual.images.items():
+                    #     if ov > knots[0][1] and ov < knots[1][1]:
+                    #         foto_size = self._formatting['individual_foto_relative_size'] * self._formatting['relative_line_thickness'] * self._formatting['vertical_step_size']
+                    #         images.append(
+                    #                 {
+                    #                     'type': 'image',
+                    #                     'config': {
+                    #                         'insert': (
+                    #                             _birth_position[0] - foto_size/2,
+                    #                             self._map_y_position(ov) - foto_size/2),
+                    #                         'size': (foto_size,foto_size),
+                    #                     },
+                    #                     'filename': filename
+                    #                 }
+                    #             )
                 else:
                     for index in range(len(knots)-1):
                         if (index + t) % 2 == 0:
@@ -674,8 +729,28 @@ class AncestorGraph(BaseGraph):
                                         self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value']))
                                 )
                             )
+                        if len(graphical_individual_representation.individual.images) > 0:
+                            svg_path = Path_types[data[-1][0]['type']](*data[-1][0]['arguments'])
+                            for ov, filename in graphical_individual_representation.individual.images.items():
+                                if ov > knots[index][1] and ov < knots[index + 1][1]:
+                                    foto_size = self._formatting['individual_foto_relative_size'] * self._formatting['relative_line_thickness'] * self._formatting['vertical_step_size']
+                                    foto_size_y = self._map_y_position(self._inverse_x_position(foto_size))
+                                    xpos = svg_path.intersect(Line(coordinate_transformation(min(knots[index][0],knots[index + 1][0])-1, ov), coordinate_transformation(max(knots[index][0],knots[index + 1][0])+1, ov)))[0]
+                                    xpos = svg_path.point(xpos[0])
+                                    images.append(
+                                            {
+                                                'type': 'image',
+                                                'config': {
+                                                    'insert': (
+                                                        xpos.real - foto_size/2,
+                                                        xpos.imag - foto_size/2),
+                                                    'size': (foto_size,foto_size),
+                                                },
+                                                'filename': filename
+                                            }
+                                        )
             life_line_bezier_paths = []
-            marriage_bezier(life_line_bezier_paths, knots)
+            marriage_bezier(images, life_line_bezier_paths, knots)
 
             # create item setup
             for path, color_pos in life_line_bezier_paths:
@@ -856,7 +931,7 @@ class AncestorGraph(BaseGraph):
                     pos_y = item['config']['insert'][1]
                     width = item['config']['size'][0]
                     height = item['config']['size'][1]
-                    key = 'image_' + str(width) + '_' + str(height)
+                    key = 'image_' + str(width) + '_' + str(height) + item['filename']
                     if key in image_defs:
                         this_def = image_defs[key]
                     else:
