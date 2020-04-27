@@ -6,10 +6,11 @@ import datetime
 import svgwrite
 from copy import deepcopy
 from .BaseGraph import BaseGraph, get_gedcom_instance_container
+from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 
 logging.basicConfig()  # level=20)
-logger = logging.getLogger()
-# logger.setLevel(10)
+logger = logging.getLogger("life_line_chart")
+logger.setLevel(logging.INFO)
 
 
 class AncestorGraph(BaseGraph):
@@ -222,6 +223,21 @@ class AncestorGraph(BaseGraph):
         self.min_ordinal = min_ordinal-3000
         self.max_ordinal = max_ordinal+3000
 
+    def _compress_single_individual_position(self, individual, cof, direction):
+        """
+        move single individual until it collides
+        """
+        try:
+            i = 0
+            while i < 5000:
+                i += 1
+                self._move_single_individual(individual, cof, direction)
+                self._check_compressed_x_position(True)
+        except LifeLineChartCollisionDetected:
+            pass        
+        self._move_single_individual(individual, cof, - direction)
+            
+
     def _compress_graph_ancestor_graph(self, graphical_family_representation):
         """
         compress the graph vertically.
@@ -232,31 +248,68 @@ class AncestorGraph(BaseGraph):
         individuals = []
         if graphical_family_representation is None:
             return
+
+        family_was_flipped = False
+        x_pos_husb = None
+        x_pos_wife = None
         if graphical_family_representation.husb is not None and graphical_family_representation.husb.has_graphical_representation():
-            individuals.append((graphical_family_representation.husb.graphical_representations[0].get_x_position()[
-                               graphical_family_representation.family_id][1], graphical_family_representation.husb))
+            x_pos_husb = graphical_family_representation.husb.graphical_representations[0].get_x_position()[
+                               graphical_family_representation.family_id][1]
+            individuals.append((1, graphical_family_representation.husb))
         if graphical_family_representation.wife is not None and graphical_family_representation.wife.has_graphical_representation():
-            individuals.append((graphical_family_representation.wife.graphical_representations[0].get_x_position()[
-                               graphical_family_representation.family_id][1], graphical_family_representation.wife))
+            x_pos_wife = graphical_family_representation.wife.graphical_representations[0].get_x_position()[
+                            graphical_family_representation.family_id][1]
+            individuals.append((-1, graphical_family_representation.wife))
+        if x_pos_husb and x_pos_wife and x_pos_husb > x_pos_wife:
+            family_was_flipped = True
+        
         for index, (_, individual) in enumerate(sorted(individuals)):
             cofs = individual.get_child_of_family()
             for cof in cofs:
                 if cof.has_graphical_representation():
+                    if cof.husb is None or cof.wife is None \
+                            or not cof.husb.has_graphical_representation() \
+                            or not cof.wife.has_graphical_representation():
+                        this_individual_x_pos = individual.graphical_representations[0].get_x_position()[cof.family_id][1]
+                        parent_x_pos = None
+                        if cof.husb is not None and cof.husb.has_graphical_representation():
+                            parent_x_pos = cof.husb.graphical_representations[0].get_x_position()[cof.family_id][1]
+                        if cof.wife is not None and cof.wife.has_graphical_representation():
+                            parent_x_pos = cof.wife.graphical_representations[0].get_x_position()[cof.family_id][1]
+                        if parent_x_pos is not None and this_individual_x_pos > parent_x_pos:
+                            self._compress_single_individual_position(individual, cof, -1)
+                            # self._move_single_individual(individual, cof, parent_x_pos - this_individual_x_pos + 1)
+                        elif parent_x_pos is not None and this_individual_x_pos < parent_x_pos:
+                            self._compress_single_individual_position(individual, cof, 1)
+                            # self._move_single_individual(individual, cof, parent_x_pos - this_individual_x_pos - 1)
                     self._compress_graph_ancestor_graph(
                         cof.graphical_representations[0])
-        for index, (_, individual) in enumerate(sorted(individuals)):
+        for index, (original_direction_factor, individual) in enumerate(sorted(individuals)):
             if individual is None:
                 continue
-            if not individual.graphical_representations[0].visible_parent_family or not individual.graphical_representations[0].visible_parent_family.family_id in individual.graphical_representations[0].get_x_position():
-                continue
             i = 0
-            if index == 0:
-                direction_factor = 1
+            if family_was_flipped:
+                direction_factor = - original_direction_factor
             else:
-                direction_factor = -1
+                direction_factor = original_direction_factor
 
             self.compression_steps -= 1
             if self.compression_steps <= 0:
+                continue
+            
+            if not individual.graphical_representations[0].visible_parent_family or not individual.graphical_representations[0].visible_parent_family.family_id in individual.graphical_representations[0].get_x_position():
+                # try:
+                #     while i < 50000:
+                #         self._move_single_individual(
+                #             individual, individual.graphical_representations[0].visible_parent_family, direction_factor*1)
+                #         self._check_compressed_x_position(True)
+                #         i += 1
+                # except LifeLineChartCollisionDetected:
+                #     # print("   collision of " + " and ".join([" ".join(a.name) for a in e.args]))
+                #     self._move_single_individual(
+                #         individual, individual.graphical_representations[0].visible_parent_family, -direction_factor*1)
+                # except LifeLineChartCannotMoveIndividual:
+                #     pass
                 continue
             # try:
             #     while i < 50000:
@@ -269,15 +322,17 @@ class AncestorGraph(BaseGraph):
             try:
                 while i < 50000:
                     self._move_individual_and_ancestors(
-                        individual, individual.get_child_of_family()[0], direction_factor*1)
+                        individual, individual.graphical_representations[0].visible_parent_family, direction_factor*1)
                     self._check_compressed_x_position(True)
                     i += 1
-            except ValueError:
+            except LifeLineChartCollisionDetected:
                 # print("   collision of " + " and ".join([" ".join(a.name) for a in e.args]))
                 self._move_individual_and_ancestors(
                     individual, individual.graphical_representations[0].visible_parent_family, -direction_factor*1)
+            except LifeLineChartCannotMoveIndividual:
+                pass
             if i != 0:
-                print('moved ' + ' '.join(individual.name) +
+                logger.info('moved ' + ' '.join(individual.name) +
                       ' by ' + str(i * direction_factor * 1))
 
     def modify_layout(self, root_individual_id):
@@ -305,6 +360,8 @@ class AncestorGraph(BaseGraph):
 
                 individual = loli[key]
                 collect_candidates(individual.children)
+                for cof in individual.individual.get_child_of_family():
+                    collect_candidates(cof.get_children())
 
             # candidantes = set()
             items = list(reversed(sorted([(child.graphical_representations[0].get_birth_event()[
@@ -321,7 +378,7 @@ class AncestorGraph(BaseGraph):
                     self._flip_family(x_pos[2])
                     failed, _, _ = self.check_unique_x_position()
                     if len(failed) > 0:
-                        print("failed flipping " +
+                        logger.error("failed flipping " +
                               str((x_pos[2].family_id, ov)))
                         break
                     new_width, _ = self._calculate_sum_of_distances()
@@ -333,10 +390,9 @@ class AncestorGraph(BaseGraph):
                 if len(failed) > 0:
                     break
 
-            print(
+            logger.info(
                 f"flipping reduced the cross connections by {width - old_width} (i.e. from {old_width} to {width})")
 
-        p = '@I8434@'
         # for graphical_family_representation in self.graphical_family_representations:
         if self._positioning['compress']:
             failed, old_x_min_index, old_x_max_index = self.check_unique_x_position()
@@ -348,13 +404,15 @@ class AncestorGraph(BaseGraph):
                 'i', root_individual_id)].graphical_representations[0].visible_parent_family)
 
             # compressed graph should be aligned left
-            # _, min_index_x, max_index_x, self.position_to_person_map = self._check_compressed_x_position(False)
-            # self._move_individual_and_ancestors(self._instances[('i',root_individual_id)], sorted(list(self._instances[('i',root_individual_id)].graphical_representations[0].get_x_position().values()))[0][2], -(min_index_x-old_x_min_index)*1)
-            # keys = sorted(list(self.position_to_person_map.keys()))
-            # for key in keys:
-            #     self.position_to_person_map[key - (old_x_min_index - min_index_x) * 1] = self.position_to_person_map.pop(key)
-            # width = (max_index_x - min_index_x)
-            # print(f"compression reduced the total width by {width - old_width} (i.e. from {old_width} to {width})")
+            _, min_index_x, max_index_x, self.position_to_person_map = self._check_compressed_x_position(False)
+            self._move_individual_and_ancestors(self._instances[('i',root_individual_id)], sorted(list(self._instances[('i',root_individual_id)].graphical_representations[0].get_x_position().values()))[0][2], -(min_index_x-old_x_min_index)*1)
+            keys = sorted(list(self.position_to_person_map.keys()))
+            for key in keys:
+                self.position_to_person_map[key - (old_x_min_index - min_index_x) * 1] = self.position_to_person_map.pop(key)
+            width = (max_index_x - min_index_x)
+            self.min_x_index = 0
+            self.max_x_index = width
+            logger.info(f"compression reduced the total width by {width - old_width} (i.e. from {old_width} to {width})")
         else:
             _, _, _, self.position_to_person_map = self._check_compressed_x_position(
                 False)
@@ -377,10 +435,12 @@ class AncestorGraph(BaseGraph):
         """
         generate graphical item information used for rendering the image.
         """
-        logger.info('start creating graphical items')
+        logger.debug('start creating graphical items')
 
         self.additional_graphical_items = {}
         self.additional_graphical_items['grid'] = []
+
+        font_size = self._formatting['font_size_description']*self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']
 
         # setup grid
         max_y = max(self._map_y_position(self.min_ordinal),
@@ -405,13 +465,13 @@ class AncestorGraph(BaseGraph):
                     self.additional_graphical_items['grid'].append({
                         'type': 'text',
                                 'config': {
-                                    'style': f"font-size:{self._formatting['font_size_description']}px;font-family:{self._formatting['font_name']}",
+                                    'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
                                     'text': str(year),
                                     'text-anchor': 'end',
                                     # 'align' : 'center',
                                     'insert': (self.get_full_width() - self._formatting['vertical_step_size']*0.1, year_pos),
                                 },
-                        'font_size': self._formatting['font_size_description'],
+                        'font_size': font_size,
                         'font_name': self._formatting['font_name'],
                     }
                     )
@@ -438,13 +498,13 @@ class AncestorGraph(BaseGraph):
                                 self.additional_graphical_items['grid'].append({
                                     'type': 'text',
                                             'config': {
-                                                'style': f"font-size:{self._formatting['font_size_description']}px;font-family:{self._formatting['font_name']}",
+                                                'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
                                                 'text': str(year),
                                                 'text-anchor': 'end',
                                                 # 'align' : 'center',
                                                 'insert': (x_position-5, year_pos),
                                             },
-                                    'font_size': self._formatting['font_size_description'],
+                                    'font_size': font_size,
                                     'font_name': self._formatting['font_name'],
                                 }
                                 )
@@ -529,7 +589,7 @@ class AncestorGraph(BaseGraph):
                                 child_x_indices.append(visible_child.graphical_representations[0].get_x_position()[
                                                        graphical_representation_marriage_family.family_id][1])
                             except:
-                                print('something went wrong with ' + "".join(visible_child.name) +
+                                logger.error('something went wrong with ' + "".join(visible_child.name) +
                                       ". The position family 0 is not equal to the placement...")
                         if len(child_x_indices) > 0:
                             # calculate the middle over the children
@@ -552,6 +612,7 @@ class AncestorGraph(BaseGraph):
                         graphical_representation_marriage_family.marriage['ordinal_value'])
                     marriage_labels.append(
                         str(graphical_representation_marriage_family.label))
+
 
             # generate event node information
             knots = []
@@ -587,20 +648,21 @@ class AncestorGraph(BaseGraph):
                 if self._formatting['marriage_label_active']:
                     dy_line = self._inverse_y_position(
                         self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']) - self._inverse_y_position(0)
-                    images.append(
-                        {
-                            'type': 'text',
-                            'config': {
-                                'style': f"font-size:{self._formatting['font_size_description']}px;font-family:{self._formatting['font_name']}",
-                                'text': label,
-                                'text-anchor': 'middle',
-                                # 'align' : 'center',
-                                'insert': self._map_position(marriage_ring_index, marriage_ordinal + dy_line),
-                            },
-                            'font_size': self._formatting['font_size_description'],
-                            'font_name': self._formatting['font_name'],
-                        }
-                    )
+                    for index, line in enumerate(label.split('\n')):
+                        position = self._map_position(marriage_ring_index, marriage_ordinal + dy_line)
+                        position = (position[0], position[1] + (index + 0.2) * font_size * 1.2)
+                        images.append({
+                                'type': 'text',
+                                'config': {
+                                    'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
+                                    'text': line,
+                                    'text-anchor': 'middle',
+                                    # 'align' : 'center',
+                                    'insert': position,
+                                },
+                                'font_size': font_size,
+                                'font_name': self._formatting['font_name'],
+                            })
                 knots.append((marriage_ring_index, marriage_ordinal))
                 if len(marriage_ordinals) > index + 1:
                     # zwischenpunkt zur ursprungsposition
@@ -768,21 +830,21 @@ class AncestorGraph(BaseGraph):
                         {
                             'type': 'textPath',
                             'config': {
-                                'style': f"font-size:{self._formatting['font_size_description']}px;font-family:{self._formatting['font_name']}",
+                                'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
                                 'text': '',
                                 # 'transform':'rotate(90,%s, %s)' % _birth_position,
                                 # 'insert' : _birth_position,
-                                'dy': [str(float(self._formatting['font_size_description'])/2.7)+'px'],
+                                'dy': [str(float(font_size)/2.7)+'px'],
                             },
                             'spans': [
                                 (individual_name[0], {
-                                 'dx': self._formatting['birth_label_letter_x_offset']}),
+                                 'dx': [str(font_size*float(self._formatting['birth_label_letter_x_offset']))]}),
                                 (individual_name[1], {
                                  'style': 'font-weight: bold'}),
                                 (birth_label, {})
                             ],
                             'path': life_line_bezier_paths[0][0],
-                            'font_size': self._formatting['font_size_description'],
+                            'font_size': font_size,
                             'font_name': self._formatting['font_name'],
                         })
                 else:
@@ -790,14 +852,14 @@ class AncestorGraph(BaseGraph):
                         {
                             'type': 'text',
                             'config': {
-                                'style': f"font-size:{self._formatting['font_size_description']}px;font-family:{self._formatting['font_name']}",
+                                'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
                                 'text': individual_name[0] + ' ' + individual_name[1] + birth_label,
                                 'transform': 'rotate(%s,%s, %s)' % (-90+self._orientation_angle(*_birth_original_location), *_birth_position),
                                 'insert': _birth_position,
-                                'dx': self._formatting['birth_label_letter_x_offset'],
-                                'dy': [str(float(self._formatting['font_size_description'])/2.7)+'px'],
+                                'dx': [str(font_size*float(self._formatting['birth_label_letter_x_offset']))],
+                                'dy': [str(float(font_size)/2.7)+'px'],
                             },
-                            'font_size': self._formatting['font_size_description'],
+                            'font_size': font_size,
                             'font_name': self._formatting['font_name'],
                         })
             if self._formatting['death_label_active']:
@@ -805,14 +867,14 @@ class AncestorGraph(BaseGraph):
                     {
                         'type': 'text',
                         'config': {
-                            'style': f"font-size:{self._formatting['font_size_description']}px;font-family:{self._formatting['font_name']}",
+                            'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
                             'text': death_label,
                             'transform': 'rotate(%g,%s, %s)' % (self._formatting['death_label_rotation']+self._orientation_angle(*_death_original_location), *_death_position),
                             'insert': _death_position,
-                            'dy': [str(float(self._formatting['font_size_description'])/2.7)+'px'],
-                            'dx': self._formatting['death_label_letter_x_offset'],
+                            'dy': [str(float(font_size)/2.7)+'px'],
+                            'dx': [str(font_size*float(self._formatting['death_label_letter_x_offset']))],
                         },
-                        'font_size': self._formatting['font_size_description'],
+                        'font_size': font_size,
                         'font_name': self._formatting['font_name'],
 
                     }
@@ -827,7 +889,7 @@ class AncestorGraph(BaseGraph):
             filename (str, optional): user defined filename. Defaults to None.
         """
 
-        logger.info('start creating document')
+        logger.debug('start creating document')
         max_y = max(self._map_y_position(self.min_ordinal),
                     self._map_y_position(self.max_ordinal))
         min_y = min(self._map_y_position(self.min_ordinal),
@@ -964,5 +1026,5 @@ class AncestorGraph(BaseGraph):
                     # insert=(rect[0], rect[1]), size = (rect[2]-rect[0], rect[3]-rect[1]), fill = 'none')
                     svg_document.add(this_rect)
 
-        logger.info('start saving document')
+        logger.debug('start saving document')
         svg_document.save(True)

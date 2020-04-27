@@ -20,4 +20,6 @@ from .InstanceContainer import InstanceContainer, get_gedcom_instance_container
 
 from .GedcomParsing import get_date_dict_from_tag, estimate_marriage_date
 
+from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
+
 __version__ = "1.2.8"

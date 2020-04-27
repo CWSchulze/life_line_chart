@@ -1,7 +1,7 @@
 from .InstanceContainer import get_gedcom_instance_container
 from .AncestorGraphFamily import ancestor_graph_family
 from .AncestorGraphIndividual import ancestor_graph_individual
-
+from .Exceptions import LifeLineChartCollisionDetected, LifeLineChartCannotMoveIndividual
 
 import os
 from copy import deepcopy
@@ -12,7 +12,7 @@ import datetime
 
 logging.basicConfig()#level=20)
 logger = logging.getLogger("life_line_chart")
-#logger.setLevel(10)
+logger.setLevel(logging.INFO)
 
 class BaseGraph():
     """
@@ -27,21 +27,19 @@ class BaseGraph():
         'relative_line_thickness' : 0.5,
         'total_height' : 2000,
         'display_factor' : -1,
-        'font_size_description': str(30 * 0.2)+'',
+        'font_size_description': 0.7,
         'font_description_letter_offset' : [str(30 / 12.0)+''],
         'font_name' : 'Arial',
         'birth_label_active':True,
         'birth_label_along_path' : False,
-        'birth_label_letter_x_offset': ['15'],
-        'birth_label_letter_y_offset': ['6'],
+        'birth_label_letter_x_offset': 0.8,
         'fade_individual_color' : True,
         'fade_individual_color_black_age' : 150,
         'marriage_label_active':True,
         'no_ring' : False,
         'death_label_active':True,
         'death_label_rotation':-90,
-        'death_label_letter_x_offset': ['5'],
-        'death_label_letter_y_offset': ['4'],
+        'death_label_letter_x_offset': 0.8,
         'warp_shape': 'normal',
     }
     _default_positioning = {
@@ -50,6 +48,52 @@ class BaseGraph():
         'compress':True,
         'flip_to_optimize':True,
         'fathers_have_the_same_color': True,
+    }
+    _formatting_description = {
+        'warp_shape' : {
+            'short_description' : 'Warp the chart shape',
+            'long_description' : 'The overall shape of the chart can be warped.'
+        },
+        'total_height' : {
+            'short_description' : 'Total height',
+            'long_description' : 'Total height of the whole chart.'
+        },
+        'relative_line_thickness' : {
+            'short_description' : 'Relative line thickness',
+            'long_description' : 'The line thickness of an individual is given relatively to the vertical step size.'
+        },
+        'vertical_step_size' : {
+            'short_description' : 'Vertical step size',
+            'long_description' : 'This is the distance from one line to another. This value is also used for scaling of other items.'
+        },
+        'birth_label_active' : {
+            'short_description' : 'Show birth label',
+            'long_description' : 'Activate the birth label.'
+        },
+        'birth_label_along_path' : {
+            'short_description' : 'Birth label alogn path',
+            'long_description' : 'The birth label is aligned to the individual line.'
+        },
+        'death_label_active' : {
+            'short_description' : 'Show death label',
+            'long_description' : 'Activate the death label.'
+        },
+        'marriage_label_active' : {
+            'short_description' : 'Show marriage label',
+            'long_description' : 'Activate the marriage label.'
+        },
+        'fade_individual_color' : {
+            'short_description' : 'Fade individual color',
+            'long_description' : 'The color of the individuals is faded to black with increasing age.'
+        },
+        'font_name' : {
+            'short_description' : 'Font name',
+            'long_description' : 'Name of the font family used for labels.'
+        },
+        'font_size_description' : {
+            'short_description' : 'Relative font size',
+            'long_description' : 'The font size is given relatively to the line thickness.'
+        },
     }
     _positioning_description = {
         'generations' : {
@@ -207,12 +251,15 @@ class BaseGraph():
                     x_pos[other_family_id][2],
                     x_pos[other_family_id][3],
                     )
-        x_pos[family_id] = (
-            x_pos[family_id][0],
-            x_pos[family_id][1]+x_index_offset,
-            x_pos[family_id][2],
-            x_pos[family_id][3],
-            )
+        if family_id in x_pos:
+            x_pos[family_id] = (
+                x_pos[family_id][0],
+                x_pos[family_id][1]+x_index_offset,
+                x_pos[family_id][2],
+                x_pos[family_id][3],
+                )
+        else:
+            raise LifeLineChartCannotMoveIndividual('This family does not exist')
         return x_pos
         
     def _move_individual_and_ancestors(self, individual, family, x_index_offset):
@@ -231,25 +278,27 @@ class BaseGraph():
             family_id = family.family_id
         if len(individual.graphical_representations) > 0:
             x_pos = self._move_single_individual(individual, family, x_index_offset)
-            if list(sorted(x_pos.values()))[0][1] != x_pos[family_id][1]:#len(x_pos) <= 1 or 
-                return
-            #for cof in individual.get_child_of_family():
-            cof = individual.graphical_representations[0].visible_parent_family
-            if cof and cof.visual_placement_child and cof.visual_placement_child.individual_id == individual.individual_id:
-                if cof.husb:
-                    #if cof.husb.graphical_representations[0].get_x_position() and len(cof.husb.graphical_representations[0].get_x_position()) == 1:
-                        self._move_individual_and_ancestors(cof.husb, cof, x_index_offset)
-                if cof.wife:
-                    #if cof.wife.graphical_representations[0].get_x_position() and len(cof.wife.graphical_representations[0].get_x_position()) == 1:
-                        self._move_individual_and_ancestors(cof.wife, cof, x_index_offset)
-                #print (individual.get)
-            if cof and len(cof.visible_children) > 1:
-                for child_individual_id, (ov, i, child_individual) in cof.visible_children.items():
-                    if child_individual_id == individual.individual_id:
-                        continue
-                    pos = sorted(list(child_individual.graphical_representations[0].get_x_position().values()))[0]
-                    if pos[2]:
-                        x_pos = self._move_single_individual(child_individual, pos[2], x_index_offset)
+            if None in x_pos or True:
+                # only move ancestors if they exist
+                if list(sorted(x_pos.values()))[0][1] != x_pos[family_id][1]:#len(x_pos) <= 1 or 
+                    return
+                #for cof in individual.get_child_of_family():
+                cof = individual.graphical_representations[0].visible_parent_family
+                if cof and cof.visual_placement_child and cof.visual_placement_child.individual_id == individual.individual_id:
+                    if cof.husb:
+                        #if cof.husb.graphical_representations[0].get_x_position() and len(cof.husb.graphical_representations[0].get_x_position()) == 1:
+                            self._move_individual_and_ancestors(cof.husb, cof, x_index_offset)
+                    if cof.wife:
+                        #if cof.wife.graphical_representations[0].get_x_position() and len(cof.wife.graphical_representations[0].get_x_position()) == 1:
+                            self._move_individual_and_ancestors(cof.wife, cof, x_index_offset)
+                    #print (individual.get)
+                if cof and len(cof.visible_children) > 1:
+                    for child_individual_id, (ov, i, child_individual) in cof.visible_children.items():
+                        if child_individual_id == individual.individual_id:
+                            continue
+                        pos = sorted(list(child_individual.graphical_representations[0].get_x_position().values()))[0]
+                        if pos[2]:
+                            x_pos = self._move_single_individual(child_individual, pos[2], x_index_offset)
 
     def _flip_family(self, family):
         """
@@ -297,7 +346,7 @@ class BaseGraph():
             early_raise (bool): raise an exception if the first individual overlap was found
         
         Raises:
-            ValueError: overlapping found
+            LifeLineChartCollisionDetected: overlapping found
         
         Returns:
             [type]: [description]
@@ -315,10 +364,10 @@ class BaseGraph():
                 x_index = value[1]
                 # if value[3]:
                 #     continue
-                if x_index < 0:
-                    if early_raise:
-                        raise ValueError(graphical_individual_representation)
-                    collisions.append((graphical_individual_representation, None))
+                # if x_index < 0:
+                #     if early_raise:
+                #         raise LifeLineChartCollisionDetected(graphical_individual_representation)
+                #     collisions.append((graphical_individual_representation, None))
                 if x_index not in v:
                     v[x_index] = []
                     position_to_person_map[x_index] = []
@@ -340,7 +389,7 @@ class BaseGraph():
                 max_x = max(max_x, x_index)
                 min_x = min(min_x, x_index)
         if len(collisions) > 0:
-            raise ValueError()
+            raise LifeLineChartCollisionDetected()
                 
         # block every x_index from birth to death in which an individual appears
         for x_index, graphical_individual_representation_list in v.items():
@@ -361,7 +410,7 @@ class BaseGraph():
                         *(death_position_b - death_position_a) < 0
                             ):
                         if early_raise:
-                            raise ValueError(graphical_individual_representation_a, graphical_individual_representation_b)
+                            raise LifeLineChartCollisionDetected(graphical_individual_representation_a, graphical_individual_representation_b)
                         collisions.append((graphical_individual_representation_a, graphical_individual_representation_b))
         # if len(collisions) > 0:
         #     raise RuntimeError()
@@ -397,7 +446,7 @@ class BaseGraph():
                 else:
                     failed.append(x_index)
                     # value = index_map[x_index]
-                    print("failed: " +str((x_index, value[2].family_id, graphical_individual_representation.name, v[x_index])))
+                    logger.error("failed: " +str((x_index, value[2].family_id, graphical_individual_representation.name, v[x_index])))
                     #raise RuntimeError((x_index, key, graphical_individual_representation.name))
         full_index_list = list(sorted(v.keys()))
         for i in range(len(full_index_list)):
