@@ -131,7 +131,7 @@ def test_fotos_in_chart():
             else:
                 max_ordinal = -1
             if round((ordinal_value-birth_ordinal_value)/image_step_size) > round((max_ordinal-birth_ordinal_value)/image_step_size):
-                images[birth_ordinal_value + round((ordinal_value-birth_ordinal_value)/image_step_size)*image_step_size] = os.path.join(os.path.dirname(__file__), 'Images', filename)
+                images[birth_ordinal_value + round((ordinal_value-birth_ordinal_value)/image_step_size)*image_step_size] = os.path.join(os.path.dirname(__file__), 'images', filename)
 
 
     graph._instances[('i', individual_id)].images.update(images)
