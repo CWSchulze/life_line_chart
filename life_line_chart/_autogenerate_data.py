@@ -75,7 +75,7 @@ def generate_gedcom_file():
         for child_id in children_ids:
             db[family_id]['string'] += f"1 CHIL {child_id}\n"
         return family_id
-    
+
     def find_by_birth_date(db, from_year, to_year, sex, exclude = []):
         ids = []
         for individual_id, data in db.items():
@@ -128,7 +128,7 @@ def generate_gedcom_file():
                     children_ids)
         db[husband_id]['string'] += "1 FAMS "+family_id + '\n'
         db[wife_id]['string'] += "1 FAMS "+family_id + '\n'
-        
+
     generate_recursive_family(db, generations=8, max_children=4)
     for k, v in db.items():
         if k.startswith('@I'):
@@ -143,14 +143,14 @@ def generate_gedcom_file():
 
 def generate_individual_images():
     from PIL import Image, ImageDraw, ImageFont
-    
+
     def generate_one_image(filename, text, font_size=22, pos = (15, 40), size = (100,100), color = (160, 160, 160)):
         img = Image.new('RGB', size, color = color)
-        
+
         d = ImageDraw.Draw(img)
-        font = ImageFont.truetype(r'arial.ttf', font_size)  
+        font = ImageFont.truetype(r'arial.ttf', font_size)
         d.text(pos, text, fill=(0,0,0), font = font)
-        
+
         img.save(filename)
 
     for i in range(20):

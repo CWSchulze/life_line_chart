@@ -17,7 +17,7 @@ logger.setLevel(logging.INFO)
 class BaseGraph():
     """
     Base class for life line charts.
-    """    
+    """
     _default_formatting = {
         'margin_left' : 50,
         'margin_right' : 50,
@@ -138,7 +138,7 @@ class BaseGraph():
         self.graphical_individual_representations = []
         self.graphical_family_representations = []
         logger.debug('finished creating instances')
-        
+
         self.min_x_index = 10000000
         self.max_x_index = -10000000
         self.min_ordinal = 10000000
@@ -147,37 +147,37 @@ class BaseGraph():
     def instantiate_all(self):
         """
         instantiate all families and individuals
-        """        
+        """
         self._instances.instantiate_all(self=self._instances)
 
     def set_formatting(self, formatting):
         """
         set the formatting configuration of the graph
-        
+
         Args:
             formatting (dict): formatting dict
-        """        
+        """
         self._formatting.update(formatting)
 
     def set_positioning(self, positioning):
         """
         set the positioning configuration of the graph
-        
+
         Args:
             positioning (dict): positioning dict
-        """        
+        """
         self._positioning.update(positioning)
 
     def _create_individual_graphical_representation(self, individual):
         """
         create a graphical representation for an individual
-        
+
         Args:
             individual (BaseIndividual): individual
-        
+
         Returns:
             ancestor_graph_inidividual: created instance
-        """        
+        """
         new_instance = self._graphical_individual_class(self._instances, individual.individual_id, self._formatting['vertical_step_size'])
         if new_instance.birth_date is None or new_instance.death_date is None:
             del new_instance
@@ -188,13 +188,13 @@ class BaseGraph():
     def _create_family_graphical_representation(self, family):
         """
         create a graphical representation for a family
-        
+
         Args:
             family (BaseFamily): family
-        
+
         Returns:
             ancestor_graph_family: created instance
-        """        
+        """
         if not family.graphical_representations:
             new_instance = self._graphical_family_class(self._instances, family.family_id)
             self.graphical_family_representations.append(new_instance)
@@ -206,10 +206,10 @@ class BaseGraph():
     def _calculate_sum_of_distances(self):
         """
         sum of distances between different families of one individual
-        
+
         Returns:
             tuple: (total_distance, list_of_linked_individuals)
-        """        
+        """
         total_distance = 0
         list_of_linked_individuals = {}
         for index, graphical_individual_representation in enumerate(self.graphical_individual_representations):
@@ -226,22 +226,22 @@ class BaseGraph():
     def _move_single_individual(self, individual, family, x_index_offset):
         """
         move a single individual vertically
-        
+
         Args:
             individual (BaseIndividual): individual instance
             family (BaseFamily): family instance
             x_index_offset (int): vertical offset
-        
+
         Returns:
             dict: position dict of the graphical individual representation
-        """        
+        """
         x_pos = individual.graphical_representations[0].get_x_position()
         positions = sorted(list(x_pos.values()))
         if not family is None:
             family_id = family.family_id
         else:
             family_id = None
-        
+
         for position in positions:
             if position[2]:
                 other_family_id = position[2].family_id
@@ -266,16 +266,16 @@ class BaseGraph():
         else:
             raise LifeLineChartCannotMoveIndividual('This family does not exist')
         return x_pos
-        
+
     def _move_individual_and_ancestors(self, individual, family, x_index_offset):
         """
         move an individual and its ancestors vertically. Only ancestors are moved, which are strongly coupled with the individual.
-        
+
         Args:
             individual (BaseIndividual): individual instance
             family (BaseFamily): family instance
             x_index_offset (int): vertical offset
-        """        
+        """
         if family is None:
             family_id = family
             #return
@@ -285,7 +285,7 @@ class BaseGraph():
             x_pos = self._move_single_individual(individual, family, x_index_offset)
             if None in x_pos or True:
                 # only move ancestors if they exist
-                if list(sorted(x_pos.values()))[0][1] != x_pos[family_id][1]:#len(x_pos) <= 1 or 
+                if list(sorted(x_pos.values()))[0][1] != x_pos[family_id][1]:#len(x_pos) <= 1 or
                     return
                 #for cof in individual.get_child_of_family():
                 cof = individual.graphical_representations[0].visible_parent_family
@@ -314,7 +314,7 @@ class BaseGraph():
 
         Args:
             family (BaseFamily): family instance
-        """        
+        """
         if family.husb is None or family.wife is None or not family.husb.has_graphical_representation() or not family.wife.has_graphical_representation():
             return
         husb_x_pos = family.husb.graphical_representations[0].get_x_position()[family.family_id][1]
@@ -324,7 +324,7 @@ class BaseGraph():
         children_width = family.graphical_representations[0].children_width
         if not children_width:
             children_width = self._formatting['vertical_step_size']
-            
+
         if husb_x_pos < wife_x_pos:
             husb_x_delta = wife_width + children_width
             wife_x_delta = -husb_width - children_width
@@ -337,25 +337,25 @@ class BaseGraph():
         for child_individual_id, (ov, i, child_individual) in family.graphical_representations[0].visible_children.items():
             pos = sorted(list(child_individual.graphical_representations[0].get_x_position().values()))
             x_pos = self._move_single_individual(child_individual, pos[0][2], child_x_delta)
-                
+
         self._move_individual_and_ancestors(family.husb, family, husb_x_delta+1000000)
         self._move_individual_and_ancestors(family.wife, family, wife_x_delta)
         self._move_individual_and_ancestors(family.husb, family, -1000000)
         pass
- 
+
     def _check_compressed_x_position(self, early_raise):
         """
         check the compressed graph for overlapping individuals
-        
+
         Args:
             early_raise (bool): raise an exception if the first individual overlap was found
-        
+
         Raises:
             LifeLineChartCollisionDetected: overlapping found
-        
+
         Returns:
             [type]: [description]
-        """        
+        """
         position_to_person_map = {}
         failed = []
         v = {}
@@ -389,13 +389,13 @@ class BaseGraph():
                     'end':end_y,
                     'individual':graphical_individual_representation
                 })
-                
+
                 v[x_index].append(graphical_individual_representation)
                 max_x = max(max_x, x_index)
                 min_x = min(min_x, x_index)
         if len(collisions) > 0:
             raise LifeLineChartCollisionDetected()
-                
+
         # block every x_index from birth to death in which an individual appears
         for x_index, graphical_individual_representation_list in v.items():
             x_positions = []
@@ -420,17 +420,17 @@ class BaseGraph():
         # if len(collisions) > 0:
         #     raise RuntimeError()
         return collisions, min_x, max_x, position_to_person_map
-        
+
     def check_unique_x_position(self):
         """
         check if every individual position has a unique vertical slot
-        
+
         Raises:
             RuntimeError: overlap was found
-        
+
         Returns:
             tuple: (list of failures, min_x_index, max_x_index)
-        """        
+        """
         failed = []
         v = {}
         for graphical_individual_representation in self.graphical_individual_representations:
@@ -471,26 +471,26 @@ class BaseGraph():
     def _map_y_position(self, ordinal_value):
         """
         map date information to y axis
-        
+
         Args:
             ordinal_value (float or int): ordinal value of the datetime
-        
+
         Returns:
             float: y position
         """
         return (
-            self._formatting['margin_top']  
-            - self._formatting['total_height'] * (self._formatting['display_factor']-1)/2 
+            self._formatting['margin_top']
+            - self._formatting['total_height'] * (self._formatting['display_factor']-1)/2
             + (ordinal_value - self.min_ordinal)/(self.max_ordinal-self.min_ordinal) * self._formatting['total_height'] * self._formatting['display_factor']
         )
 
     def _map_x_position(self, x_index):
         """
         map vertical index to x axis
-        
+
         Args:
             x_index (float or int): vertical index
-        
+
         Returns:
             float: x position
         """
@@ -499,11 +499,11 @@ class BaseGraph():
     def _map_position(self, pos_x, pos_y):
         """
         map date information and vertical index to x and y axis. This function also supports warping of the whole graph.
-        
+
         Args:
             pos_x (float or int): vertical index
             pos_y (float or int): ordinal value of the datetime
-        
+
         Returns:
             tuple: (x position, y position)
         """
@@ -511,12 +511,12 @@ class BaseGraph():
         if self._formatting['warp_shape'] == 'sine':
             y_rel = (1-sin((1-(pos_y - self.min_ordinal)/(self.max_ordinal - self.min_ordinal))*pi/2))*0.5
             x_av = (self.max_x_index + self.min_x_index)/2
-            
+
             return self._map_x_position(pos_x*(1-y_rel) + y_rel*x_av), self._map_y_position(pos_y)
         elif self._formatting['warp_shape'] == 'triangle':
             y_rel = (pos_y - self.min_ordinal)/(self.max_ordinal - self.min_ordinal)*0.8
             x_av = (self.max_x_index + self.min_x_index)/2
-            
+
             return self._map_x_position(pos_x*(1-y_rel) + y_rel*x_av), self._map_y_position(pos_y)
         else:
             return self._map_x_position(pos_x), self._map_y_position(pos_y)
@@ -524,14 +524,14 @@ class BaseGraph():
     def _orientation_angle(self, pos_x, pos_y):
         """
         get the rotation of the lines which is caused by the warping of the whole graph
-        
+
         Args:
             pos_x (float or int): vertical index
             pos_y (float or int): ordinal value of the datetime
-        
+
         Returns:
             float: angle
-        """        
+        """
         from math import pi, sin, cos, atan, sqrt, asin
         p1 = self._map_position(pos_x, pos_y-0.5)
         p2 = self._map_position(pos_x, pos_y+0.5)
@@ -539,15 +539,15 @@ class BaseGraph():
         an_kathete = p2[1]-p1[1]
         hypotenuse = sqrt(gegen_kathete*gegen_kathete + an_kathete*an_kathete)
         angle = asin(gegen_kathete/hypotenuse)
-        angle_deg = angle/pi*180 
-        
+        angle_deg = angle/pi*180
+
         return angle_deg
 
     def _inverse_y_position(self, pos_y):
         return (
             pos_y
             - self._formatting['margin_top']
-            + self._formatting['total_height'] * (self._formatting['display_factor']-1)/2 
+            + self._formatting['total_height'] * (self._formatting['display_factor']-1)/2
         ) / (self._formatting['total_height'] * self._formatting['display_factor']) * (self.max_ordinal-self.min_ordinal) + self.min_ordinal
 
     def _inverse_x_position(self, pos_x):
@@ -556,41 +556,41 @@ class BaseGraph():
     def get_full_width(self):
         """
         get the full width of the graph including margins
-        
+
         Returns:
             float: graph width
-        """        
+        """
         return (self._map_x_position(self.max_x_index) + self._formatting['margin_right'])
 
     def get_full_height(self):
         """
         get the full height of the graph including margins
-        
+
         Returns:
             float: graph height
-        """        
+        """
         return abs(self._map_y_position(self.min_ordinal) - self._map_y_position(self.max_ordinal)) + self._formatting['margin_bottom']
 
     def get_individual_from_position(self, pos_x, pos_y):
         """
         inverse mapping from graph position to individual instance
-        
+
         Args:
             pos_x (float or int): x position
             pos_y (float or int): y position
-        
+
         Returns:
             BaseIndividual: individual instance
-        """        
+        """
         x_index = self._inverse_x_position(pos_x)
         ordinal_value = int(self._inverse_y_position(pos_y))
         possible_matches = self.position_to_person_map.get(x_index)
         if not possible_matches is None:
             for possible_match in possible_matches:
                 if possible_match['start'] < ordinal_value and possible_match['end'] > ordinal_value:
-                    return possible_match['individual'] 
+                    return possible_match['individual']
         return None
                     # print(possible_match['individual'].individual.plain_name)
                     # print(datetime.date.fromordinal(ordinal_value))
                     # print(x_index)
-  
+

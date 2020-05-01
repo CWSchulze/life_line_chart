@@ -260,9 +260,9 @@ class AncestorGraph(BaseGraph):
                 self._move_single_individual(individual, cof, direction)
                 self._check_compressed_x_position(True)
         except LifeLineChartCollisionDetected:
-            pass        
+            pass
         self._move_single_individual(individual, cof, - direction)
-            
+
 
     def _compress_graph_ancestor_graph(self, graphical_family_representation):
         """
@@ -288,7 +288,7 @@ class AncestorGraph(BaseGraph):
             individuals.append((-1, graphical_family_representation.wife))
         if x_pos_husb and x_pos_wife and x_pos_husb > x_pos_wife:
             family_was_flipped = True
-        
+
         for index, (_, individual) in enumerate(sorted(individuals)):
             cofs = individual.get_child_of_family()
             for cof in cofs:
@@ -322,7 +322,7 @@ class AncestorGraph(BaseGraph):
             self.compression_steps -= 1
             if self.compression_steps <= 0:
                 continue
-            
+
             if not individual.graphical_representations[0].visible_parent_family or not individual.graphical_representations[0].visible_parent_family.family_id in individual.graphical_representations[0].get_x_position():
                 # try:
                 #     while i < 50000:
