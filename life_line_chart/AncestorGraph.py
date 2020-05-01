@@ -1,5 +1,5 @@
-from svgpathtools import Path, Line, CubicBezier
 import os
+from .SimpleSVGItems import Line, Path, CubicBezier
 import logging
 import hashlib
 import datetime
@@ -7,11 +7,37 @@ import svgwrite
 from copy import deepcopy
 from .BaseGraph import BaseGraph, get_gedcom_instance_container
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
+from cmath import sqrt, exp, pi
 
 logging.basicConfig()  # level=20)
 logger = logging.getLogger("life_line_chart")
 logger.setLevel(logging.INFO)
 
+J = exp(2j*pi/3)
+Jc = 1/J
+
+
+def Cardano(a, b, c, d):
+    z0 = b/3/a
+    a2, b2 = a*a, b*b
+    p = -b2/3/a2 + c/a
+    q = (b/27*(2*b2/a2-9*c/a)+d)/a
+    D = -4*p*p*p-27*q*q
+    r = sqrt(-D/27+0j)
+    u = ((-q-r)/2)**0.33333333333333333333333
+    v = ((-q+r)/2)**0.33333333333333333333333
+    w = u*v
+    w0 = abs(w+p/3)
+    w1 = abs(w*J+p/3)
+    w2 = abs(w*Jc+p/3)
+    if w0 < w1:
+        if w2 < w0:
+            v *= Jc
+    elif w2 < w1:
+        v *= Jc
+    else:
+        v *= J
+    return u+v-z0, u*J+v*Jc-z0, u*Jc+v*J-z0
 
 class AncestorGraph(BaseGraph):
     """
@@ -726,8 +752,19 @@ class AncestorGraph(BaseGraph):
                             if ov >= knots[index][1] and ov <= knots[index + 1][1]:
                                 foto_size = self._formatting['individual_foto_relative_size'] * self._formatting['relative_line_thickness'] * self._formatting['vertical_step_size']
                                 foto_size_y = self._map_y_position(self._inverse_x_position(foto_size))
-                                xpos = svg_path.intersect(Line(coordinate_transformation(min(knots[index][0],knots[index + 1][0])-1, ov), coordinate_transformation(max(knots[index][0],knots[index + 1][0])+1, ov)))[0]
-                                xpos = svg_path.point(xpos[0])
+                                # xpos = svg_path.intersect(Line(coordinate_transformation(min(knots[index][0],knots[index + 1][0])-1, ov), coordinate_transformation(max(knots[index][0],knots[index + 1][0])+1, ov)))[0]
+                                # xpos = svg_path.point(xpos[0])
+                                if type(svg_path) == Line:
+                                    xpos = svg_path.start.real + self._map_y_position(ov)*1j
+                                else:
+                                    coeffs = svg_path.poly()
+                                    coeffs2 = (coeffs[0].imag, coeffs[1].imag, coeffs[2].imag, coeffs[3].imag - self._map_y_position(ov))
+                                    roots = Cardano(*coeffs2)
+                                    root = [root.real for root in roots if abs(root.imag) < 1e-10][0]
+                                    if len(root) > 0:
+                                        xpos = svg_path.point(root[0])
+                                    else:
+                                        xpos = svg_path.point(roots[1])
                                 images.append(
                                         {
                                             'type': 'image',
@@ -797,8 +834,20 @@ class AncestorGraph(BaseGraph):
                                 if ov > knots[index][1] and ov < knots[index + 1][1]:
                                     foto_size = self._formatting['individual_foto_relative_size'] * self._formatting['relative_line_thickness'] * self._formatting['vertical_step_size']
                                     foto_size_y = self._map_y_position(self._inverse_x_position(foto_size))
-                                    xpos = svg_path.intersect(Line(coordinate_transformation(min(knots[index][0],knots[index + 1][0])-1, ov), coordinate_transformation(max(knots[index][0],knots[index + 1][0])+1, ov)))[0]
-                                    xpos = svg_path.point(xpos[0])
+                                    # xpos = svg_path.intersect(Line(coordinate_transformation(min(knots[index][0],knots[index + 1][0])-1, ov), coordinate_transformation(max(knots[index][0],knots[index + 1][0])+1, ov)))[0]
+                                    # xpos = svg_path.point(xpos[0])
+                                    if type(svg_path) == Line:
+                                        xpos = svg_path.start.real + self._map_y_position(ov)*1j
+                                    else:
+                                        coeffs = svg_path.poly()
+                                        coeffs2 = (coeffs[0].imag, coeffs[1].imag, coeffs[2].imag, coeffs[3].imag - self._map_y_position(ov))
+                                        #coeffs2 = (coeffs[0] - self._map_y_position(ov)*1j, coeffs[1], coeffs[2], coeffs[3])
+                                        roots = Cardano(*coeffs2)
+                                        root = [root.real for root in roots if abs(root.imag) < 1e-10 and root.real >= 0 and root.real <= 1]
+                                        if len(root) > 0:
+                                            xpos = svg_path.point(root[0])
+                                        else:
+                                            xpos = svg_path.point(roots[1])
                                     images.append(
                                             {
                                                 'type': 'image',
