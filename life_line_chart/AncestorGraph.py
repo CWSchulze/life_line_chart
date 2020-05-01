@@ -794,17 +794,16 @@ class AncestorGraph(BaseGraph):
                     #             )
                 else:
                     for index in range(len(knots)-1):
+                        def interp(*val):
+                            return (knots[index][0]*(1-val[0]) + knots[index+1][0]*val[0],
+                                    knots[index][1]*(1-val[1]) + knots[index+1][1]*val[1])
                         if (index + t) % 2 == 0:
                             data.append(
                                 ({'type': 'CubicBezier', 'arguments': (
-                                    coordinate_transformation(
-                                        knots[index][0], knots[index][1]),
-                                    coordinate_transformation(
-                                        knots[index][0], knots[index+1][1]),
-                                    coordinate_transformation(
-                                        knots[index][0], knots[index+1][1]),
-                                    coordinate_transformation(
-                                        knots[index+1][0], knots[index+1][1]),
+                                    coordinate_transformation(*interp(0, 0)),
+                                    coordinate_transformation(*interp(0, 1)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(0.0, 0.7)),
+                                    coordinate_transformation(*interp(0, 1)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(0.5, 0.9)),
+                                    coordinate_transformation(*interp(1, 1)),
                                 )},
                                     # ((knots[index][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value'])-_birth_position[1]), (knots[index+1][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value'])-_birth_position[1])),
                                     (_birth_position[1], self._map_y_position(
@@ -814,14 +813,10 @@ class AncestorGraph(BaseGraph):
                         else:
                             data.append(
                                 ({'type': 'CubicBezier', 'arguments': (
-                                    coordinate_transformation(
-                                        knots[index][0], knots[index][1]),
-                                    coordinate_transformation(
-                                        knots[index+1][0], knots[index][1]),
-                                    coordinate_transformation(
-                                        knots[index+1][0], knots[index][1]),
-                                    coordinate_transformation(
-                                        knots[index+1][0], knots[index+1][1]),
+                                    coordinate_transformation(*interp(0, 0)),
+                                    coordinate_transformation(*interp(1, 0)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(0.8, 0)),
+                                    coordinate_transformation(*interp(1, 0)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(1, 0.2)),
+                                    coordinate_transformation(*interp(1, 1)),
                                 )},
                                     # ((knots[index][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value'])-_birth_position[1]), (knots[index+1][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value'])-_birth_position[1])),
                                     (_birth_position[1], self._map_y_position(

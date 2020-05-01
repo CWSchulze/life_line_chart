@@ -41,6 +41,7 @@ class BaseGraph():
         'death_label_rotation':-90,
         'death_label_letter_x_offset': 0.8,
         'warp_shape': 'normal',
+        'family_shape' : 0,
     }
     _default_positioning = {
         'generations':4,
@@ -93,6 +94,10 @@ class BaseGraph():
         'font_size_description' : {
             'short_description' : 'Relative font size',
             'long_description' : 'The font size is given relatively to the line thickness.'
+        },
+        'family_shape' : {
+            'short_description' : 'Family shape',
+            'long_description' : 'The shape of the families can be varied.'
         },
     }
     _positioning_description = {
