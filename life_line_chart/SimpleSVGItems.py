@@ -54,9 +54,9 @@ class Line(object):
     #     return inv_arclength(self, s, s_tol=s_tol, maxits=maxits, error=error,
     #                          min_depth=min_depth)
 
-    # def bpoints(self):
-    #     """returns the Bezier control points of the segment."""
-    #     return self.start, self.end
+    def bpoints(self):
+        """returns the Bezier control points of the segment."""
+        return self.start, self.end
 
     def poly(self, return_coeffs=False):
         """returns the line as a Polynomial object."""
@@ -691,21 +691,21 @@ class Path(MutableSequence):
                             segment.control2.real, segment.control2.imag,
                             segment.end.real, segment.end.imag)
                     parts.append('C {},{} {},{} {},{}'.format(*args))
-            elif isinstance(segment, QuadraticBezier):
-                if useSandT and segment.is_smooth_from(previous_segment,
-                                                       warning_on=False):
-                    args = segment.end.real, segment.end.imag
-                    parts.append('T {},{}'.format(*args))
-                else:
-                    args = (segment.control.real, segment.control.imag,
-                            segment.end.real, segment.end.imag)
-                    parts.append('Q {},{} {},{}'.format(*args))
+            # elif isinstance(segment, QuadraticBezier):
+            #     if useSandT and segment.is_smooth_from(previous_segment,
+            #                                            warning_on=False):
+            #         args = segment.end.real, segment.end.imag
+            #         parts.append('T {},{}'.format(*args))
+            #     else:
+            #         args = (segment.control.real, segment.control.imag,
+            #                 segment.end.real, segment.end.imag)
+            #         parts.append('Q {},{} {},{}'.format(*args))
 
-            elif isinstance(segment, Arc):
-                args = (segment.radius.real, segment.radius.imag,
-                        segment.rotation,int(segment.large_arc),
-                        int(segment.sweep),segment.end.real, segment.end.imag)
-                parts.append('A {},{} {} {:d},{:d} {},{}'.format(*args))
+            # elif isinstance(segment, Arc):
+            #     args = (segment.radius.real, segment.radius.imag,
+            #             segment.rotation,int(segment.large_arc),
+            #             int(segment.sweep),segment.end.real, segment.end.imag)
+            #     parts.append('A {},{} {} {:d},{:d} {},{}'.format(*args))
             current_pos = segment.end
             previous_segment = segment
 
