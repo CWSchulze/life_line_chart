@@ -10,119 +10,123 @@ import json
 import datetime
 
 
-logging.basicConfig()#level=20)
+logging.basicConfig()  # level=20)
 logger = logging.getLogger("life_line_chart")
 logger.setLevel(logging.INFO)
+
 
 class BaseGraph():
     """
     Base class for life line charts.
     """
     _default_formatting = {
-        'margin_left' : 50,
-        'margin_right' : 50,
-        'margin_top' : 50,
-        'margin_bottom' : 50,
-        'vertical_step_size' : 20,
-        'relative_line_thickness' : 0.5,
-        'total_height' : 2000,
-        'display_factor' : -1,
+        'margin_left': 50,
+        'margin_right': 50,
+        'margin_top': 50,
+        'margin_bottom': 50,
+        'vertical_step_size': 20,
+        'relative_line_thickness': 0.5,
+        'total_height': 2000,
+        'display_factor': -1,
         'font_size_description': 0.7,
-        'font_description_letter_offset' : [str(30 / 12.0)+''],
-        'font_name' : 'Arial',
-        'birth_label_active':True,
-        'birth_label_along_path' : False,
+        'font_description_letter_offset': [str(30 / 12.0)+''],
+        'font_name': 'Arial',
+        'birth_label_active': True,
+        'birth_label_along_path': False,
         'birth_label_letter_x_offset': 0.8,
-        'fade_individual_color' : True,
-        'fade_individual_color_black_age' : 150,
-        'marriage_label_active':True,
-        'no_ring' : False,
-        'death_label_active':True,
-        'death_label_rotation':-90,
+        'fade_individual_color': True,
+        'fade_individual_color_black_age': 150,
+        'marriage_label_active': True,
+        'no_ring': False,
+        'death_label_active': True,
+        'death_label_rotation': -90,
         'death_label_letter_x_offset': 0.8,
         'warp_shape': 'normal',
-        'family_shape' : 0,
+        'family_shape': 0,
     }
     _default_positioning = {
-        'generations':4,
-        'compression_steps':-1, # debugging option
-        'compress':True,
-        'flip_to_optimize':True,
+        'generations': 4,
+        'compression_steps': -1,  # debugging option
+        'compress': True,
+        'flip_to_optimize': True,
         'fathers_have_the_same_color': True,
     }
     _formatting_description = {
-        'warp_shape' : {
-            'short_description' : 'Warp the chart shape',
-            'long_description' : 'The overall shape of the chart can be warped.'
+        'warp_shape': {
+            'short_description': 'Warp the chart shape',
+            'long_description': 'The overall shape of the chart can be warped.'
         },
-        'total_height' : {
-            'short_description' : 'Total height',
-            'long_description' : 'Total height of the whole chart.'
+        'total_height': {
+            'short_description': 'Total height',
+            'long_description': 'Total height of the whole chart.'
         },
-        'relative_line_thickness' : {
-            'short_description' : 'Relative line thickness',
-            'long_description' : 'The line thickness of an individual is given relatively to the vertical step size.'
+        'relative_line_thickness': {
+            'short_description': 'Relative line thickness',
+            'long_description': 'The line thickness of an individual is given relatively to the vertical step size.'
         },
-        'vertical_step_size' : {
-            'short_description' : 'Vertical step size',
-            'long_description' : 'This is the distance from one line to another. This value is also used for scaling of other items.'
+        'vertical_step_size': {
+            'short_description': 'Vertical step size',
+            'long_description': 'This is the distance from one line to another. This value is also used for scaling of other items.'
         },
-        'birth_label_active' : {
-            'short_description' : 'Show birth label',
-            'long_description' : 'Activate the birth label.'
+        'birth_label_active': {
+            'short_description': 'Show birth label',
+            'long_description': 'Activate the birth label.'
         },
-        'birth_label_along_path' : {
-            'short_description' : 'Birth label alogn path',
-            'long_description' : 'The birth label is aligned to the individual line.'
+        'birth_label_along_path': {
+            'short_description': 'Birth label alogn path',
+            'long_description': 'The birth label is aligned to the individual line.'
         },
-        'death_label_active' : {
-            'short_description' : 'Show death label',
-            'long_description' : 'Activate the death label.'
+        'death_label_active': {
+            'short_description': 'Show death label',
+            'long_description': 'Activate the death label.'
         },
-        'marriage_label_active' : {
-            'short_description' : 'Show marriage label',
-            'long_description' : 'Activate the marriage label.'
+        'marriage_label_active': {
+            'short_description': 'Show marriage label',
+            'long_description': 'Activate the marriage label.'
         },
-        'fade_individual_color' : {
-            'short_description' : 'Fade individual color',
-            'long_description' : 'The color of the individuals is faded to black with increasing age.'
+        'fade_individual_color': {
+            'short_description': 'Fade individual color',
+            'long_description': 'The color of the individuals is faded to black with increasing age.'
         },
-        'font_name' : {
-            'short_description' : 'Font name',
-            'long_description' : 'Name of the font family used for labels.'
+        'font_name': {
+            'short_description': 'Font name',
+            'long_description': 'Name of the font family used for labels.'
         },
-        'font_size_description' : {
-            'short_description' : 'Relative font size',
-            'long_description' : 'The font size is given relatively to the line thickness.'
+        'font_size_description': {
+            'short_description': 'Relative font size',
+            'long_description': 'The font size is given relatively to the line thickness.'
         },
-        'family_shape' : {
-            'short_description' : 'Family shape',
-            'long_description' : 'The shape of the families can be varied.'
+        'family_shape': {
+            'short_description': 'Family shape',
+            'long_description': 'The shape of the families can be varied.'
         },
     }
     _positioning_description = {
-        'generations' : {
-            'short_description' : 'Maximum number of generations',
-            'long_description' : 'When this number of generations has been reached, the algorithm doesn´\'t go any deeper'
+        'generations': {
+            'short_description': 'Maximum number of generations',
+            'long_description': 'When this number of generations has been reached, the algorithm doesn´\'t go any deeper'
         },
-        'compress' : {
-            'short_description' : 'Compress the graph vertically',
-            'long_description' : 'By default every individual has a unique vertical slot. This can be inefficient with many generations. This algorithm lets several people share a vertical slot, if they do not overlap.'
+        'compress': {
+            'short_description': 'Compress the graph vertically',
+            'long_description': 'By default every individual has a unique vertical slot. This can be inefficient with many generations. This algorithm lets several people share a vertical slot, if they do not overlap.'
         },
-        'flip_to_optimize' : {
-            'short_description' : 'Flip families to reduce vertical connections',
-            'long_description' : 'Switch the position of mother and father in a family, to reduce the overall vertical cross connections in larger graphs (pedigree collapse).'
+        'flip_to_optimize': {
+            'short_description': 'Flip families to reduce vertical connections',
+            'long_description': 'Switch the position of mother and father in a family, to reduce the overall vertical cross connections in larger graphs (pedigree collapse).'
         },
-        'fathers_have_the_same_color' : {
-            'short_description' : 'Fathers have the same color',
-            'long_description' : 'Starting from the root person, each father of an added individual has the same color as that individual.'
+        'fathers_have_the_same_color': {
+            'short_description': 'Fathers have the same color',
+            'long_description': 'Starting from the root person, each father of an added individual has the same color as that individual.'
         },
 
     }
     _available_warp_shapes = ['normal', 'sine', 'triangle']
-    _graphical_family_class = ancestor_graph_family # TODO: extract base class for other graph types
-    _graphical_individual_class = ancestor_graph_individual # TODO: extract base class for other graph types
-    def __init__(self, positioning = None, formatting = None, instance_container = get_gedcom_instance_container):
+    # TODO: extract base class for other graph types
+    _graphical_family_class = ancestor_graph_family
+    # TODO: extract base class for other graph types
+    _graphical_individual_class = ancestor_graph_individual
+
+    def __init__(self, positioning=None, formatting=None, instance_container=get_gedcom_instance_container):
         # renderer = HighlightRenderer()
         # self._markdown_to_spans = mistune.Markdown(renderer=renderer)
 
@@ -134,7 +138,7 @@ class BaseGraph():
         if formatting:
             self._formatting.update(formatting)
         self._instances = instance_container()
-        self._instances[('i',None)] = None
+        self._instances[('i', None)] = None
         self.graphical_individual_representations = []
         self.graphical_family_representations = []
         logger.debug('finished creating instances')
@@ -178,7 +182,8 @@ class BaseGraph():
         Returns:
             ancestor_graph_inidividual: created instance
         """
-        new_instance = self._graphical_individual_class(self._instances, individual.individual_id, self._formatting['vertical_step_size'])
+        new_instance = self._graphical_individual_class(
+            self._instances, individual.individual_id, self._formatting['vertical_step_size'])
         if new_instance.birth_date is None or new_instance.death_date is None:
             del new_instance
             return None
@@ -196,7 +201,8 @@ class BaseGraph():
             ancestor_graph_family: created instance
         """
         if not family.graphical_representations:
-            new_instance = self._graphical_family_class(self._instances, family.family_id)
+            new_instance = self._graphical_family_class(
+                self._instances, family.family_id)
             self.graphical_family_representations.append(new_instance)
         else:
             new_instance = family.graphical_representations[0]
@@ -220,7 +226,8 @@ class BaseGraph():
                 distance_of_this_individual += max(vector) - min(vector)
             total_distance += distance_of_this_individual
             if distance_of_this_individual > 0:
-                list_of_linked_individuals[(distance_of_this_individual, index)] = graphical_individual_representation
+                list_of_linked_individuals[(
+                    distance_of_this_individual, index)] = graphical_individual_representation
         return total_distance, list_of_linked_individuals
 
     def _move_single_individual(self, individual, family, x_index_offset):
@@ -255,16 +262,17 @@ class BaseGraph():
                     x_pos[other_family_id][1]+x_index_offset,
                     x_pos[other_family_id][2],
                     x_pos[other_family_id][3],
-                    )
+                )
         if family_id in x_pos:
             x_pos[family_id] = (
                 x_pos[family_id][0],
                 x_pos[family_id][1]+x_index_offset,
                 x_pos[family_id][2],
                 x_pos[family_id][3],
-                )
+            )
         else:
-            raise LifeLineChartCannotMoveIndividual('This family does not exist')
+            raise LifeLineChartCannotMoveIndividual(
+                'This family does not exist')
         return x_pos
 
     def _move_individual_and_ancestors(self, individual, family, x_index_offset):
@@ -282,28 +290,34 @@ class BaseGraph():
         else:
             family_id = family.family_id
         if len(individual.graphical_representations) > 0:
-            x_pos = self._move_single_individual(individual, family, x_index_offset)
+            x_pos = self._move_single_individual(
+                individual, family, x_index_offset)
             if None in x_pos or True:
                 # only move ancestors if they exist
-                if list(sorted(x_pos.values()))[0][1] != x_pos[family_id][1]:#len(x_pos) <= 1 or
+                # len(x_pos) <= 1 or
+                if list(sorted(x_pos.values()))[0][1] != x_pos[family_id][1]:
                     return
                 #for cof in individual.get_child_of_family():
                 cof = individual.graphical_representations[0].visible_parent_family
                 if cof and cof.visual_placement_child and cof.visual_placement_child.individual_id == individual.individual_id:
                     if cof.husb:
                         #if cof.husb.graphical_representations[0].get_x_position() and len(cof.husb.graphical_representations[0].get_x_position()) == 1:
-                            self._move_individual_and_ancestors(cof.husb, cof, x_index_offset)
+                            self._move_individual_and_ancestors(
+                                cof.husb, cof, x_index_offset)
                     if cof.wife:
                         #if cof.wife.graphical_representations[0].get_x_position() and len(cof.wife.graphical_representations[0].get_x_position()) == 1:
-                            self._move_individual_and_ancestors(cof.wife, cof, x_index_offset)
+                            self._move_individual_and_ancestors(
+                                cof.wife, cof, x_index_offset)
                     #print (individual.get)
                 if cof and len(cof.visible_children) > 1:
                     for child_individual_id, (ov, i, child_individual) in cof.visible_children.items():
                         if child_individual_id == individual.individual_id:
                             continue
-                        pos = sorted(list(child_individual.graphical_representations[0].get_x_position().values()))[0]
+                        pos = sorted(
+                            list(child_individual.graphical_representations[0].get_x_position().values()))[0]
                         if pos[2]:
-                            x_pos = self._move_single_individual(child_individual, pos[2], x_index_offset)
+                            x_pos = self._move_single_individual(
+                                child_individual, pos[2], x_index_offset)
 
     def _flip_family(self, family):
         """
@@ -317,9 +331,11 @@ class BaseGraph():
         """
         if family.husb is None or family.wife is None or not family.husb.has_graphical_representation() or not family.wife.has_graphical_representation():
             return
-        husb_x_pos = family.husb.graphical_representations[0].get_x_position()[family.family_id][1]
+        husb_x_pos = family.husb.graphical_representations[0].get_x_position()[
+            family.family_id][1]
         husb_width = family.graphical_representations[0].husb_width
-        wife_x_pos = family.wife.graphical_representations[0].get_x_position()[family.family_id][1]
+        wife_x_pos = family.wife.graphical_representations[0].get_x_position()[
+            family.family_id][1]
         wife_width = family.graphical_representations[0].wife_width
         children_width = family.graphical_representations[0].children_width
         if not children_width:
@@ -335,10 +351,13 @@ class BaseGraph():
             child_x_delta = husb_width - wife_width
 
         for child_individual_id, (ov, i, child_individual) in family.graphical_representations[0].visible_children.items():
-            pos = sorted(list(child_individual.graphical_representations[0].get_x_position().values()))
-            x_pos = self._move_single_individual(child_individual, pos[0][2], child_x_delta)
+            pos = sorted(
+                list(child_individual.graphical_representations[0].get_x_position().values()))
+            x_pos = self._move_single_individual(
+                child_individual, pos[0][2], child_x_delta)
 
-        self._move_individual_and_ancestors(family.husb, family, husb_x_delta+1000000)
+        self._move_individual_and_ancestors(
+            family.husb, family, husb_x_delta+1000000)
         self._move_individual_and_ancestors(family.wife, family, wife_x_delta)
         self._move_individual_and_ancestors(family.husb, family, -1000000)
         pass
@@ -377,17 +396,19 @@ class BaseGraph():
                     v[x_index] = []
                     position_to_person_map[x_index] = []
                 if i == 0:
-                    start_y = graphical_individual_representation.get_birth_event()['ordinal_value']
+                    start_y = graphical_individual_representation.get_birth_event()[
+                        'ordinal_value']
                 else:
                     start_y = list(x_pos.values())[i][0]
                 if i < len(x_pos) - 1:
                     end_y = list(x_pos.values())[i+1][0]
                 else:
-                    end_y = graphical_individual_representation.get_death_event()['ordinal_value']
+                    end_y = graphical_individual_representation.get_death_event()[
+                        'ordinal_value']
                 position_to_person_map[x_index].append({
-                    'start':start_y,
-                    'end':end_y,
-                    'individual':graphical_individual_representation
+                    'start': start_y,
+                    'end': end_y,
+                    'individual': graphical_individual_representation
                 })
 
                 v[x_index].append(graphical_individual_representation)
@@ -401,22 +422,28 @@ class BaseGraph():
             x_positions = []
             for index, graphical_individual_representation_a in enumerate(graphical_individual_representation_list):
                 for graphical_individual_representation_b in graphical_individual_representation_list[index+1:]:
-                    birth_position_a = graphical_individual_representation_a.get_birth_event()['ordinal_value'] - 365*15
-                    birth_position_b = graphical_individual_representation_b.get_birth_event()['ordinal_value'] - 365*15
-                    death_position_a = graphical_individual_representation_a.get_death_event()['ordinal_value'] + 365*15
-                    death_position_b = graphical_individual_representation_b.get_death_event()['ordinal_value'] + 365*15
+                    birth_position_a = graphical_individual_representation_a.get_birth_event()[
+                        'ordinal_value'] - 365*15
+                    birth_position_b = graphical_individual_representation_b.get_birth_event()[
+                        'ordinal_value'] - 365*15
+                    death_position_a = graphical_individual_representation_a.get_death_event()[
+                        'ordinal_value'] + 365*15
+                    death_position_b = graphical_individual_representation_b.get_death_event()[
+                        'ordinal_value'] + 365*15
                     if ((birth_position_a - birth_position_b)
-                        *(birth_position_a - death_position_b) < 0 or
-                        (death_position_a - birth_position_b)
-                        *(death_position_a - death_position_b) < 0 or
-                        (birth_position_b - birth_position_a)
-                        *(birth_position_b - death_position_a) < 0 or
-                        (death_position_b - birth_position_a)
-                        *(death_position_b - death_position_a) < 0
+                                * (birth_position_a - death_position_b) < 0 or
+                                (death_position_a - birth_position_b)
+                                * (death_position_a - death_position_b) < 0 or
+                                (birth_position_b - birth_position_a)
+                                * (birth_position_b - death_position_a) < 0 or
+                                (death_position_b - birth_position_a)
+                                * (death_position_b - death_position_a) < 0
                             ):
                         if early_raise:
-                            raise LifeLineChartCollisionDetected(graphical_individual_representation_a, graphical_individual_representation_b)
-                        collisions.append((graphical_individual_representation_a, graphical_individual_representation_b))
+                            raise LifeLineChartCollisionDetected(
+                                graphical_individual_representation_a, graphical_individual_representation_b)
+                        collisions.append(
+                            (graphical_individual_representation_a, graphical_individual_representation_b))
         # if len(collisions) > 0:
         #     raise RuntimeError()
         return collisions, min_x, max_x, position_to_person_map
@@ -451,7 +478,8 @@ class BaseGraph():
                 else:
                     failed.append(x_index)
                     # value = index_map[x_index]
-                    logger.error("failed: " +str((x_index, value[2].family_id, graphical_individual_representation.name, v[x_index])))
+                    logger.error(
+                        "failed: " + str((x_index, value[2].family_id, graphical_individual_representation.name, v[x_index])))
                     #raise RuntimeError((x_index, key, graphical_individual_representation.name))
         full_index_list = list(sorted(v.keys()))
         for i in range(len(full_index_list)):
@@ -459,13 +487,13 @@ class BaseGraph():
                 graphical_individual_representation.items.append({
                     'type': 'rect',
                     'config': {
-                        'insert' : (self._map_x_position(i), self._map_y_position(self.max_ordinal)),
-                        'size' : (self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'], self._map_y_position(self.min_ordinal)),
-                        'fill' : 'black',
-                        'fill-opacity':"0.5"
+                        'insert': (self._map_x_position(i), self._map_y_position(self.max_ordinal)),
+                        'size': (self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'], self._map_y_position(self.min_ordinal)),
+                        'fill': 'black',
+                        'fill-opacity': "0.5"
                     }
                 })
-                failed.append(('missing',i))
+                failed.append(('missing', i))
         return failed, full_index_list[0], full_index_list[-1]
 
     def _map_y_position(self, ordinal_value):
@@ -480,8 +508,11 @@ class BaseGraph():
         """
         return (
             self._formatting['margin_top']
-            - self._formatting['total_height'] * (self._formatting['display_factor']-1)/2
-            + (ordinal_value - self.min_ordinal)/(self.max_ordinal-self.min_ordinal) * self._formatting['total_height'] * self._formatting['display_factor']
+            - self._formatting['total_height'] *
+            (self._formatting['display_factor']-1)/2
+            + (ordinal_value - self.min_ordinal)/(self.max_ordinal-self.min_ordinal) *
+            self._formatting['total_height'] *
+            self._formatting['display_factor']
         )
 
     def _map_x_position(self, x_index):
@@ -509,12 +540,14 @@ class BaseGraph():
         """
         from math import pi, sin, cos
         if self._formatting['warp_shape'] == 'sine':
-            y_rel = (1-sin((1-(pos_y - self.min_ordinal)/(self.max_ordinal - self.min_ordinal))*pi/2))*0.5
+            y_rel = (1-sin((1-(pos_y - self.min_ordinal) /
+                            (self.max_ordinal - self.min_ordinal))*pi/2))*0.5
             x_av = (self.max_x_index + self.min_x_index)/2
 
             return self._map_x_position(pos_x*(1-y_rel) + y_rel*x_av), self._map_y_position(pos_y)
         elif self._formatting['warp_shape'] == 'triangle':
-            y_rel = (pos_y - self.min_ordinal)/(self.max_ordinal - self.min_ordinal)*0.8
+            y_rel = (pos_y - self.min_ordinal) / \
+                (self.max_ordinal - self.min_ordinal)*0.8
             x_av = (self.max_x_index + self.min_x_index)/2
 
             return self._map_x_position(pos_x*(1-y_rel) + y_rel*x_av), self._map_y_position(pos_y)
@@ -547,7 +580,8 @@ class BaseGraph():
         return (
             pos_y
             - self._formatting['margin_top']
-            + self._formatting['total_height'] * (self._formatting['display_factor']-1)/2
+            + self._formatting['total_height'] *
+            (self._formatting['display_factor']-1)/2
         ) / (self._formatting['total_height'] * self._formatting['display_factor']) * (self.max_ordinal-self.min_ordinal) + self.min_ordinal
 
     def _inverse_x_position(self, pos_x):
@@ -590,7 +624,6 @@ class BaseGraph():
                 if possible_match['start'] < ordinal_value and possible_match['end'] > ordinal_value:
                     return possible_match['individual']
         return None
-                    # print(possible_match['individual'].individual.plain_name)
-                    # print(datetime.date.fromordinal(ordinal_value))
-                    # print(x_index)
-
+        # print(possible_match['individual'].individual.plain_name)
+        # print(datetime.date.fromordinal(ordinal_value))
+        # print(x_index)

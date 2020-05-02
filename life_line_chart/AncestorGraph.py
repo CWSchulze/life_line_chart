@@ -39,6 +39,7 @@ def Cardano(a, b, c, d):
         v *= J
     return u+v-z0, u*J+v*Jc-z0, u*Jc+v*J-z0
 
+
 class AncestorGraph(BaseGraph):
     """
     This class enables setting up ancestor graphs and save them
@@ -103,6 +104,7 @@ class AncestorGraph(BaseGraph):
                     self.select_individuals(
                         mother, generations - 1, filter=filter)
             # family.visible_children.sort()
+
     def place_selected_individuals(self, individual, child_family, spouse_family, child_of_family, x_offset=0):
         """
         Place the graphical representations in direction of x
@@ -263,7 +265,6 @@ class AncestorGraph(BaseGraph):
             pass
         self._move_single_individual(individual, cof, - direction)
 
-
     def _compress_graph_ancestor_graph(self, graphical_family_representation):
         """
         compress the graph vertically.
@@ -280,37 +281,42 @@ class AncestorGraph(BaseGraph):
         x_pos_wife = None
         if graphical_family_representation.husb is not None and graphical_family_representation.husb.has_graphical_representation():
             x_pos_husb = graphical_family_representation.husb.graphical_representations[0].get_x_position()[
-                               graphical_family_representation.family_id][1]
+                graphical_family_representation.family_id][1]
             individuals.append((1, graphical_family_representation.husb))
         if graphical_family_representation.wife is not None and graphical_family_representation.wife.has_graphical_representation():
             x_pos_wife = graphical_family_representation.wife.graphical_representations[0].get_x_position()[
-                            graphical_family_representation.family_id][1]
+                graphical_family_representation.family_id][1]
             individuals.append((-1, graphical_family_representation.wife))
         if x_pos_husb and x_pos_wife and x_pos_husb > x_pos_wife:
             family_was_flipped = True
 
-        for index, (_, individual) in enumerate(sorted(individuals)):
+        for _, individual in sorted(individuals):
             cofs = individual.get_child_of_family()
             for cof in cofs:
                 if cof.has_graphical_representation():
                     if cof.husb is None or cof.wife is None \
                             or not cof.husb.has_graphical_representation() \
                             or not cof.wife.has_graphical_representation():
-                        this_individual_x_pos = individual.graphical_representations[0].get_x_position()[cof.family_id][1]
+                        this_individual_x_pos = individual.graphical_representations[0].get_x_position()[
+                            cof.family_id][1]
                         parent_x_pos = None
                         if cof.husb is not None and cof.husb.has_graphical_representation():
-                            parent_x_pos = cof.husb.graphical_representations[0].get_x_position()[cof.family_id][1]
+                            parent_x_pos = cof.husb.graphical_representations[0].get_x_position()[
+                                cof.family_id][1]
                         if cof.wife is not None and cof.wife.has_graphical_representation():
-                            parent_x_pos = cof.wife.graphical_representations[0].get_x_position()[cof.family_id][1]
+                            parent_x_pos = cof.wife.graphical_representations[0].get_x_position()[
+                                cof.family_id][1]
                         if parent_x_pos is not None and this_individual_x_pos > parent_x_pos:
-                            self._compress_single_individual_position(individual, cof, -1)
+                            self._compress_single_individual_position(
+                                individual, cof, -1)
                             # self._move_single_individual(individual, cof, parent_x_pos - this_individual_x_pos + 1)
                         elif parent_x_pos is not None and this_individual_x_pos < parent_x_pos:
-                            self._compress_single_individual_position(individual, cof, 1)
+                            self._compress_single_individual_position(
+                                individual, cof, 1)
                             # self._move_single_individual(individual, cof, parent_x_pos - this_individual_x_pos - 1)
                     self._compress_graph_ancestor_graph(
                         cof.graphical_representations[0])
-        for index, (original_direction_factor, individual) in enumerate(sorted(individuals)):
+        for original_direction_factor, individual in sorted(individuals):
             if individual is None:
                 continue
             i = 0
@@ -359,7 +365,7 @@ class AncestorGraph(BaseGraph):
                 pass
             if i != 0:
                 logger.info('moved ' + ' '.join(individual.name) +
-                      ' by ' + str(i * direction_factor * 1))
+                            ' by ' + str(i * direction_factor * 1))
 
     def modify_layout(self, root_individual_id):
         """
@@ -393,7 +399,7 @@ class AncestorGraph(BaseGraph):
             items = list(reversed(sorted([(child.graphical_representations[0].get_birth_event()[
                          'ordinal_value'], index, child) for index, child in enumerate(candidantes)])))
             failed = []
-            for ov, index, child in items:
+            for ov, _, child in items:
                 c_pos = list(
                     child.graphical_representations[0].get_x_position().values())[1:]
                 for x_pos in c_pos:
@@ -405,7 +411,7 @@ class AncestorGraph(BaseGraph):
                     failed, _, _ = self.check_unique_x_position()
                     if len(failed) > 0:
                         logger.error("failed flipping " +
-                              str((x_pos[2].family_id, ov)))
+                                     str((x_pos[2].family_id, ov)))
                         break
                     new_width, _ = self._calculate_sum_of_distances()
                     if new_width > width:
@@ -430,15 +436,19 @@ class AncestorGraph(BaseGraph):
                 'i', root_individual_id)].graphical_representations[0].visible_parent_family)
 
             # compressed graph should be aligned left
-            _, min_index_x, max_index_x, self.position_to_person_map = self._check_compressed_x_position(False)
-            self._move_individual_and_ancestors(self._instances[('i',root_individual_id)], sorted(list(self._instances[('i',root_individual_id)].graphical_representations[0].get_x_position().values()))[0][2], -(min_index_x-old_x_min_index)*1)
+            _, min_index_x, max_index_x, self.position_to_person_map = self._check_compressed_x_position(
+                False)
+            self._move_individual_and_ancestors(self._instances[('i', root_individual_id)], sorted(list(self._instances[(
+                'i', root_individual_id)].graphical_representations[0].get_x_position().values()))[0][2], -(min_index_x-old_x_min_index)*1)
             keys = sorted(list(self.position_to_person_map.keys()))
             for key in keys:
-                self.position_to_person_map[key - (old_x_min_index - min_index_x) * 1] = self.position_to_person_map.pop(key)
+                self.position_to_person_map[key - (
+                    old_x_min_index - min_index_x) * 1] = self.position_to_person_map.pop(key)
             width = (max_index_x - min_index_x)
             self.min_x_index = 0
             self.max_x_index = width
-            logger.info(f"compression reduced the total width by {width - old_width} (i.e. from {old_width} to {width})")
+            logger.info(
+                f"compression reduced the total width by {width - old_width} (i.e. from {old_width} to {width})")
         else:
             _, _, _, self.position_to_person_map = self._check_compressed_x_position(
                 False)
@@ -466,7 +476,9 @@ class AncestorGraph(BaseGraph):
         self.additional_graphical_items = {}
         self.additional_graphical_items['grid'] = []
 
-        font_size = self._formatting['font_size_description']*self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']
+        font_size = self._formatting['font_size_description'] * \
+            self._formatting['relative_line_thickness'] * \
+            self._formatting['vertical_step_size']
 
         # setup grid
         max_y = max(self._map_y_position(self.min_ordinal),
@@ -512,8 +524,8 @@ class AncestorGraph(BaseGraph):
         for index in range(1000):
             x_position = index*100
             if x_position > min_x_index and x_position < max_x_index:
-                svg_path = Path(
-                    Line(x_position + min_y*1j, x_position + max_y*1j))
+                # svg_path = Path(
+                #     Line(x_position + min_y*1j, x_position + max_y*1j))
                 if index % 20 == 0:
                     for index2 in range(600):
                         year = 1000 + 2*index2
@@ -616,7 +628,7 @@ class AncestorGraph(BaseGraph):
                                                        graphical_representation_marriage_family.family_id][1])
                             except:
                                 logger.error('something went wrong with ' + "".join(visible_child.name) +
-                                      ". The position family 0 is not equal to the placement...")
+                                             ". The position family 0 is not equal to the placement...")
                         if len(child_x_indices) > 0:
                             # calculate the middle over the children
                             marriage_ring_positions.append(self._map_position(
@@ -638,7 +650,6 @@ class AncestorGraph(BaseGraph):
                         graphical_representation_marriage_family.marriage['ordinal_value'])
                     marriage_labels.append(
                         str(graphical_representation_marriage_family.label))
-
 
             # generate event node information
             knots = []
@@ -675,20 +686,22 @@ class AncestorGraph(BaseGraph):
                     dy_line = self._inverse_y_position(
                         self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']) - self._inverse_y_position(0)
                     for index, line in enumerate(label.split('\n')):
-                        position = self._map_position(marriage_ring_index, marriage_ordinal + dy_line)
-                        position = (position[0], position[1] + (index + 0.2) * font_size * 1.2)
+                        position = self._map_position(
+                            marriage_ring_index, marriage_ordinal + dy_line)
+                        position = (position[0], position[1] +
+                                    (index + 0.2) * font_size * 1.2)
                         images.append({
-                                'type': 'text',
-                                'config': {
+                            'type': 'text',
+                            'config': {
                                     'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
                                     'text': line,
                                     'text-anchor': 'middle',
                                     # 'align' : 'center',
                                     'insert': position,
-                                },
-                                'font_size': font_size,
-                                'font_name': self._formatting['font_name'],
-                            })
+                            },
+                            'font_size': font_size,
+                            'font_name': self._formatting['font_name'],
+                        })
                 knots.append((marriage_ring_index, marriage_ordinal))
                 if len(marriage_ordinals) > index + 1:
                     # zwischenpunkt zur ursprungsposition
@@ -698,7 +711,7 @@ class AncestorGraph(BaseGraph):
 
             Path_types = {
                 'Line': Line,
-                'CubicBezier':CubicBezier
+                'CubicBezier': CubicBezier
             }
             # for ov, filename in graphical_individual_representation.individual.images.items():
             #     foto_size = self._formatting['individual_foto_relative_size'] * self._formatting['relative_line_thickness'] * self._formatting['vertical_step_size']
@@ -747,36 +760,42 @@ class AncestorGraph(BaseGraph):
                     )
                     if len(graphical_individual_representation.individual.images) > 0:
                         index = 0
-                        svg_path = Path_types[data[-1][0]['type']](*data[-1][0]['arguments'])
+                        svg_path = Path_types[data[-1][0]
+                                              ['type']](*data[-1][0]['arguments'])
                         for ov, filename in graphical_individual_representation.individual.images.items():
                             if ov >= knots[index][1] and ov <= knots[index + 1][1]:
-                                foto_size = self._formatting['individual_foto_relative_size'] * self._formatting['relative_line_thickness'] * self._formatting['vertical_step_size']
-                                foto_size_y = self._map_y_position(self._inverse_x_position(foto_size))
+                                foto_size = self._formatting['individual_foto_relative_size'] * \
+                                    self._formatting['relative_line_thickness'] * \
+                                    self._formatting['vertical_step_size']
+                                # foto_size_y = self._map_y_position(self._inverse_x_position(foto_size))
                                 # xpos = svg_path.intersect(Line(coordinate_transformation(min(knots[index][0],knots[index + 1][0])-1, ov), coordinate_transformation(max(knots[index][0],knots[index + 1][0])+1, ov)))[0]
                                 # xpos = svg_path.point(xpos[0])
                                 if type(svg_path) == Line:
-                                    xpos = svg_path.start.real + self._map_y_position(ov)*1j
+                                    xpos = svg_path.start.real + \
+                                        self._map_y_position(ov)*1j
                                 else:
                                     coeffs = svg_path.poly()
-                                    coeffs2 = (coeffs[0].imag, coeffs[1].imag, coeffs[2].imag, coeffs[3].imag - self._map_y_position(ov))
+                                    coeffs2 = (
+                                        coeffs[0].imag, coeffs[1].imag, coeffs[2].imag, coeffs[3].imag - self._map_y_position(ov))
                                     roots = Cardano(*coeffs2)
-                                    root = [root.real for root in roots if abs(root.imag) < 1e-10][0]
+                                    root = [root.real for root in roots if abs(
+                                        root.imag) < 1e-10][0]
                                     if len(root) > 0:
                                         xpos = svg_path.point(root[0])
                                     else:
                                         xpos = svg_path.point(roots[1])
                                 images.append(
-                                        {
-                                            'type': 'image',
-                                            'config': {
+                                    {
+                                        'type': 'image',
+                                        'config': {
                                                 'insert': (
                                                     xpos.real - foto_size/2,
                                                     xpos.imag - foto_size/2),
-                                                'size': (foto_size,foto_size),
-                                            },
-                                            'filename': filename
-                                        }
-                                    )
+                                                'size': (foto_size, foto_size),
+                                        },
+                                        'filename': filename
+                                    }
+                                )
                     # for ov, filename in graphical_individual_representation.individual.images.items():
                     #     if ov > knots[0][1] and ov < knots[1][1]:
                     #         foto_size = self._formatting['individual_foto_relative_size'] * self._formatting['relative_line_thickness'] * self._formatting['vertical_step_size']
@@ -801,8 +820,10 @@ class AncestorGraph(BaseGraph):
                             data.append(
                                 ({'type': 'CubicBezier', 'arguments': (
                                     coordinate_transformation(*interp(0, 0)),
-                                    coordinate_transformation(*interp(0, 1)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(0.0, 0.7)),
-                                    coordinate_transformation(*interp(0, 1)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(0.5, 0.9)),
+                                    coordinate_transformation(
+                                        *interp(0, 1)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(0.0, 0.7)),
+                                    coordinate_transformation(
+                                        *interp(0, 1)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(0.5, 0.9)),
                                     coordinate_transformation(*interp(1, 1)),
                                 )},
                                     # ((knots[index][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value'])-_birth_position[1]), (knots[index+1][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value'])-_birth_position[1])),
@@ -814,8 +835,10 @@ class AncestorGraph(BaseGraph):
                             data.append(
                                 ({'type': 'CubicBezier', 'arguments': (
                                     coordinate_transformation(*interp(0, 0)),
-                                    coordinate_transformation(*interp(1, 0)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(0.8, 0)),
-                                    coordinate_transformation(*interp(1, 0)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(1, 0.2)),
+                                    coordinate_transformation(
+                                        *interp(1, 0)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(0.8, 0)),
+                                    coordinate_transformation(
+                                        *interp(1, 0)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(1, 0.2)),
                                     coordinate_transformation(*interp(1, 1)),
                                 )},
                                     # ((knots[index][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value'])-_birth_position[1]), (knots[index+1][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value'])-_birth_position[1])),
@@ -824,37 +847,43 @@ class AncestorGraph(BaseGraph):
                                 )
                             )
                         if len(graphical_individual_representation.individual.images) > 0:
-                            svg_path = Path_types[data[-1][0]['type']](*data[-1][0]['arguments'])
+                            svg_path = Path_types[data[-1][0]
+                                                  ['type']](*data[-1][0]['arguments'])
                             for ov, filename in graphical_individual_representation.individual.images.items():
                                 if ov > knots[index][1] and ov < knots[index + 1][1]:
-                                    foto_size = self._formatting['individual_foto_relative_size'] * self._formatting['relative_line_thickness'] * self._formatting['vertical_step_size']
-                                    foto_size_y = self._map_y_position(self._inverse_x_position(foto_size))
+                                    foto_size = self._formatting['individual_foto_relative_size'] * \
+                                        self._formatting['relative_line_thickness'] * \
+                                        self._formatting['vertical_step_size']
+                                    # foto_size_y = self._map_y_position(self._inverse_x_position(foto_size))
                                     # xpos = svg_path.intersect(Line(coordinate_transformation(min(knots[index][0],knots[index + 1][0])-1, ov), coordinate_transformation(max(knots[index][0],knots[index + 1][0])+1, ov)))[0]
                                     # xpos = svg_path.point(xpos[0])
                                     if type(svg_path) == Line:
-                                        xpos = svg_path.start.real + self._map_y_position(ov)*1j
+                                        xpos = svg_path.start.real + \
+                                            self._map_y_position(ov)*1j
                                     else:
                                         coeffs = svg_path.poly()
-                                        coeffs2 = (coeffs[0].imag, coeffs[1].imag, coeffs[2].imag, coeffs[3].imag - self._map_y_position(ov))
-                                        #coeffs2 = (coeffs[0] - self._map_y_position(ov)*1j, coeffs[1], coeffs[2], coeffs[3])
+                                        coeffs2 = (
+                                            coeffs[0].imag, coeffs[1].imag, coeffs[2].imag, coeffs[3].imag - self._map_y_position(ov))
+                                        # coeffs2 = (coeffs[0] - self._map_y_position(ov)*1j, coeffs[1], coeffs[2], coeffs[3])
                                         roots = Cardano(*coeffs2)
-                                        root = [root.real for root in roots if abs(root.imag) < 1e-10 and root.real >= 0 and root.real <= 1]
+                                        root = [root.real for root in roots if abs(
+                                            root.imag) < 1e-10 and root.real >= 0 and root.real <= 1]
                                         if len(root) > 0:
                                             xpos = svg_path.point(root[0])
                                         else:
                                             xpos = svg_path.point(roots[1])
                                     images.append(
-                                            {
-                                                'type': 'image',
-                                                'config': {
+                                        {
+                                            'type': 'image',
+                                            'config': {
                                                     'insert': (
                                                         xpos.real - foto_size/2,
                                                         xpos.imag - foto_size/2),
-                                                    'size': (foto_size,foto_size),
-                                                },
-                                                'filename': filename
-                                            }
-                                        )
+                                                    'size': (foto_size, foto_size),
+                                            },
+                                            'filename': filename
+                                        }
+                                    )
             life_line_bezier_paths = []
             marriage_bezier(images, life_line_bezier_paths, knots)
 
@@ -924,6 +953,7 @@ class AncestorGraph(BaseGraph):
                     }
                 )
             graphical_individual_representation.items += images
+
     def paint_and_save(self, individual_id, filename=None):
         """
         setup svg file and save it.
@@ -934,10 +964,10 @@ class AncestorGraph(BaseGraph):
         """
 
         logger.debug('start creating document')
-        max_y = max(self._map_y_position(self.min_ordinal),
-                    self._map_y_position(self.max_ordinal))
-        min_y = min(self._map_y_position(self.min_ordinal),
-                    self._map_y_position(self.max_ordinal))
+        # max_y = max(self._map_y_position(self.min_ordinal),
+        #             self._map_y_position(self.max_ordinal))
+        # min_y = min(self._map_y_position(self.min_ordinal),
+        #             self._map_y_position(self.max_ordinal))
 
         # drawing = svg2rlg("file.svg")
         if filename is None:
@@ -971,7 +1001,7 @@ class AncestorGraph(BaseGraph):
                               for index, gr in enumerate(self.graphical_individual_representations)]
         sorted_individuals.sort()
         sorted_individual_items = []
-        for _, index, graphical_individual_representation in sorted_individuals:
+        for _, _, graphical_individual_representation in sorted_individuals:
             sorted_individual_items += graphical_individual_representation.items
 
         for item in additional_items + sorted_individual_items:
@@ -1037,7 +1067,8 @@ class AncestorGraph(BaseGraph):
                     pos_y = item['config']['insert'][1]
                     width = item['config']['size'][0]
                     height = item['config']['size'][1]
-                    key = 'image_' + str(width) + '_' + str(height) + item['filename']
+                    key = 'image_' + str(width) + '_' + \
+                        str(height) + item['filename']
                     if key in image_defs:
                         this_def = image_defs[key]
                     else:
