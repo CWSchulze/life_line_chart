@@ -42,8 +42,6 @@ graph.paint_and_save(individual_id, 'example_1.svg')
 
 Then you will need the following modules:
 - svgwrite
-- svgpathtools
-- numpy
 - pillow
 - python-dateutil
 
