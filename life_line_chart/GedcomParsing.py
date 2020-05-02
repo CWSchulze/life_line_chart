@@ -1,4 +1,3 @@
-from copy import deepcopy
 import datetime
 from dateutil.parser import parse
 

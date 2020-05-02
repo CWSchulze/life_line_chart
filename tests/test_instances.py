@@ -2,7 +2,6 @@
 from life_line_chart import GedcomParsing, InstanceContainer, GedcomIndividual, ancestor_graph_individual, ancestor_graph_family, GedcomFamily
 from life_line_chart import ReadGedcom, get_gedcom_instance_container
 import os
-import sys
 
 
 def test_instance_container_load():

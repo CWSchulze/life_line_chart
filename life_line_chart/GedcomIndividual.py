@@ -46,6 +46,6 @@ class GedcomIndividual(BaseIndividual):
             if 'FAMS' not in self._database_indi[self.individual_id]:
                 return []
             return self._database_indi[self.individual_id]['FAMS']['tag_data'].split('\n')
-        except:
+        except KeyError:
             pass
         return []

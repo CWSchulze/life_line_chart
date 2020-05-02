@@ -6,8 +6,6 @@ from .Exceptions import LifeLineChartCollisionDetected, LifeLineChartCannotMoveI
 import os
 from copy import deepcopy
 import logging
-import json
-import datetime
 
 
 logging.basicConfig()  # level=20)
@@ -244,7 +242,7 @@ class BaseGraph():
         """
         x_pos = individual.graphical_representations[0].get_x_position()
         positions = sorted(list(x_pos.values()))
-        if not family is None:
+        if family is not None:
             family_id = family.family_id
         else:
             family_id = None
@@ -435,8 +433,7 @@ class BaseGraph():
                                 (birth_position_b - birth_position_a)
                                 * (birth_position_b - death_position_a) < 0 or
                                 (death_position_b - birth_position_a)
-                                * (death_position_b - death_position_a) < 0
-                            ):
+                                * (death_position_b - death_position_a) < 0):
                         if early_raise:
                             raise LifeLineChartCollisionDetected(
                                 graphical_individual_representation_a, graphical_individual_representation_b)
@@ -534,7 +531,7 @@ class BaseGraph():
         Returns:
             tuple: (x position, y position)
         """
-        from math import pi, sin, cos
+        from math import pi, sin
         if self._formatting['warp_shape'] == 'sine':
             y_rel = (1-sin((1-(pos_y - self.min_ordinal) /
                             (self.max_ordinal - self.min_ordinal))*pi/2))*0.5
@@ -561,7 +558,7 @@ class BaseGraph():
         Returns:
             float: angle
         """
-        from math import pi, sin, cos, atan, sqrt, asin
+        from math import pi, sqrt, asin
         p1 = self._map_position(pos_x, pos_y-0.5)
         p2 = self._map_position(pos_x, pos_y+0.5)
         gegen_kathete = p2[0]-p1[0]
@@ -615,7 +612,7 @@ class BaseGraph():
         x_index = self._inverse_x_position(pos_x)
         ordinal_value = int(self._inverse_y_position(pos_y))
         possible_matches = self.position_to_person_map.get(x_index)
-        if not possible_matches is None:
+        if possible_matches is not None:
             for possible_match in possible_matches:
                 if possible_match['start'] < ordinal_value and possible_match['end'] > ordinal_value:
                     return possible_match['individual']

@@ -147,7 +147,7 @@ class AncestorGraph(BaseGraph):
             individual.graphical_representations[0].set_x_position(
                 x_position, spouse_family)
             # if child_of_family :# and len(child_of_family.graphical_representations[0].visible_children) > 1:
-            if child_of_family and not child_of_family.family_id in individual.graphical_representations[0].get_x_position():
+            if child_of_family and child_of_family.family_id not in individual.graphical_representations[0].get_x_position():
                 individual.graphical_representations[0].set_x_position(
                     x_position, child_of_family, True)
             x_position += 1
@@ -158,12 +158,12 @@ class AncestorGraph(BaseGraph):
         else:
             for _, _, sibling in sorted(child_of_family.graphical_representations[0].visible_children.values()):
                 if sibling.individual_id == individual.individual_id:
-                    if not sibling.graphical_representations[0].get_x_position() or not child_of_family.family_id in sibling.graphical_representations[0].get_x_position():
+                    if not sibling.graphical_representations[0].get_x_position() or child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
                         pass
                         # sibling.graphical_representations[0].set_x_position(x_position - 1, child_of_family)
                         # x_position += 1
                 else:
-                    if not sibling.graphical_representations[0].get_x_position() or not child_of_family.family_id in sibling.graphical_representations[0].get_x_position():
+                    if not sibling.graphical_representations[0].get_x_position() or child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
                         if not sibling.graphical_representations[0].visual_placement_child:
                             sibling.graphical_representations[
                                 0].visual_placement_child = individual.graphical_representations[0].visual_placement_child
@@ -661,7 +661,6 @@ class AncestorGraph(BaseGraph):
             _death_position = self._map_position(*_death_original_location)
             knots.append((x_pos_list[0][1], birth_event['ordinal_value']))
             images = []
-            import os
             for index, (marriage_ring_index, marriage_ordinal, new_x_index_after_marriage, label) in enumerate(zip(marriage_ring_indices, marriage_ordinals, new_x_indices_after_marriage, marriage_labels)):
                 if not self._formatting['no_ring']:
                     ring_position = self._map_position(
@@ -991,7 +990,6 @@ class AncestorGraph(BaseGraph):
 
         from PIL import Image
         import base64
-        import os
 
         image_defs = {}
         additional_items = []
