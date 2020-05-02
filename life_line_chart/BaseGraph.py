@@ -146,6 +146,12 @@ class BaseGraph():
         self.min_ordinal = 10000000
         self.max_ordinal = -10000000
 
+    def get_default_formatting_and_description(self):
+        return deepcopy(self._default_formatting), deepcopy(self._formatting_description)
+
+    def get_default_positioning_and_description(self):
+        return deepcopy(self._default_positioning), deepcopy(self._positioning_description)
+
     def instantiate_all(self):
         """
         instantiate all families and individuals
