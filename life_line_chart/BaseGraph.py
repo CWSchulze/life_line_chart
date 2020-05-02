@@ -310,7 +310,7 @@ class BaseGraph():
                                 cof.wife, cof, x_index_offset)
                     #print (individual.get)
                 if cof and len(cof.visible_children) > 1:
-                    for child_individual_id, (ov, i, child_individual) in cof.visible_children.items():
+                    for child_individual_id, (_, _, child_individual) in cof.visible_children.items():
                         if child_individual_id == individual.individual_id:
                             continue
                         pos = sorted(
@@ -350,10 +350,10 @@ class BaseGraph():
             wife_x_delta = husb_width + children_width
             child_x_delta = husb_width - wife_width
 
-        for child_individual_id, (ov, i, child_individual) in family.graphical_representations[0].visible_children.items():
+        for _, (_, _, child_individual) in family.graphical_representations[0].visible_children.items():
             pos = sorted(
                 list(child_individual.graphical_representations[0].get_x_position().values()))
-            x_pos = self._move_single_individual(
+            self._move_single_individual(
                 child_individual, pos[0][2], child_x_delta)
 
         self._move_individual_and_ancestors(
@@ -376,7 +376,6 @@ class BaseGraph():
             [type]: [description]
         """
         position_to_person_map = {}
-        failed = []
         v = {}
         collisions = []
         min_x = 999999
@@ -419,7 +418,6 @@ class BaseGraph():
 
         # block every x_index from birth to death in which an individual appears
         for x_index, graphical_individual_representation_list in v.items():
-            x_positions = []
             for index, graphical_individual_representation_a in enumerate(graphical_individual_representation_list):
                 for graphical_individual_representation_b in graphical_individual_representation_list[index+1:]:
                     birth_position_a = graphical_individual_representation_a.get_birth_event()[
@@ -462,8 +460,6 @@ class BaseGraph():
         v = {}
         for graphical_individual_representation in self.graphical_individual_representations:
             x_pos = graphical_individual_representation.get_x_position()
-            x_indices = set()
-            index_map = {}
             for value in x_pos.values():
                 x_index = value[1]
                 if value[3]:
