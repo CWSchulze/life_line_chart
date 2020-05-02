@@ -206,7 +206,7 @@ class BaseGraph():
             self.graphical_family_representations.append(new_instance)
         else:
             new_instance = family.graphical_representations[0]
-            #print('the family was added twice:'+family.family_id)
+            # print('the family was added twice:'+family.family_id)
         return new_instance
 
     def _calculate_sum_of_distances(self):
@@ -286,7 +286,7 @@ class BaseGraph():
         """
         if family is None:
             family_id = family
-            #return
+            # return
         else:
             family_id = family.family_id
         if len(individual.graphical_representations) > 0:
@@ -297,18 +297,18 @@ class BaseGraph():
                 # len(x_pos) <= 1 or
                 if list(sorted(x_pos.values()))[0][1] != x_pos[family_id][1]:
                     return
-                #for cof in individual.get_child_of_family():
+                # for cof in individual.get_child_of_family():
                 cof = individual.graphical_representations[0].visible_parent_family
                 if cof and cof.visual_placement_child and cof.visual_placement_child.individual_id == individual.individual_id:
                     if cof.husb:
-                        #if cof.husb.graphical_representations[0].get_x_position() and len(cof.husb.graphical_representations[0].get_x_position()) == 1:
+                        # if cof.husb.graphical_representations[0].get_x_position() and len(cof.husb.graphical_representations[0].get_x_position()) == 1:
                             self._move_individual_and_ancestors(
                                 cof.husb, cof, x_index_offset)
                     if cof.wife:
-                        #if cof.wife.graphical_representations[0].get_x_position() and len(cof.wife.graphical_representations[0].get_x_position()) == 1:
+                        # if cof.wife.graphical_representations[0].get_x_position() and len(cof.wife.graphical_representations[0].get_x_position()) == 1:
                             self._move_individual_and_ancestors(
                                 cof.wife, cof, x_index_offset)
-                    #print (individual.get)
+                    # print (individual.get)
                 if cof and len(cof.visible_children) > 1:
                     for child_individual_id, (_, _, child_individual) in cof.visible_children.items():
                         if child_individual_id == individual.individual_id:
@@ -476,7 +476,7 @@ class BaseGraph():
                     # value = index_map[x_index]
                     logger.error(
                         "failed: " + str((x_index, value[2].family_id, graphical_individual_representation.name, v[x_index])))
-                    #raise RuntimeError((x_index, key, graphical_individual_representation.name))
+                    # raise RuntimeError((x_index, key, graphical_individual_representation.name))
         full_index_list = list(sorted(v.keys()))
         for i in range(len(full_index_list)):
             if i not in full_index_list:

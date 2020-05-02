@@ -153,4 +153,4 @@ def test_fotos_in_chart():
         os.path.dirname(__file__), 'output', 'test_svg_fotos.svg'))
 
 
-#test_fotos_in_chart()
+# test_fotos_in_chart()

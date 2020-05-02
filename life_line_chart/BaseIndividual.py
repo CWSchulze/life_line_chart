@@ -122,9 +122,9 @@ class BaseIndividual():
         self._marriage_family_ids = []
         self.marriages = []
         self.child_of_family_id = []
-        self.events = {}  #: events like birth or death
-        self.graphical_representations = [] #: instances of graphical representations
-        self.images = {}  #: mapping of ordinal values to fotos of this individual
+        self.events = {}  # : events like birth or death
+        self.graphical_representations = [] # : instances of graphical representations
+        self.images = {}  # : mapping of ordinal values to fotos of this individual
 
     def _initialize(self):
         self._marriage_family_ids = self._get_marriage_family_ids()
