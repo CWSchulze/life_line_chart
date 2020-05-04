@@ -71,7 +71,7 @@ class BaseGraph():
             'long_description': 'Activate the birth label.'
         },
         'birth_label_along_path': {
-            'short_description': 'Birth label alogn path',
+            'short_description': 'Birth label along path',
             'long_description': 'The birth label is aligned to the individual line.'
         },
         'death_label_active': {
