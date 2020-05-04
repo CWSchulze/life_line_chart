@@ -290,4 +290,3 @@ class BaseIndividual():
         if True:
             raise NotImplementedError()
         return []
-

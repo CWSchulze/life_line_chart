@@ -194,7 +194,6 @@ class Line(object):
     #     return scale(self, sx=sx, sy=sy, origin=origin)
 
 
-
 class CubicBezier(object):
     # For compatibility with old pickle files.
     # _length_info = {'length': None, 'bpoints': None, 'error': None,

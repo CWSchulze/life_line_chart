@@ -48,7 +48,7 @@ class GedcomFamily(BaseFamily):
             if 'CHIL' not in self._database_fam[self.family_id]:
                 return []
             return self._database_fam[self.family_id]['CHIL']['tag_data'].split('\n')
-        except:
+        except KeyError:
             return []
 
     def _get_husb_name(self):
