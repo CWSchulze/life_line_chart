@@ -237,19 +237,20 @@ class AncestorGraph(BaseGraph):
                         0, individual.graphical_representations[0].x_end - individual.graphical_representations[0].x_start)
                     sibling.graphical_representations[0].range[child_family] = (
                         individual.graphical_representations[0].x_start, individual.graphical_representations[0].x_end)
-        min_ordinal = 9e99
-        max_ordinal = -9e99
-        for graphical_individual_representation in self.graphical_individual_representations:
-            birth_event = graphical_individual_representation.get_birth_event()
-            if not birth_event:
-                continue
-            birth_ordinal_value = birth_event['ordinal_value']
-            death_event = graphical_individual_representation.get_death_event()
-            death_ordinal_value = death_event['ordinal_value']
-            min_ordinal = min(min_ordinal, birth_ordinal_value)
-            max_ordinal = max(max_ordinal, death_ordinal_value)
-        self.min_ordinal = min_ordinal-3000
-        self.max_ordinal = max_ordinal+3000
+        if len(self.graphical_individual_representations) > 0:
+            min_ordinal = 9e99
+            max_ordinal = -9e99
+            for graphical_individual_representation in self.graphical_individual_representations:
+                birth_event = graphical_individual_representation.get_birth_event()
+                if not birth_event:
+                    continue
+                birth_ordinal_value = birth_event['ordinal_value']
+                death_event = graphical_individual_representation.get_death_event()
+                death_ordinal_value = death_event['ordinal_value']
+                min_ordinal = min(min_ordinal, birth_ordinal_value)
+                max_ordinal = max(max_ordinal, death_ordinal_value)
+            self.min_ordinal = min_ordinal-3000
+            self.max_ordinal = max_ordinal+3000
 
     def _compress_single_individual_position(self, individual, cof, direction):
         """
@@ -480,6 +481,13 @@ class AncestorGraph(BaseGraph):
             self._formatting['relative_line_thickness'] * \
             self._formatting['vertical_step_size']
 
+        if len(self.graphical_individual_representations) == 0:
+            # settings for empty graphs
+            self.min_x_index = 0
+            self.max_x_index = 1
+            self.min_ordinal = datetime.date(1900,1,1).toordinal()
+            self.max_ordinal = datetime.date(2000,1,1).toordinal()
+
         # setup grid
         max_y = max(self._map_y_position(self.min_ordinal),
                     self._map_y_position(self.max_ordinal))
@@ -570,6 +578,9 @@ class AncestorGraph(BaseGraph):
             for _, x_position in x_positions.items():
                 min_x_index = min(min_x_index, x_position[1])
                 max_x_index = max(max_x_index, x_position[1])
+        if len(self.graphical_individual_representations) == 0:
+            min_x_index = 0
+            max_x_index = 0
         self.min_x_index = min_x_index  # -1000
         self.max_x_index = max_x_index + 1  # +200
 
