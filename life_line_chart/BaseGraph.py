@@ -45,6 +45,8 @@ class BaseGraph():
         'death_label_letter_y_offset': 0,
         'warp_shape': 'normal',
         'family_shape': 0,
+        'individual_foto_active': False,
+        'individual_foto_relative_size': 2.5
     }
     _default_positioning = {
         'generations': 4,
@@ -62,6 +64,14 @@ class BaseGraph():
                 'sine': 'Sine shape',
                 'triangle': 'Triangular shape'
             }
+        },
+        'individual_foto_active': {
+            'short_description': 'Show fotos',
+            'long_description': 'Fotos of the individual are shown.'
+        },
+        'individual_foto_relative_size': {
+            'short_description': 'Foto size',
+            'long_description': 'Fotos which are shown are fitted into a square of this extent. The size is given relative to the line thickness.'
         },
         'total_height': {
             'short_description': 'Total height',
