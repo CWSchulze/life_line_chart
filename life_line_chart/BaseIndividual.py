@@ -103,17 +103,17 @@ class BaseIndividual():
     Base class for individuals. This class is used as interface to the database.
     """
     date_label_translation = {
-        'Calculated': '{symbol} berechnet {datum}',
-        'Estimated': '{symbol} geschätzt {datum}',
-        'Estimated (min 25 at marriage)': '{symbol} geschätzt {datum}',
-        'Estimated (max age 75)': '{symbol} geschätzt {datum}',
-        'Estimated (max age 100)': '{symbol} geschätzt {datum}',
-        'Estimated (min 1 after parents marriage)': '{symbol} geschätzt {datum}',
+        'Calculated': '{symbol}\u2009berechnet\u2009{datum}',
+        'Estimated': '{symbol}\u2009geschätzt\u2009{datum}',
+        'Estimated (min 25 at marriage)': '{symbol}\u2009geschätzt\u2009{datum}',
+        'Estimated (max age 75)': '{symbol}\u2009geschätzt\u2009{datum}',
+        'Estimated (max age 100)': '{symbol}\u2009geschätzt\u2009{datum}',
+        'Estimated (min 1 after parents marriage)': '{symbol}\u2009geschätzt\u2009{datum}',
         'Still alive': '',
-        'About': '{symbol} etwa {datum}',
-        'Before': '{symbol} vor {datum}',
-        'After': '{symbol} nach {datum}',
-        'YearPrecision': '{symbol} {datum}'
+        'About': '{symbol}\u2009etwa\u2009{datum}',
+        'Before': '{symbol}\u2009vor\u2009{datum}',
+        'After': '{symbol}\u2009nach\u2009{datum}',
+        'YearPrecision': '{symbol}\u2009{datum}'
     }
 
     def __init__(self, instances, individual_id):
@@ -197,7 +197,7 @@ class BaseIndividual():
                     symbol='*', datum=str(event['date'].date().year))
                 # string += ' ' + self.events['birth_or_christening']['comment']
             else:
-                string += '* ' + event['date'].date().strftime('%d.%m.%Y')
+                string += '*\u2009' + event['date'].date().strftime('%d.%m.%Y')
         return string
     birth_label = property(_get_birth_label)
 
@@ -216,7 +216,7 @@ class BaseIndividual():
                     symbol='\u2020', datum=str(event['date'].date().year))
                 # string += ' ' + self.events['birth_or_christening']['comment']
             else:
-                string += '\u2020 ' + event['date'].date().strftime('%d.%m.%Y')
+                string += '\u2020\u2009' + event['date'].date().strftime('%d.%m.%Y')
         return string
     death_label = property(_get_death_label)
 

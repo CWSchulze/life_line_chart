@@ -52,6 +52,6 @@ def test_instance_container_labels():
     assert str(
         individual_plain_names[1:5]) == "['Keith Lloyd Smith', 'Hans Peter Smith', 'Hanna Smith', 'Herman Julius Nielsen']"
     assert str(
-        individual_birth_labels[1:5]) == "['* 11.08.1966', '* 17.04.1904', '* 29.01.1821', '* 31.08.1889']"
+        individual_birth_labels[1:5]) == "['*\\u200911.08.1966', '*\\u200917.04.1904', '*\\u200929.01.1821', '*\\u200931.08.1889']"
     assert str(
-        individual_death_labels[1:5]) == "['', '† 29.01.1977', '† geschätzt 1896', '† 1945']"
+        individual_death_labels[1:5]) == "['', '†\\u200929.01.1977', '†\\u2009geschätzt\\u20091896', '†\\u20091945']"
