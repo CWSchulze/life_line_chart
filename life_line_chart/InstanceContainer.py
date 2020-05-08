@@ -63,6 +63,13 @@ class InstanceContainer():
     def __setitem__(self, key, value):
         self._data[key] = value
 
+    def clear(self):
+        """
+        clear all data
+        """        
+        self._data.clear()
+        self._data.update({('i', None): None, ('f', None): None})
+
 
 def get_gedcom_instance_container(filename='gramps_testdata.ged'):
     """

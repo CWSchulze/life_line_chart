@@ -709,6 +709,14 @@ class BaseGraph():
                 if possible_match['start'] < ordinal_value and possible_match['end'] > ordinal_value:
                     return possible_match['individual']
         return None
-        # print(possible_match['individual'].individual.plain_name)
-        # print(datetime.date.fromordinal(ordinal_value))
-        # print(x_index)
+
+    def clear_graphical_representations(self):
+        """
+        clear all graphical representations to rebuild the chart
+        """
+        self.additional_graphical_items = {}
+        self.additional_graphical_items['grid'] = []
+        self.graphical_individual_representations.clear()
+        self.graphical_family_representations.clear()
+        for key, instance in self._instances.items():
+            instance.graphical_representations.clear()

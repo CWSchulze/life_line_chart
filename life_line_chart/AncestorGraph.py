@@ -466,6 +466,15 @@ class AncestorGraph(BaseGraph):
         for graphical_individual_representation in self.graphical_individual_representations:
             graphical_individual_representation.items.clear()
 
+    def clear_graphical_representations(self):
+        """
+        clear all graphical representations to rebuild the chart
+        """
+        self.min_x_index = 0
+        self.max_x_index = 0
+        self.clear_svg_items()
+        BaseGraph.clear_graphical_representations(self)
+
     def define_svg_items(self):
         """
         generate graphical item information used for rendering the image.
