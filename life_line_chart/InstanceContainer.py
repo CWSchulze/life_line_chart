@@ -66,7 +66,7 @@ class InstanceContainer():
     def clear(self):
         """
         clear all data
-        """        
+        """
         self._data.clear()
         self._data.update({('i', None): None, ('f', None): None})
 
