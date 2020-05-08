@@ -787,7 +787,7 @@ class AncestorGraph(BaseGraph):
                                         coeffs[0].imag, coeffs[1].imag, coeffs[2].imag, coeffs[3].imag - self._map_y_position(ov))
                                     roots = Cardano(*coeffs2)
                                     root = [root.real for root in roots if abs(
-                                        root.imag) < 1e-10][0]
+                                        root.imag) < 1e-5 and root.real >= 0 and root.real <= 1]
                                     if len(root) > 0:
                                         xpos = svg_path.point(root[0])
                                     else:
@@ -875,7 +875,7 @@ class AncestorGraph(BaseGraph):
                                         # coeffs2 = (coeffs[0] - self._map_y_position(ov)*1j, coeffs[1], coeffs[2], coeffs[3])
                                         roots = Cardano(*coeffs2)
                                         root = [root.real for root in roots if abs(
-                                            root.imag) < 1e-10 and root.real >= 0 and root.real <= 1]
+                                            root.imag) < 1e-5 and root.real >= 0 and root.real <= 1]
                                         if len(root) > 0:
                                             xpos = svg_path.point(root[0])
                                         else:
