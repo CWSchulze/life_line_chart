@@ -22,37 +22,49 @@ class BaseGraph():
         'margin_right': 50,
         'margin_top': 50,
         'margin_bottom': 50,
-        'vertical_step_size': 20,
+        'vertical_step_size': 40,
         'relative_line_thickness': 0.5,
         'total_height': 2000,
         'display_factor': -1,
         'font_size_description': 0.7,
-        'font_description_letter_offset': [str(30 / 12.0)+''],
+        'font_description_letter_offset': [str(30 / 12.0)],
         'font_name': 'Arial',
         'birth_label_active': True,
         'birth_label_along_path': False,
+        'birth_label_rotation': -90,
+        'birth_label_anchor': 'start',
+        'birth_label_wrapping_active': False,
         'birth_label_letter_x_offset': 0.8,
+        'birth_label_letter_y_offset': 0,
         'fade_individual_color': True,
         'fade_individual_color_black_age': 150,
         'marriage_label_active': True,
         'no_ring': False,
         'death_label_active': True,
         'death_label_rotation': -90,
+        'death_label_anchor': 'start',
+        'death_label_wrapping_active': False,
         'death_label_letter_x_offset': 0.8,
+        'death_label_letter_y_offset': 0,
         'warp_shape': 'normal',
         'family_shape': 0,
     }
     _default_positioning = {
         'generations': 4,
         'compression_steps': -1,  # debugging option
-        'compress': True,
-        'flip_to_optimize': True,
-        'fathers_have_the_same_color': True,
+        'compress': False,
+        'flip_to_optimize': False,
+        'fathers_have_the_same_color': False,
     }
     _formatting_description = {
         'warp_shape': {
             'short_description': 'Warp the chart shape',
-            'long_description': 'The overall shape of the chart can be warped.'
+            'long_description': 'The overall shape of the chart can be warped.',
+            'choices': {
+                'normal': 'Normal grid shape',
+                'sine': 'Sine shape',
+                'triangle': 'Triangular shape'
+            }
         },
         'total_height': {
             'short_description': 'Total height',
@@ -72,11 +84,72 @@ class BaseGraph():
         },
         'birth_label_along_path': {
             'short_description': 'Birth label along path',
-            'long_description': 'The birth label is aligned to the individual line.'
+            'long_description': 'The birth label is aligned to the individual line.',
+            'tab': 'Label Configuration'
+        },
+        'birth_label_rotation': {
+            'short_description': 'Birth label rotation',
+            'long_description': 'The birth label is written in a text frame rotated by this value.',
+            'tab': 'Label Configuration'
+        },
+        'birth_label_letter_x_offset': {
+            'short_description': 'Birth label x offset',
+            'long_description': 'The birth label is moved in x direction by this value, which is given relatively to the font size.',
+            'tab': 'Label Configuration'
+        },
+        'birth_label_letter_y_offset': {
+            'short_description': 'Birth label y offset',
+            'long_description': 'The birth label is moved in y direction by this value, which is given relatively to the font size.',
+            'tab': 'Label Configuration'
+        },
+        'birth_label_wrapping_active': {
+            'short_description': 'Wrap words in birth label',
+            'long_description': 'The birth label content is wrapped where possible.',
+            'tab': 'Label Configuration'
+        },
+        'birth_label_anchor': {
+            'short_description': 'Birth label anchor',
+            'long_description': 'Text alignment of the birth label.',
+            'choices': {
+                'start' : 'Left',
+                'middle' : 'Center',
+                'end' : 'Right'
+            },
+            'tab': 'Label Configuration'
         },
         'death_label_active': {
             'short_description': 'Show death label',
             'long_description': 'Activate the death label.'
+        },
+        'death_label_rotation': {
+            'short_description': 'Death label rotation',
+            'long_description': 'The death label is written in a text frame rotated by this value.',
+            'tab': 'Label Configuration'
+        },
+        'death_label_letter_x_offset': {
+            'short_description': 'Death label x offset',
+            'long_description': 'The death label is moved in x direction by this value, which is given relatively to the font size.',
+            'tab': 'Label Configuration'
+        },
+        'death_label_letter_y_offset': {
+            'short_description': 'Death label y offset',
+            'long_description': 'The death label is moved in y direction by this value, which is given relatively to the font size.',
+            'tab': 'Label Configuration'
+        },
+        'death_label_wrapping_active': {
+            'short_description': 'Wrap words in death label',
+            'long_description': 'The death label content is wrapped where possible.',
+            'tab': 'Label Configuration'
+        },
+        'death_label_anchor': {
+            'short_description': 'Death label anchor',
+            'long_description': 'Text alignment of the death label.',
+            'choices': {
+                'start' : 'Left',
+                'middle' : 'Center',
+                'end' : 'Right'
+            },
+            'tab': 'Label Configuration'
         },
         'marriage_label_active': {
             'short_description': 'Show marriage label',
@@ -88,15 +161,21 @@ class BaseGraph():
         },
         'font_name': {
             'short_description': 'Font name',
-            'long_description': 'Name of the font family used for labels.'
+            'long_description': 'Name of the font family used for labels.',
+            'tab': 'Label Configuration'
         },
         'font_size_description': {
             'short_description': 'Relative font size',
-            'long_description': 'The font size is given relatively to the line thickness.'
+            'long_description': 'The font size is given relatively to the line thickness.',
+            'tab': 'Label Configuration'
         },
         'family_shape': {
             'short_description': 'Family shape',
-            'long_description': 'The shape of the families can be varied.'
+            'long_description': 'The shape of the families can be varied.',
+            'choices': {
+                0 : 'Rectangular',
+                1 : 'Softer'
+            }
         },
     }
     _positioning_description = {
@@ -118,7 +197,7 @@ class BaseGraph():
         },
 
     }
-    _available_warp_shapes = ['normal', 'sine', 'triangle']
+    _available_warp_shapes = list(_formatting_description['warp_shape']['choices'].keys())
     # TODO: extract base class for other graph types
     _graphical_family_class = ancestor_graph_family
     # TODO: extract base class for other graph types

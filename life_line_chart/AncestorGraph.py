@@ -931,30 +931,37 @@ class AncestorGraph(BaseGraph):
                             'font_name': self._formatting['font_name'],
                         })
                 else:
+                    birth_label_text = " ".join(individual_name + [birth_label])
+                    if self._formatting['birth_label_wrapping_active']:
+                        birth_label_text = birth_label_text.strip().replace(' ', '\n')
                     graphical_individual_representation.items.append(
                         {
                             'type': 'text',
                             'config': {
                                 'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
-                                'text': individual_name[0] + ' ' + individual_name[1] + birth_label,
-                                'transform': 'rotate(%s,%s, %s)' % (-90+self._orientation_angle(*_birth_original_location), *_birth_position),
+                                'text': birth_label_text,
+                                'text-anchor': self._formatting['birth_label_anchor'],
+                                'transform': 'rotate(%s,%s, %s)' % (self._formatting['birth_label_rotation']+self._orientation_angle(*_birth_original_location), *_birth_position),
                                 'insert': _birth_position,
                                 'dx': [str(font_size*float(self._formatting['birth_label_letter_x_offset']))],
-                                'dy': [str(float(font_size)/2.7)+'px'],
+                                'dy': [str(float(font_size)/2.7 + font_size*float(self._formatting['birth_label_letter_y_offset']))+'px'],
                             },
                             'font_size': font_size,
                             'font_name': self._formatting['font_name'],
                         })
             if self._formatting['death_label_active']:
+                if self._formatting['death_label_wrapping_active']:
+                    death_label = death_label.strip().replace(' ', '\n')
                 graphical_individual_representation.items.append(
                     {
                         'type': 'text',
                         'config': {
                             'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
                             'text': death_label,
+                            'text-anchor': self._formatting['death_label_anchor'],
                             'transform': 'rotate(%g,%s, %s)' % (self._formatting['death_label_rotation']+self._orientation_angle(*_death_original_location), *_death_position),
                             'insert': _death_position,
-                            'dy': [str(float(font_size)/2.7)+'px'],
+                            'dy': [str(float(font_size)/2.7 + font_size*float(self._formatting['death_label_letter_y_offset']))+'px'],
                             'dx': [str(font_size*float(self._formatting['death_label_letter_x_offset']))],
                         },
                         'font_size': font_size,
