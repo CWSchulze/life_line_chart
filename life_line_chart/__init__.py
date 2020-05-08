@@ -22,4 +22,10 @@ from .GedcomParsing import get_date_dict_from_tag, estimate_marriage_date
 
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 
-__version__ = "1.2.15"
+__version__ = "1.2.16"
+
+import logging
+logging.basicConfig()
+logger = logging.getLogger("life_line_chart")
+logger.setLevel(logging.FATAL)
+

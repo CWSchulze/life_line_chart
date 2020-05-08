@@ -152,5 +152,6 @@ def test_fotos_in_chart():
     graph.paint_and_save(individual_id, os.path.join(
         os.path.dirname(__file__), 'output', 'test_svg_fotos.svg'))
 
-
-# test_fotos_in_chart()
+#import life_line_chart, logging
+#life_line_chart.logger.setLevel(logging.DEBUG)
+#test_fotos_in_chart()

@@ -9,9 +9,7 @@ from .BaseGraph import BaseGraph, get_gedcom_instance_container
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 from cmath import sqrt, exp, pi
 
-logging.basicConfig()  # level=20)
 logger = logging.getLogger("life_line_chart")
-logger.setLevel(logging.INFO)
 
 J = exp(2j*pi/3)
 Jc = 1/J

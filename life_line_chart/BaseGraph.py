@@ -7,10 +7,7 @@ import os
 from copy import deepcopy
 import logging
 
-
-logging.basicConfig()  # level=20)
 logger = logging.getLogger("life_line_chart")
-logger.setLevel(logging.INFO)
 
 
 class BaseGraph():
