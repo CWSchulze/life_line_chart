@@ -854,7 +854,7 @@ class AncestorGraph(BaseGraph):
                                         self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value']))
                                 )
                             )
-                        if len(graphical_individual_representation.individual.images) > 0:
+                        if self._formatting['individual_foto_active'] and len(graphical_individual_representation.individual.images) > 0:
                             svg_path = Path_types[data[-1][0]
                                                   ['type']](*data[-1][0]['arguments'])
                             for ov, filename in graphical_individual_representation.individual.images.items():
