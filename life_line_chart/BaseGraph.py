@@ -17,8 +17,8 @@ class BaseGraph():
     _default_formatting = {
         'margin_left': 50,
         'margin_right': 50,
-        'margin_top': 50,
-        'margin_bottom': 50,
+        'margin_year_max': 5,
+        'margin_year_min': 10,
         'vertical_step_size': 40,
         'relative_line_thickness': 0.5,
         'total_height': 2000,
@@ -184,6 +184,14 @@ class BaseGraph():
                 1 : 'Softer'
             }
         },
+        'margin_year_max': {
+            'short_description': 'Upper year minimum margin',
+            'long_description': 'The upper bound of the chart is extended by at least this number of years.'
+        },
+        'margin_year_min': {
+            'short_description': 'Lower year minimum margin',
+            'long_description': 'The lower bound of the chart is extended by at least this number of years.'
+        }
     }
     _positioning_description = {
         'generations': {
@@ -225,12 +233,15 @@ class BaseGraph():
         self._instances[('i', None)] = None
         self.graphical_individual_representations = []
         self.graphical_family_representations = []
+        self.additional_graphical_items = {}
         logger.debug('finished creating instances')
 
         self.min_x_index = 10000000
         self.max_x_index = -10000000
-        self.min_ordinal = 10000000
-        self.max_ordinal = -10000000
+        self.min_ordinal = None
+        self.max_ordinal = None
+        self.chart_min_ordinal = None
+        self.chart_max_ordinal = None
 
     def get_default_formatting_and_description(self):
         return deepcopy(self._default_formatting), deepcopy(self._formatting_description)
@@ -485,15 +496,13 @@ class BaseGraph():
                     v[x_index] = []
                     position_to_person_map[x_index] = []
                 if i == 0:
-                    start_y = graphical_individual_representation.get_birth_event()[
-                        'ordinal_value']
+                    start_y = graphical_individual_representation.get_birth_date_ov()
                 else:
                     start_y = list(x_pos.values())[i][0]
                 if i < len(x_pos) - 1:
                     end_y = list(x_pos.values())[i+1][0]
                 else:
-                    end_y = graphical_individual_representation.get_death_event()[
-                        'ordinal_value']
+                    end_y = graphical_individual_representation.get_death_date_ov()
                 position_to_person_map[x_index].append({
                     'start': start_y,
                     'end': end_y,
@@ -510,14 +519,10 @@ class BaseGraph():
         for x_index, graphical_individual_representation_list in v.items():
             for index, graphical_individual_representation_a in enumerate(graphical_individual_representation_list):
                 for graphical_individual_representation_b in graphical_individual_representation_list[index+1:]:
-                    birth_position_a = graphical_individual_representation_a.get_birth_event()[
-                        'ordinal_value'] - 365*15
-                    birth_position_b = graphical_individual_representation_b.get_birth_event()[
-                        'ordinal_value'] - 365*15
-                    death_position_a = graphical_individual_representation_a.get_death_event()[
-                        'ordinal_value'] + 365*15
-                    death_position_b = graphical_individual_representation_b.get_death_event()[
-                        'ordinal_value'] + 365*15
+                    birth_position_a = graphical_individual_representation_a.get_birth_date_ov() - 365*15
+                    birth_position_b = graphical_individual_representation_b.get_birth_date_ov() - 365*15
+                    death_position_a = graphical_individual_representation_a.get_death_date_ov() + 365*15
+                    death_position_b = graphical_individual_representation_b.get_death_date_ov() + 365*15
                     if ((birth_position_a - birth_position_b)
                                 * (birth_position_a - death_position_b) < 0 or
                                 (death_position_a - birth_position_b)
@@ -592,12 +597,11 @@ class BaseGraph():
             float: y position
         """
         return (
-            self._formatting['margin_top']
-            - self._formatting['total_height'] *
-            (self._formatting['display_factor']-1)/2
-            + (ordinal_value - self.min_ordinal)/(self.max_ordinal-self.min_ordinal) *
+            + (ordinal_value - self.chart_min_ordinal)/(self.chart_max_ordinal-self.chart_min_ordinal) *
             self._formatting['total_height'] *
             self._formatting['display_factor']
+            - self._formatting['total_height'] *
+            (self._formatting['display_factor']-1)/2
         )
 
     def _map_x_position(self, x_index):
@@ -661,13 +665,33 @@ class BaseGraph():
 
         return angle_deg
 
+    def _inverse_y_delta(self, delta_y):
+        """
+        map back a delta display size to the delta ordinal value
+
+        Args:
+            delta_y (float): difference of display size
+
+        Returns:
+            float: difference of ordinal value
+        """
+        return delta_y / (self._formatting['total_height'] * self._formatting['display_factor']) * (self.max_ordinal-self.min_ordinal)
+
     def _inverse_y_position(self, pos_y):
+        """
+        map back a display position to an ordinal value
+
+        Args:
+            pos_y (float): display position
+
+        Returns:
+            float: ordinal value
+        """
         return (
             pos_y
-            - self._formatting['margin_top']
             + self._formatting['total_height'] *
             (self._formatting['display_factor']-1)/2
-        ) / (self._formatting['total_height'] * self._formatting['display_factor']) * (self.max_ordinal-self.min_ordinal) + self.min_ordinal
+        ) / (self._formatting['total_height'] * self._formatting['display_factor']) * (self.chart_max_ordinal-self.chart_min_ordinal) + self.chart_min_ordinal
 
     def _inverse_x_position(self, pos_x):
         return int(round((pos_x - self._formatting['margin_left'])/self._formatting['vertical_step_size']))
@@ -688,7 +712,7 @@ class BaseGraph():
         Returns:
             float: graph height
         """
-        return abs(self._map_y_position(self.min_ordinal) - self._map_y_position(self.max_ordinal)) + self._formatting['margin_bottom']
+        return abs(self._map_y_position(self.chart_min_ordinal) - self._map_y_position(self.chart_max_ordinal))
 
     def get_individual_from_position(self, pos_x, pos_y):
         """
@@ -714,8 +738,9 @@ class BaseGraph():
         """
         clear all graphical representations to rebuild the chart
         """
-        self.additional_graphical_items = {}
-        self.additional_graphical_items['grid'] = []
+        self.max_ordinal = None
+        self.min_ordinal = None
+        self.additional_graphical_items.clear()
         self.graphical_individual_representations.clear()
         self.graphical_family_representations.clear()
         for key, instance in self._instances.items():

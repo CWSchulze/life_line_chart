@@ -17,11 +17,12 @@ class ancestor_graph_individual():
         self.individual_id = individual_id
         self.__instances = instances
         self.individual = self.__instances[('i', self.individual_id)]
-        self.__instances[('i', self.individual_id)
-                         ].graphical_representations.append(self)
+        self.individual.graphical_representations.append(self)
         self.widths = {}
         self.range = {}
         self.visual_placement_child = None
+        self.__birth_date_ov = None
+        self.__death_date_ov = None
         pass
 
     def get_marriages(self):
@@ -38,7 +39,7 @@ class ancestor_graph_individual():
             return self.widths[family]
             # return max(0, self.x_end - self.x_start)
         width = 0
-        for child_of_family in self.__instances[('i', self.individual_id)].get_child_of_family():
+        for child_of_family in self.individual.get_child_of_family():
             father, mother = child_of_family.get_husband_and_wife()
             if father and father.graphical_representations:
                 width += father.graphical_representations[0].get_width(
@@ -95,10 +96,42 @@ class ancestor_graph_individual():
     x_position = property(get_x_position, set_x_position)
 
     def get_birth_event(self):
-        return self.__instances[('i', self.individual_id)].events['birth_or_christening']
+        return self.individual.events['birth_or_christening']
 
     def get_death_event(self):
-        return self.__instances[('i', self.individual_id)].events['death_or_burial']
+        return self.individual.events['death_or_burial']
+
+    def get_birth_date_ov(self):
+        """
+        get the ordinal value of the birth (or christening or baptism) date
+
+        Returns:
+            float: ordinal value of birth date
+        """
+        if self.__birth_date_ov is None:
+            boc = self.individual.events.get('birth_or_christening')
+            if boc:
+                self.__birth_date_ov = boc['date'].date().toordinal()
+                return self.__birth_date_ov
+            return None
+        else:
+            return self.__birth_date_ov
+
+    def get_death_date_ov(self):
+        """
+        get the ordinal value of the death (or burial) date
+
+        Returns:
+            float: ordinal value of death date
+        """
+        if self.__death_date_ov is None:
+            dob = self.individual.events.get('death_or_burial')
+            if dob:
+                self.__death_date_ov = dob['date'].date().toordinal()
+                return self.__death_date_ov
+            return None
+        else:
+            return self.__death_date_ov
 
     def __get_birth_label(self):
         return self.individual.birth_label

@@ -8,6 +8,7 @@ from copy import deepcopy
 from .BaseGraph import BaseGraph, get_gedcom_instance_container
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 from cmath import sqrt, exp, pi
+from math import floor, ceil
 
 logger = logging.getLogger("life_line_chart")
 
@@ -115,9 +116,12 @@ class AncestorGraph(BaseGraph):
         """
         # logger.info('start setting placement')
         x_position = x_offset
-        individual.graphical_representations[0].x_start = x_position
+        graphical_individual_representation = individual.graphical_representations[0]
+        graphical_individual_representation.x_start = x_position
         self.min_x_index = min(self.min_x_index, x_position)
         child_of_families = individual.get_child_of_family()
+
+        # recursively add the father branch
         for local_child_of_family in child_of_families:
             father, mother = local_child_of_family.get_husband_and_wife()
             if father and father.has_graphical_representation():
@@ -140,18 +144,19 @@ class AncestorGraph(BaseGraph):
                         local_child_of_family.graphical_representations[0].husb_width = width
                     x_position += width
 
+        # add the main individual and its visible siblings
         children_start_x = x_position
-        if individual.graphical_representations[0].get_x_position() is None or spouse_family is not None and spouse_family.family_id not in individual.graphical_representations[0].get_x_position() or False:
-            individual.graphical_representations[0].set_x_position(
+        if graphical_individual_representation.get_x_position() is None or spouse_family is not None and spouse_family.family_id not in graphical_individual_representation.get_x_position() or False:
+            graphical_individual_representation.set_x_position(
                 x_position, spouse_family)
             # if child_of_family :# and len(child_of_family.graphical_representations[0].visible_children) > 1:
-            if child_of_family and child_of_family.family_id not in individual.graphical_representations[0].get_x_position():
-                individual.graphical_representations[0].set_x_position(
+            if child_of_family and child_of_family.family_id not in graphical_individual_representation.get_x_position():
+                graphical_individual_representation.set_x_position(
                     x_position, child_of_family, True)
             x_position += 1
         if not child_of_family or not child_of_family.graphical_representations:
             # x_position += 1
-            if True or not individual.graphical_representations[0].get_x_position() or False:
+            if True or not graphical_individual_representation.get_x_position() or False:
                 pass
         else:
             for _, _, sibling in sorted(child_of_family.graphical_representations[0].visible_children.values()):
@@ -164,7 +169,7 @@ class AncestorGraph(BaseGraph):
                     if not sibling.graphical_representations[0].get_x_position() or child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
                         if not sibling.graphical_representations[0].visual_placement_child:
                             sibling.graphical_representations[
-                                0].visual_placement_child = individual.graphical_representations[0].visual_placement_child
+                                0].visual_placement_child = graphical_individual_representation.visual_placement_child
                             sibling.graphical_representations[0].set_x_position(
                                 x_position, child_of_family)
                         # if sibling != individual:
@@ -177,6 +182,7 @@ class AncestorGraph(BaseGraph):
             child_of_family.graphical_representations[0].children_width = x_position - \
                 children_start_x
 
+        # recursively add the mother branch
         for local_child_of_family in child_of_families:
             father, mother = local_child_of_family.get_husband_and_wife()
             if mother and mother.has_graphical_representation():
@@ -198,57 +204,56 @@ class AncestorGraph(BaseGraph):
                     if local_child_of_family:
                         local_child_of_family.graphical_representations[0].wife_width = width
                     x_position += width
+
+        # set width, range, x_end
         self.max_x_index = max(self.max_x_index, x_position)
-        individual.graphical_representations[0].x_end = x_position
+        graphical_individual_representation.x_end = x_position
         if child_of_family:
-            if child_of_family.family_id not in individual.graphical_representations[0].widths:
+            if child_of_family.family_id not in graphical_individual_representation.widths:
                 if child_of_family and child_of_family.has_graphical_representation() and len(child_of_family.graphical_representations[0].visible_children) > 1:
-                    individual.graphical_representations[0].widths[child_of_family.family_id] = max(
-                        0, individual.graphical_representations[0].x_end - individual.graphical_representations[0].x_start)
-                    individual.graphical_representations[0].range[child_of_family.family_id] = (
-                        individual.graphical_representations[0].x_start, individual.graphical_representations[0].x_end)
+                    graphical_individual_representation.widths[child_of_family.family_id] = max(
+                        0, graphical_individual_representation.x_end - graphical_individual_representation.x_start)
+                    graphical_individual_representation.range[child_of_family.family_id] = (
+                        graphical_individual_representation.x_start, graphical_individual_representation.x_end)
                 else:
-                    individual.graphical_representations[0].widths[child_of_family.family_id] = max(
-                        0, individual.graphical_representations[0].x_end - individual.graphical_representations[0].x_start)
-                    individual.graphical_representations[0].range[child_of_family.family_id] = (
-                        individual.graphical_representations[0].x_start, individual.graphical_representations[0].x_end)
+                    graphical_individual_representation.widths[child_of_family.family_id] = max(
+                        0, graphical_individual_representation.x_end - graphical_individual_representation.x_start)
+                    graphical_individual_representation.range[child_of_family.family_id] = (
+                        graphical_individual_representation.x_start, graphical_individual_representation.x_end)
                     # print("as")
             # else:
             #     logger.info("Width was already set for "+child_of_family.family_id)
 
         if not child_of_family or not child_of_family.graphical_representations:
-            if child_family not in individual.graphical_representations[0].widths:
+            if child_family not in graphical_individual_representation.widths:
                 if child_family:
-                    individual.graphical_representations[0].widths[child_family.family_id] = 1
+                    graphical_individual_representation.widths[child_family.family_id] = 1
                 else:
-                    individual.graphical_representations[0].widths[child_family] = 1
+                    graphical_individual_representation.widths[child_family] = 1
             pass
         else:
             for _, _, sibling in sorted(child_of_family.graphical_representations[0].visible_children.values()):
                 if child_family:
                     sibling.graphical_representations[0].widths[child_family.family_id] = max(
-                        0, individual.graphical_representations[0].x_end - individual.graphical_representations[0].x_start)
+                        0, graphical_individual_representation.x_end - graphical_individual_representation.x_start)
                     sibling.graphical_representations[0].range[child_family.family_id] = (
-                        individual.graphical_representations[0].x_start, individual.graphical_representations[0].x_end)
+                        graphical_individual_representation.x_start, graphical_individual_representation.x_end)
                 else:
                     sibling.graphical_representations[0].widths[child_family] = max(
-                        0, individual.graphical_representations[0].x_end - individual.graphical_representations[0].x_start)
+                        0, graphical_individual_representation.x_end - graphical_individual_representation.x_start)
                     sibling.graphical_representations[0].range[child_family] = (
-                        individual.graphical_representations[0].x_start, individual.graphical_representations[0].x_end)
-        if len(self.graphical_individual_representations) > 0:
-            min_ordinal = 9e99
-            max_ordinal = -9e99
-            for graphical_individual_representation in self.graphical_individual_representations:
-                birth_event = graphical_individual_representation.get_birth_event()
-                if not birth_event:
-                    continue
-                birth_ordinal_value = birth_event['ordinal_value']
-                death_event = graphical_individual_representation.get_death_event()
-                death_ordinal_value = death_event['ordinal_value']
-                min_ordinal = min(min_ordinal, birth_ordinal_value)
-                max_ordinal = max(max_ordinal, death_ordinal_value)
-            self.min_ordinal = min_ordinal-3000
-            self.max_ordinal = max_ordinal+3000
+                        graphical_individual_representation.x_start, graphical_individual_representation.x_end)
+
+        # recalculate
+        birth_ordinal_value = graphical_individual_representation.get_birth_date_ov()
+        death_ordinal_value = graphical_individual_representation.get_death_date_ov()
+        if self.min_ordinal is not None and self.max_ordinal is not None:
+            self.min_ordinal = min(self.min_ordinal, birth_ordinal_value)
+            self.max_ordinal = max(self.max_ordinal, death_ordinal_value)
+        elif death_ordinal_value and birth_ordinal_value:
+            self.min_ordinal = birth_ordinal_value
+            self.max_ordinal = death_ordinal_value
+
 
     def _compress_single_individual_position(self, individual, cof, direction):
         """
@@ -395,8 +400,7 @@ class AncestorGraph(BaseGraph):
                     collect_candidates(cof.get_children())
 
             # candidantes = set()
-            items = list(reversed(sorted([(child.graphical_representations[0].get_birth_event()[
-                         'ordinal_value'], index, child) for index, child in enumerate(candidantes)])))
+            items = list(reversed(sorted([(child.graphical_representations[0].get_birth_date_ov(), index, child) for index, child in enumerate(candidantes)])))
             failed = []
             for ov, _, child in items:
                 c_pos = list(
@@ -461,8 +465,7 @@ class AncestorGraph(BaseGraph):
         """
         clear all graphical items to render the graph with different settings
         """
-        self.additional_graphical_items = {}
-        self.additional_graphical_items['grid'] = []
+        self.additional_graphical_items.clear()
         for graphical_individual_representation in self.graphical_individual_representations:
             graphical_individual_representation.items.clear()
 
@@ -481,8 +484,7 @@ class AncestorGraph(BaseGraph):
         """
         logger.debug('start creating graphical items')
 
-        self.additional_graphical_items = {}
-        self.additional_graphical_items['grid'] = []
+        self.additional_graphical_items.clear()
 
         font_size = self._formatting['font_size_description'] * \
             self._formatting['relative_line_thickness'] * \
@@ -495,88 +497,93 @@ class AncestorGraph(BaseGraph):
             self.min_ordinal = datetime.date(1900,1,1).toordinal()
             self.max_ordinal = datetime.date(2000,1,1).toordinal()
 
+        # calculate outer chart bounds
+        min_year = datetime.date.fromordinal(self.min_ordinal).year - self._formatting['margin_year_min']
+        min_year = int(floor(min_year/10.)*10)
+        self.chart_min_ordinal = datetime.date(min_year - 5, 1, 1).toordinal()
+        max_year = datetime.date.fromordinal(self.max_ordinal).year + self._formatting['margin_year_max']
+        max_year = int(ceil(max_year/10.)*10)
+        self.chart_max_ordinal = datetime.date(max_year + 5, 1, 1).toordinal()
+
         # setup grid
-        max_y = max(self._map_y_position(self.min_ordinal),
-                    self._map_y_position(self.max_ordinal))
-        min_y = min(self._map_y_position(self.min_ordinal),
-                    self._map_y_position(self.max_ordinal))
         min_x_index = self.min_x_index
         max_x_index = self.max_x_index
-        for index in range(600):
-            year = 1000 + 2*index
+        if 'grid' not in self.additional_graphical_items:
+            self.additional_graphical_items['grid'] = []
+        for year in range(min_year, max_year + 2, 2):
             year_pos = self._map_y_position(
                 datetime.date(year, 1, 1).toordinal())
-            if year_pos > 0 and year_pos < max_y:
-                if year % 10 == 0:
-                    self.additional_graphical_items['grid'].append({
-                        'type': 'path',
-                                'config': {'type': 'Line', 'arguments': (0 + year_pos*1j, self.get_full_width() + year_pos*1j)},
-                                'color': [210]*3,
-                                'stroke_width': 1
-                    }
-                    )
-                    self.additional_graphical_items['grid'].append({
-                        'type': 'text',
-                                'config': {
-                                    'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
-                                    'text': str(year),
-                                    'text-anchor': 'end',
-                                    # 'align' : 'center',
-                                    'insert': (self.get_full_width() - self._formatting['vertical_step_size']*0.1, year_pos),
-                                },
-                        'font_size': font_size,
-                        'font_name': self._formatting['font_name'],
-                    }
-                    )
-                else:
-                    self.additional_graphical_items['grid'].append({
-                        'type': 'path',
-                                'config': {'type': 'Line', 'arguments': (0 + year_pos*1j, self.get_full_width() + year_pos*1j)},
-                                'color': [210]*3,
-                                'stroke_width': 0.1
-                    }
-                    )
-        for index in range(1000):
-            x_position = index*100
-            if x_position > min_x_index and x_position < max_x_index:
-                # svg_path = Path(
-                #     Line(x_position + min_y*1j, x_position + max_y*1j))
-                if index % 20 == 0:
-                    for index2 in range(600):
-                        year = 1000 + 2*index2
-                        year_pos = self._map_y_position(
-                            datetime.date(year, 1, 1).toordinal())
-                        if year_pos > 0 and year_pos < max_y:
-                            if year % 10 == 0:
-                                self.additional_graphical_items['grid'].append({
-                                    'type': 'text',
-                                            'config': {
-                                                'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
-                                                'text': str(year),
-                                                'text-anchor': 'end',
-                                                # 'align' : 'center',
-                                                'insert': (x_position-5, year_pos),
-                                            },
-                                    'font_size': font_size,
-                                    'font_name': self._formatting['font_name'],
-                                }
-                                )
-                if index % 10 == 0:
-                    self.additional_graphical_items['grid'].append({
-                        'type': 'path',
-                                'config': {'type': 'Line', 'arguments': (x_position + min_y*1j, x_position + max_y*1j)},
-                                'color': [210]*3,
-                                'stroke_width': 1
-                    }
-                    )
-                else:
-                    self.additional_graphical_items['grid'].append({
-                        'type': 'path',
-                                'config': {'type': 'Line', 'arguments': (x_position + min_y*1j, x_position + max_y*1j)},
-                                'color': [210]*3,
-                                'stroke_width': 0.1
-                    }
-                    )
+            if year % 10 == 0:
+                # add bold line and number every 10 years
+                self.additional_graphical_items['grid'].append({
+                    'type': 'path',
+                            'config': {'type': 'Line', 'arguments': (0 + year_pos*1j, self.get_full_width() + year_pos*1j)},
+                            'color': [210]*3,
+                            'stroke_width': 1
+                }
+                )
+                self.additional_graphical_items['grid'].append({
+                    'type': 'text',
+                            'config': {
+                                'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
+                                'text': str(year),
+                                'text-anchor': 'end',
+                                # 'align' : 'center',
+                                'insert': (self.get_full_width() - self._formatting['vertical_step_size']*0.1, year_pos),
+                            },
+                    'font_size': font_size,
+                    'font_name': self._formatting['font_name'],
+                }
+                )
+            else:
+                # add thin line
+                self.additional_graphical_items['grid'].append({
+                    'type': 'path',
+                            'config': {'type': 'Line', 'arguments': (0 + year_pos*1j, self.get_full_width() + year_pos*1j)},
+                            'color': [210]*3,
+                            'stroke_width': 0.1
+                }
+                )
+        # for index in range(1000):
+        #     x_position = index*100
+        #     if x_position > min_x_index and x_position < max_x_index:
+        #         # svg_path = Path(
+        #         #     Line(x_position + min_y*1j, x_position + max_y*1j))
+        #         if index % 20 == 0:
+        #             for year in range(min_year, max_year + 2, 2):
+        #                 year_pos = self._map_y_position(
+        #                     datetime.date(year, 1, 1).toordinal())
+        #                 if year_pos > 0 and year_pos < max_y:
+        #                     if year % 10 == 0:
+        #                         self.additional_graphical_items['grid'].append({
+        #                             'type': 'text',
+        #                                     'config': {
+        #                                         'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
+        #                                         'text': str(year),
+        #                                         'text-anchor': 'end',
+        #                                         # 'align' : 'center',
+        #                                         'insert': (x_position-5, year_pos),
+        #                                     },
+        #                             'font_size': font_size,
+        #                             'font_name': self._formatting['font_name'],
+        #                         }
+        #                         )
+        #         if index % 10 == 0:
+        #             self.additional_graphical_items['grid'].append({
+        #                 'type': 'path',
+        #                         'config': {'type': 'Line', 'arguments': (x_position + min_y*1j, x_position + max_y*1j)},
+        #                         'color': [210]*3,
+        #                         'stroke_width': 1
+        #             }
+        #             )
+        #         else:
+        #             self.additional_graphical_items['grid'].append({
+        #                 'type': 'path',
+        #                         'config': {'type': 'Line', 'arguments': (x_position + min_y*1j, x_position + max_y*1j)},
+        #                         'color': [210]*3,
+        #                         'stroke_width': 0.1
+        #             }
+        #             )
 
         min_x_index = 9e99
         max_x_index = -9e99
@@ -594,8 +601,8 @@ class AncestorGraph(BaseGraph):
         for graphical_individual_representation in self.graphical_individual_representations:
             birth_label = graphical_individual_representation.birth_label
             death_label = graphical_individual_representation.death_label
-            birth_event = graphical_individual_representation.get_birth_event()
-            if not birth_event:
+            birth_date_ov = graphical_individual_representation.get_birth_date_ov()
+            if not birth_date_ov:
                 continue
             death_event = graphical_individual_representation.get_death_event()
 
@@ -672,12 +679,12 @@ class AncestorGraph(BaseGraph):
             # generate event node information
             knots = []
             _birth_original_location = (
-                x_pos_list[0][1], birth_event['ordinal_value'])
+                x_pos_list[0][1], birth_date_ov)
             _death_original_location = (
                 x_pos_list[-1][1], death_event['ordinal_value'])
             _birth_position = self._map_position(*_birth_original_location)
             _death_position = self._map_position(*_death_original_location)
-            knots.append((x_pos_list[0][1], birth_event['ordinal_value']))
+            knots.append((x_pos_list[0][1], birth_date_ov))
             images = []
             for index, (marriage_ring_index, marriage_ordinal, new_x_index_after_marriage, label) in enumerate(zip(marriage_ring_indices, marriage_ordinals, new_x_indices_after_marriage, marriage_labels)):
                 if not self._formatting['no_ring']:
@@ -770,9 +777,9 @@ class AncestorGraph(BaseGraph):
                             coordinate_transformation(
                                 knots[0+1][0], knots[0+1][1]),
                         )},
-                            # ((knots[0][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value'])-_birth_position[1]), (knots[0+1][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value'])-_birth_position[1])),
+                            # ((knots[0][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)-_birth_position[1]), (knots[0+1][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)-_birth_position[1])),
                             (_birth_position[1], self._map_y_position(
-                                self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value']))
+                                self._formatting['fade_individual_color_black_age']*365+birth_date_ov))
                         )
                     )
                     if self._formatting['individual_foto_active'] and len(graphical_individual_representation.individual.images) > 0:
@@ -843,9 +850,9 @@ class AncestorGraph(BaseGraph):
                                         *interp(0, 1)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(0.5, 0.9)),
                                     coordinate_transformation(*interp(1, 1)),
                                 )},
-                                    # ((knots[index][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value'])-_birth_position[1]), (knots[index+1][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value'])-_birth_position[1])),
+                                    # ((knots[index][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)-_birth_position[1]), (knots[index+1][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)-_birth_position[1])),
                                     (_birth_position[1], self._map_y_position(
-                                        self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value']))
+                                        self._formatting['fade_individual_color_black_age']*365+birth_date_ov))
                                 )
                             )
                         else:
@@ -858,9 +865,9 @@ class AncestorGraph(BaseGraph):
                                         *interp(1, 0)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(1, 0.2)),
                                     coordinate_transformation(*interp(1, 1)),
                                 )},
-                                    # ((knots[index][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value'])-_birth_position[1]), (knots[index+1][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value'])-_birth_position[1])),
+                                    # ((knots[index][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)-_birth_position[1]), (knots[index+1][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)-_birth_position[1])),
                                     (_birth_position[1], self._map_y_position(
-                                        self._formatting['fade_individual_color_black_age']*365+birth_event['ordinal_value']))
+                                        self._formatting['fade_individual_color_black_age']*365+birth_date_ov))
                                 )
                             )
                         if self._formatting['individual_foto_active'] and len(graphical_individual_representation.individual.images) > 0:
@@ -1020,7 +1027,7 @@ class AncestorGraph(BaseGraph):
         additional_items = []
         for key, value in self.additional_graphical_items.items():
             additional_items += value
-        sorted_individuals = [(gr.get_birth_event()['ordinal_value'], index, gr)
+        sorted_individuals = [(gr.get_birth_date_ov(), index, gr)
                               for index, gr in enumerate(self.graphical_individual_representations)]
         sorted_individuals.sort()
         sorted_individual_items = []
