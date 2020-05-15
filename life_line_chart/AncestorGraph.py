@@ -293,8 +293,8 @@ class AncestorGraph(BaseGraph):
                 if not mother.graphical_representations[0].get_x_position() or local_child_of_family.family_id not in mother.graphical_representations[0].get_x_position():
                     mother.graphical_representations[0].visual_placement_child = (
                         individual, spouse_family)
-                    # mother.graphical_representations[0].visual_placement_child = spouse_family
                     local_child_of_family.graphical_representations[0].visual_placement_child = individual
+                    # mother.graphical_representations[0].visual_placement_child = spouse_family
                     self.place_selected_individuals(
                         mother, spouse_family, local_child_of_family, mothers_born_in_family, x_position)
                     # x_position = mother.graphical_representations[0].get_x_position()
