@@ -212,71 +212,33 @@ class AncestorGraph(BaseGraph):
         # add the main individual and its visible siblings
         children_start_x = x_position
 
-        # if child_of_family is not None and child_of_family.has_graphical_representation() and child_of_family.graphical_representations[0].visible_children:
-        #     siblings = [sibling for _, _, sibling in sorted(child_of_family.graphical_representations[0].visible_children.values())]
-        # else:
-        #     siblings = [individual]
-        # for sibling in siblings:
-        #     if sibling.individual_id == individual.individual_id:
-        #         if sibling.graphical_representations[0].get_x_position() is None or spouse_family is not None and spouse_family.family_id not in sibling.graphical_representations[0].get_x_position() or False:
-        #             sibling.graphical_representations[0].set_x_position(
-        #                 x_position, spouse_family)
-
-        #             if child_of_family and child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
-        #                 sibling.graphical_representations[0].set_x_position(
-        #                     x_position, child_of_family, True)
-        #                 x_position += 1
-        #     # elif not child_of_family or not child_of_family.graphical_representations:
-        #     #     pass
-        #     # elif not sibling.graphical_representations[0].get_x_position() or child_of_family and child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
-        #     #     if not sibling.graphical_representations[0].visual_placement_child and sibling.individual_id != individual.individual_id:
-
-        # for sibling in siblings:
-        #     if sibling.individual_id == individual.individual_id:
-        #         pass
-        #     elif not sibling.graphical_representations[0].get_x_position() or child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
-        #         if not sibling.graphical_representations[0].visual_placement_child:
-        #             sibling.graphical_representations[
-        #                 0].visual_placement_child = graphical_individual_representation.visual_placement_child
-        #             sibling.graphical_representations[0].set_x_position(
-        #                 x_position,
-        #                 child_of_family)
-        #         # if sibling != individual:
-        #             x_position += 1
-
-
-        if graphical_individual_representation.get_x_position() is None or spouse_family is not None and spouse_family.family_id not in graphical_individual_representation.get_x_position() or False:
-            graphical_individual_representation.set_x_position(
-                x_position, spouse_family)
-            # if child_of_family :# and len(child_of_family.graphical_representations[0].visible_children) > 1:
-            if child_of_family and child_of_family.family_id not in graphical_individual_representation.get_x_position():
-                graphical_individual_representation.set_x_position(
-                    x_position, child_of_family, True)
-            x_position += 1
-        if not child_of_family or not child_of_family.graphical_representations:
-            # x_position += 1
-            if True or not graphical_individual_representation.get_x_position() or False:
-                pass
+        if child_of_family is not None and child_of_family.has_graphical_representation() and child_of_family.graphical_representations[0].visible_children:
+            siblings = [sibling for _, _, sibling in sorted(child_of_family.graphical_representations[0].visible_children.values())]
         else:
-            for _, _, sibling in sorted(child_of_family.graphical_representations[0].visible_children.values()):
-                if sibling.individual_id == individual.individual_id:
-                    if not sibling.graphical_representations[0].get_x_position() or child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
-                        pass
-                        # sibling.graphical_representations[0].set_x_position(x_position - 1, child_of_family)
-                        # x_position += 1
-                else:
-                    if not sibling.graphical_representations[0].get_x_position() or child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
-                        if not sibling.graphical_representations[0].visual_placement_child:
-                            sibling.graphical_representations[
-                                0].visual_placement_child = graphical_individual_representation.visual_placement_child
-                            sibling.graphical_representations[0].set_x_position(
-                                x_position, child_of_family)
-                        # if sibling != individual:
-                            x_position += 1
+            siblings = [individual]
+        for sibling in siblings:
+            if sibling.individual_id == individual.individual_id:
+                if sibling.graphical_representations[0].get_x_position() is None or spouse_family is not None and spouse_family.family_id not in sibling.graphical_representations[0].get_x_position() or False:
+                    sibling.graphical_representations[0].set_x_position(
+                        x_position, spouse_family)
 
-                    # for marriage in sibling.marriages:
-                    #     sibling.graphical_representations[0].set_x_position()
-                    #     print ("s")
+                    if child_of_family and child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
+                        # not added yet, so do it
+                        sibling.graphical_representations[0].set_x_position(
+                            x_position, child_of_family, True)
+                        x_position += 1
+                    else:
+                        # already added, so just move forward
+                        x_position += 1
+            elif not sibling.graphical_representations[0].get_x_position() or child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
+                if not sibling.graphical_representations[0].visual_placement_child:
+                    sibling.graphical_representations[
+                        0].visual_placement_child = graphical_individual_representation.visual_placement_child
+                    sibling.graphical_representations[0].set_x_position(
+                        x_position,
+                        child_of_family)
+                    x_position += 1
+
         if child_of_family and child_of_family.has_graphical_representation() and not child_of_family.graphical_representations[0].children_width:
             child_of_family.graphical_representations[0].children_width = x_position - \
                 children_start_x
