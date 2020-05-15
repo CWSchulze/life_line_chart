@@ -549,6 +549,9 @@ class AncestorGraph(BaseGraph):
         max_x_index = -9e99
         for graphical_individual_representation in self.graphical_individual_representations:
             x_positions = graphical_individual_representation.get_x_position()
+            if x_positions is None:
+                logger.error(graphical_individual_representation.individual.plain_name + ' has a graphical representation, but was not placed!')
+                continue
             for _, x_position in x_positions.items():
                 min_x_index = min(min_x_index, x_position[1])
                 max_x_index = max(max_x_index, x_position[1])
@@ -559,8 +562,6 @@ class AncestorGraph(BaseGraph):
         self.max_x_index = max_x_index + 1  # +200
 
         for graphical_individual_representation in self.graphical_individual_representations:
-            birth_label = graphical_individual_representation.birth_label
-            death_label = graphical_individual_representation.death_label
             birth_date_ov = graphical_individual_representation.get_birth_date_ov()
             if not birth_date_ov:
                 continue
@@ -572,8 +573,13 @@ class AncestorGraph(BaseGraph):
 
             # individual = self._instances[('i',individual_id)]
             x_pos = graphical_individual_representation.get_x_position()
+            if x_pos is None:
+                # logger.error(graphical_individual_representation.individual.plain_name + ' has a graphical representation, but was not placed!')
+                continue
             x_pos_list = sorted([(ov, pos, index, family_id, flag)
                                  for index, (family_id, (ov, pos, f, flag)) in enumerate(x_pos.items())])
+            birth_label = graphical_individual_representation.birth_label
+            death_label = graphical_individual_representation.death_label
 
             # collect information about marriages
             marriage_ordinals = []
@@ -587,6 +593,9 @@ class AncestorGraph(BaseGraph):
                 for graphical_representation_marriage_family in graphical_individual_representation.get_marriages():
                     if graphical_representation_marriage_family.marriage is None:
                         continue
+                    if graphical_representation_marriage_family.family_id not in x_pos:
+                        logger.error(graphical_representation_marriage_family.family_id + ' has a graphical representation, but was not placed!')
+                        continue
                     spouse_representation = graphical_representation_marriage_family.get_spouse(
                         graphical_individual_representation.individual)
                     marriage_x_index = x_pos[graphical_representation_marriage_family.family_id][1]
@@ -597,7 +606,7 @@ class AncestorGraph(BaseGraph):
                     if spouse_representation and spouse_representation.get_x_position() and graphical_representation_marriage_family.marriage:
                         # if there is a spouse, choose the middle between them
                         spouse_x_index = spouse_representation.get_x_position(
-                        )[graphical_representation_marriage_family.family_id][1]
+                            )[graphical_representation_marriage_family.family_id][1]
                         # spouse_x_position = self._map_x_position(spouse_x_index)
                         marriage_ring_positions.append(self._map_position(
                             (spouse_x_index + marriage_x_index)/2.,
