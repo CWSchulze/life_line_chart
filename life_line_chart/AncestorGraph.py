@@ -104,6 +104,71 @@ class AncestorGraph(BaseGraph):
                         mother, generations - 1, filter=filter)
             # family.visible_children.sort()
 
+    def select_individual_children(self, individual, generations=None, color=None, filter=None):
+        """
+        Select children of an individual. This is done by creating instances of graphical representations.
+
+        Args:
+            individual (BaseIndividual): starting point for selection
+            generations (int, optional): number of generations to search for ancestors. Defaults to None.
+            color (list, optional): RGB color. Defaults to None.
+            filter (lambda, optional): lambda(BaseIndividual) : return Boolean. Defaults to None.
+        """
+
+        if filter and filter(individual):
+            return
+
+        if generations is None:
+            generations = 2 # self._positioning['generations']
+
+        if not individual.has_graphical_representation():
+            individual_representation = self._create_individual_graphical_representation(
+                individual)
+
+            if individual_representation is None:
+                return
+
+            if color is None:
+                i = int(hashlib.sha1(" ".join(individual_representation.name).encode(
+                    'utf8')).hexdigest(), 16) % (10 ** 8)
+                c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
+                f = 255/max(c)
+                c = [int(x*f) for x in c]
+                f = min(1, 500/sum(c))
+                c = [int(x*f) for x in c]
+                individual_representation.color = c
+            else:
+                individual_representation.color = color
+        else:
+            individual_representation = individual.graphical_representations[0]
+
+        marriage_families = individual.marriages
+        for marriage_family in marriage_families:
+            family = self._create_family_graphical_representation(
+                marriage_family)
+            #family.add_visible_children(individual)
+            #individual_representation.visible_parent_family = family
+            if generations > 0 or generations < 0:
+                for child in marriage_family.get_children():
+                    self.select_individual_children(
+                        child,
+                        generations - 1,
+                        None,
+                        filter=filter)
+                    marriage_family.graphical_representations[0].add_visible_children(child)
+                    child.graphical_representations[0].visible_parent_family = marriage_family
+
+
+                    # parents = individual.get_father_and_mother()
+                    # father, mother = marriage_family.get_husband_and_wife()
+                    # if father:
+                    #     self.select_individuals(
+                    #         father, generations - 1, color=individual_representation.color if self._positioning['fathers_have_the_same_color'] else None, filter=filter)
+                    # if mother:
+                    #     self.select_individuals(
+                    #         mother, generations - 1, filter=filter)
+            # family.visible_children.sort()
+
     def place_selected_individuals(self, individual, child_family, spouse_family, child_of_family, x_offset=0):
         """
         Place the graphical representations in direction of x
@@ -146,6 +211,40 @@ class AncestorGraph(BaseGraph):
 
         # add the main individual and its visible siblings
         children_start_x = x_position
+
+        # if child_of_family is not None and child_of_family.has_graphical_representation() and child_of_family.graphical_representations[0].visible_children:
+        #     siblings = [sibling for _, _, sibling in sorted(child_of_family.graphical_representations[0].visible_children.values())]
+        # else:
+        #     siblings = [individual]
+        # for sibling in siblings:
+        #     if sibling.individual_id == individual.individual_id:
+        #         if sibling.graphical_representations[0].get_x_position() is None or spouse_family is not None and spouse_family.family_id not in sibling.graphical_representations[0].get_x_position() or False:
+        #             sibling.graphical_representations[0].set_x_position(
+        #                 x_position, spouse_family)
+
+        #             if child_of_family and child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
+        #                 sibling.graphical_representations[0].set_x_position(
+        #                     x_position, child_of_family, True)
+        #                 x_position += 1
+        #     # elif not child_of_family or not child_of_family.graphical_representations:
+        #     #     pass
+        #     # elif not sibling.graphical_representations[0].get_x_position() or child_of_family and child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
+        #     #     if not sibling.graphical_representations[0].visual_placement_child and sibling.individual_id != individual.individual_id:
+
+        # for sibling in siblings:
+        #     if sibling.individual_id == individual.individual_id:
+        #         pass
+        #     elif not sibling.graphical_representations[0].get_x_position() or child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
+        #         if not sibling.graphical_representations[0].visual_placement_child:
+        #             sibling.graphical_representations[
+        #                 0].visual_placement_child = graphical_individual_representation.visual_placement_child
+        #             sibling.graphical_representations[0].set_x_position(
+        #                 x_position,
+        #                 child_of_family)
+        #         # if sibling != individual:
+        #             x_position += 1
+
+
         if graphical_individual_representation.get_x_position() is None or spouse_family is not None and spouse_family.family_id not in graphical_individual_representation.get_x_position() or False:
             graphical_individual_representation.set_x_position(
                 x_position, spouse_family)
