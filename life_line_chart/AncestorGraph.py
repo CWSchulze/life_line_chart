@@ -510,7 +510,7 @@ class AncestorGraph(BaseGraph):
                                      str((x_pos[2].family_id, ov)))
                         break
                     new_width, _ = self._calculate_sum_of_distances()
-                    if new_width > width:
+                    if new_width >= width:
                         self._flip_family(x_pos[2])
                     else:
                         width = new_width
