@@ -2,3 +2,8 @@
 build
 life_line_chart.egg-info
 dist
+.vscode
+.pytest_cache
+docs
+Images
+tests/output
