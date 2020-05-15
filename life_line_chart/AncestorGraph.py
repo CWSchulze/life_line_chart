@@ -777,11 +777,11 @@ class AncestorGraph(BaseGraph):
                 if self._formatting['marriage_label_active']:
                     dy_line = self._inverse_y_position(
                         self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']) - self._inverse_y_position(0)
-                    for index, line in enumerate(label.split('\n')):
+                    for index2, line in enumerate(label.split('\n')):
                         position = self._map_position(
                             marriage_ring_index, marriage_ordinal + dy_line)
                         position = (position[0], position[1] +
-                                    (index + 0.2) * font_size * 1.2)
+                                    (index2 + 0.2) * font_size * 1.2)
                         images.append({
                             'type': 'text',
                             'config': {
