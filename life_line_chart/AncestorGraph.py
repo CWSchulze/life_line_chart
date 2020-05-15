@@ -544,46 +544,6 @@ class AncestorGraph(BaseGraph):
                             'stroke_width': 0.1
                 }
                 )
-        # for index in range(1000):
-        #     x_position = index*100
-        #     if x_position > min_x_index and x_position < max_x_index:
-        #         # svg_path = Path(
-        #         #     Line(x_position + min_y*1j, x_position + max_y*1j))
-        #         if index % 20 == 0:
-        #             for year in range(min_year, max_year + 2, 2):
-        #                 year_pos = self._map_y_position(
-        #                     datetime.date(year, 1, 1).toordinal())
-        #                 if year_pos > 0 and year_pos < max_y:
-        #                     if year % 10 == 0:
-        #                         self.additional_graphical_items['grid'].append({
-        #                             'type': 'text',
-        #                                     'config': {
-        #                                         'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
-        #                                         'text': str(year),
-        #                                         'text-anchor': 'end',
-        #                                         # 'align' : 'center',
-        #                                         'insert': (x_position-5, year_pos),
-        #                                     },
-        #                             'font_size': font_size,
-        #                             'font_name': self._formatting['font_name'],
-        #                         }
-        #                         )
-        #         if index % 10 == 0:
-        #             self.additional_graphical_items['grid'].append({
-        #                 'type': 'path',
-        #                         'config': {'type': 'Line', 'arguments': (x_position + min_y*1j, x_position + max_y*1j)},
-        #                         'color': [210]*3,
-        #                         'stroke_width': 1
-        #             }
-        #             )
-        #         else:
-        #             self.additional_graphical_items['grid'].append({
-        #                 'type': 'path',
-        #                         'config': {'type': 'Line', 'arguments': (x_position + min_y*1j, x_position + max_y*1j)},
-        #                         'color': [210]*3,
-        #                         'stroke_width': 0.1
-        #             }
-        #             )
 
         min_x_index = 9e99
         max_x_index = -9e99
@@ -737,20 +697,6 @@ class AncestorGraph(BaseGraph):
                 'Line': Line,
                 'CubicBezier': CubicBezier
             }
-            # for ov, filename in graphical_individual_representation.individual.images.items():
-            #     foto_size = self._formatting['individual_foto_relative_size'] * self._formatting['relative_line_thickness'] * self._formatting['vertical_step_size']
-            #     images.append(
-            #             {
-            #                 'type': 'image',
-            #                 'config': {
-            #                     'insert': (
-            #                         _birth_position[0] - foto_size/2,
-            #                         self._map_y_position(ov) - foto_size/2),
-            #                     'size': (foto_size,foto_size),
-            #                 },
-            #                 'filename': filename
-            #             }
-            #         )
 
             # generate spline paths
             def marriage_bezier(images, data, knots, flip=False):
@@ -791,9 +737,6 @@ class AncestorGraph(BaseGraph):
                                 foto_size = self._formatting['individual_foto_relative_size'] * \
                                     self._formatting['relative_line_thickness'] * \
                                     self._formatting['vertical_step_size']
-                                # foto_size_y = self._map_y_position(self._inverse_x_position(foto_size))
-                                # xpos = svg_path.intersect(Line(coordinate_transformation(min(knots[index][0],knots[index + 1][0])-1, ov), coordinate_transformation(max(knots[index][0],knots[index + 1][0])+1, ov)))[0]
-                                # xpos = svg_path.point(xpos[0])
                                 if type(svg_path) == Line:
                                     xpos = svg_path.start.real + \
                                         self._map_y_position(ov)*1j
@@ -820,21 +763,6 @@ class AncestorGraph(BaseGraph):
                                         'filename': filename
                                     }
                                 )
-                    # for ov, filename in graphical_individual_representation.individual.images.items():
-                    #     if ov > knots[0][1] and ov < knots[1][1]:
-                    #         foto_size = self._formatting['individual_foto_relative_size'] * self._formatting['relative_line_thickness'] * self._formatting['vertical_step_size']
-                    #         images.append(
-                    #                 {
-                    #                     'type': 'image',
-                    #                     'config': {
-                    #                         'insert': (
-                    #                             _birth_position[0] - foto_size/2,
-                    #                             self._map_y_position(ov) - foto_size/2),
-                    #                         'size': (foto_size,foto_size),
-                    #                     },
-                    #                     'filename': filename
-                    #                 }
-                    #             )
                 else:
                     for index in range(len(knots)-1):
                         def interp(*val):
@@ -878,9 +806,6 @@ class AncestorGraph(BaseGraph):
                                     foto_size = self._formatting['individual_foto_relative_size'] * \
                                         self._formatting['relative_line_thickness'] * \
                                         self._formatting['vertical_step_size']
-                                    # foto_size_y = self._map_y_position(self._inverse_x_position(foto_size))
-                                    # xpos = svg_path.intersect(Line(coordinate_transformation(min(knots[index][0],knots[index + 1][0])-1, ov), coordinate_transformation(max(knots[index][0],knots[index + 1][0])+1, ov)))[0]
-                                    # xpos = svg_path.point(xpos[0])
                                     if type(svg_path) == Line:
                                         xpos = svg_path.start.real + \
                                             self._map_y_position(ov)*1j
@@ -995,12 +920,7 @@ class AncestorGraph(BaseGraph):
         """
 
         logger.debug('start creating document')
-        # max_y = max(self._map_y_position(self.min_ordinal),
-        #             self._map_y_position(self.max_ordinal))
-        # min_y = min(self._map_y_position(self.min_ordinal),
-        #             self._map_y_position(self.max_ordinal))
 
-        # drawing = svg2rlg("file.svg")
         if filename is None:
             filename = 'ancestors_of_' + \
                 "".join(self._instances[('i', individual_id)].name).replace(
