@@ -309,19 +309,10 @@ class AncestorGraph(BaseGraph):
         graphical_individual_representation.x_end = x_position
         if child_of_family:
             if child_of_family.family_id not in graphical_individual_representation.widths:
-                if child_of_family and child_of_family.has_graphical_representation() and len(child_of_family.graphical_representations[0].visible_children) > 1:
-                    graphical_individual_representation.widths[child_of_family.family_id] = max(
-                        0, graphical_individual_representation.x_end - graphical_individual_representation.x_start)
-                    graphical_individual_representation.range[child_of_family.family_id] = (
-                        graphical_individual_representation.x_start, graphical_individual_representation.x_end)
-                else:
-                    graphical_individual_representation.widths[child_of_family.family_id] = max(
-                        0, graphical_individual_representation.x_end - graphical_individual_representation.x_start)
-                    graphical_individual_representation.range[child_of_family.family_id] = (
-                        graphical_individual_representation.x_start, graphical_individual_representation.x_end)
-                    # print("as")
-            # else:
-            #     logger.info("Width was already set for "+child_of_family.family_id)
+                graphical_individual_representation.widths[child_of_family.family_id] = max(
+                    0, graphical_individual_representation.x_end - graphical_individual_representation.x_start)
+                graphical_individual_representation.range[child_of_family.family_id] = (
+                    graphical_individual_representation.x_start, graphical_individual_representation.x_end)
 
         if child_family:
             child_family_id = child_family.family_id
