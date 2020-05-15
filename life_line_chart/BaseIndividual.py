@@ -282,6 +282,7 @@ class BaseIndividual():
 
     def get_child_of_family(self):
         return [self._instances[('f', family_id)] for family_id in self.child_of_family_id]
+    child_of_family = property(get_child_of_family)
 
     def has_graphical_representation(self):
         return len(self.graphical_representations) > 0
