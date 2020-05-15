@@ -323,25 +323,19 @@ class AncestorGraph(BaseGraph):
             # else:
             #     logger.info("Width was already set for "+child_of_family.family_id)
 
+        if child_family:
+            child_family_id = child_family.family_id
+        else:
+            child_family_id = None
         if not child_of_family or not child_of_family.graphical_representations:
             if child_family not in graphical_individual_representation.widths:
-                if child_family:
-                    graphical_individual_representation.widths[child_family.family_id] = 1
-                else:
-                    graphical_individual_representation.widths[child_family] = 1
-            pass
+                graphical_individual_representation.widths[child_family_id] = 1
         else:
             for _, _, sibling in sorted(child_of_family.graphical_representations[0].visible_children.values()):
-                if child_family:
-                    sibling.graphical_representations[0].widths[child_family.family_id] = max(
-                        0, graphical_individual_representation.x_end - graphical_individual_representation.x_start)
-                    sibling.graphical_representations[0].range[child_family.family_id] = (
-                        graphical_individual_representation.x_start, graphical_individual_representation.x_end)
-                else:
-                    sibling.graphical_representations[0].widths[child_family] = max(
-                        0, graphical_individual_representation.x_end - graphical_individual_representation.x_start)
-                    sibling.graphical_representations[0].range[child_family] = (
-                        graphical_individual_representation.x_start, graphical_individual_representation.x_end)
+                sibling.graphical_representations[0].widths[child_family_id] = max(
+                    0, graphical_individual_representation.x_end - graphical_individual_representation.x_start)
+                sibling.graphical_representations[0].range[child_family_id] = (
+                    graphical_individual_representation.x_start, graphical_individual_representation.x_end)
 
         # recalculate
         birth_ordinal_value = graphical_individual_representation.get_birth_date_ov()
