@@ -560,7 +560,7 @@ class AncestorGraph(BaseGraph):
                                 'text': str(year),
                                 'text-anchor': 'end',
                                 # 'align' : 'center',
-                                'insert': (self.get_full_width() - self._formatting['vertical_step_size']*0.1, year_pos),
+                                'insert': (self.get_full_width() - self._formatting['vertical_step_size']*0.01, year_pos),
                             },
                     'font_size': font_size,
                     'font_name': self._formatting['font_name'],
