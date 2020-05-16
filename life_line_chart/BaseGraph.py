@@ -461,7 +461,7 @@ class BaseGraph():
             family.husb, family, husb_x_delta+1000000)
         self._move_individual_and_ancestors(family.wife, family, wife_x_delta)
         self._move_individual_and_ancestors(family.husb, family, -1000000)
-        self._instances.width_cache.clear()
+        self._instances.ancestor_width_cache.clear()
         pass
 
     def _check_compressed_x_position(self, early_raise):

@@ -506,7 +506,7 @@ class AncestorGraph(BaseGraph):
         self.min_x_index = 0
         self.max_x_index = 0
         self.clear_svg_items()
-        self._instances.width_cache.clear()
+        self._instances.ancestor_width_cache.clear()
         BaseGraph.clear_graphical_representations(self)
 
     def define_svg_items(self):

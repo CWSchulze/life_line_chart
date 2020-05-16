@@ -58,9 +58,9 @@ class ancestor_graph_individual():
         if family is not None:
             family_id = family.family_id
             # at least root node has None
-        if (self.individual_id, family_id) in self.__instances.width_cache:
+        if (self.individual_id, family_id) in self.__instances.ancestor_width_cache:
             # caching
-            return self.__instances.width_cache[(self.individual_id, family_id)]
+            return self.__instances.ancestor_width_cache[(self.individual_id, family_id)]
         x_v = [self._x_position[family_id][1]]
         x_min = x_v.copy()
         x_max = x_v.copy()
@@ -111,7 +111,7 @@ class ancestor_graph_individual():
             x_max += x_v
         x_min = min(x_min)
         x_max = max(x_max)
-        self.__instances.width_cache[(self.individual_id, family_id)] = x_min, x_max
+        self.__instances.ancestor_width_cache[(self.individual_id, family_id)] = x_min, x_max
         return x_min, x_max
 
     def __get_name(self):
