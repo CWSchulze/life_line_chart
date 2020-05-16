@@ -27,9 +27,9 @@ def test_generate_svg_file():
         child_of_family = graph._instances[('f', cof_ids[0])]
     graph.place_selected_individuals(
         graph._instances[('i', individual_id)], None, None, child_of_family, x_position)
-    width = graph._instances[('i', individual_id)
-                             ].graphical_representations[0].get_width(None)
-    x_position += width
+    x_min, x_max = graph._instances[('i', individual_id)
+                             ].graphical_representations[0].get_range(None)
+    x_position += x_max - x_min + 1
 
     graph.modify_layout(individual_id)
 
@@ -62,9 +62,9 @@ def test_generate_svg_file_with_two_roots():
         child_of_family = graph._instances[('f', cof_ids[0])]
     graph.place_selected_individuals(
         graph._instances[('i', individual_id)], None, None, child_of_family, x_position)
-    width = graph._instances[('i', individual_id)
-                             ].graphical_representations[0].get_width(None)
-    x_position += width
+    x_min, x_max = graph._instances[('i', individual_id)
+                             ].graphical_representations[0].get_range(None)
+    x_position += x_max - x_min + 1
     graph.modify_layout(individual_id)
 
     # select individual to show
@@ -85,9 +85,9 @@ def test_generate_svg_file_with_two_roots():
         child_of_family = graph._instances[('f', cof_ids[0])]
     graph.place_selected_individuals(
         graph._instances[('i', individual_id)], None, None, child_of_family, x_position)
-    width = graph._instances[('i', individual_id)
-                             ].graphical_representations[0].get_width(None)
-    x_position += width
+    x_min, x_max = graph._instances[('i', individual_id)
+                             ].graphical_representations[0].get_range(None)
+    x_position += x_max - x_min + 1
 
     graph.define_svg_items()
     graph.paint_and_save(individual_id, os.path.join(
@@ -143,9 +143,9 @@ def test_fotos_in_chart():
         child_of_family = graph._instances[('f', cof_ids[0])]
     graph.place_selected_individuals(
         graph._instances[('i', individual_id)], None, None, child_of_family, x_position)
-    width = graph._instances[('i', individual_id)
-                             ].graphical_representations[0].get_width(None)
-    x_position += width
+    x_min, x_max = graph._instances[('i', individual_id)
+                             ].graphical_representations[0].get_range(None)
+    x_position += x_max - x_min + 1
     graph.modify_layout(individual_id)
 
     graph.define_svg_items()
