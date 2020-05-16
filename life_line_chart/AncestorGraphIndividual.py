@@ -30,12 +30,30 @@ class ancestor_graph_individual():
         marriages = self.individual.marriages
         return [m.graphical_representations[0] for m in marriages if m.has_graphical_representation()]
 
-    def get_width(self, family, recursive=False):
+    def get_width(self, family):
+        """
+        width of the ancestor individuals which are strongly connected
+
+        Args:
+            family (BaseFamily): family which is examined
+
+        Returns:
+            int: width
+        """
         x_min, x_max = self.get_range(family)
         width = x_max - x_min + 1
         return width
 
     def get_range(self, family):
+        """
+        get the x range from min to max
+
+        Args:
+            family (BaseFamily): family which is examined
+
+        Returns:
+            tuple: x_min, x_max
+        """
         family_id = None
         if family is not None:
             family_id = family.family_id
@@ -118,8 +136,6 @@ class ancestor_graph_individual():
         return self._x_position
 
     def set_x_position(self, x_position, family, parent_starting_point=False):
-        # self._x_position = x_position
-        # return
         if family:
             family_id = family.family_id
             if family.marriage:
