@@ -87,7 +87,7 @@ class AncestorGraph(BaseGraph):
         else:
             individual_representation = individual.graphical_representations[0]
 
-        child_of_families = individual.get_child_of_family()
+        child_of_families = individual.get_child_of_family()[:1]
         for child_of_family in child_of_families:
             family = self._create_family_graphical_representation(
                 child_of_family)
