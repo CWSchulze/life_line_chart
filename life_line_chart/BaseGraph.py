@@ -434,10 +434,10 @@ class BaseGraph():
             return
         husb_x_pos = family.husb.graphical_representations[0].get_x_position()[
             family.family_id][1]
-        husb_width = family.graphical_representations[0].husb_width
+        husb_width = family.graphical_representations[0].husb_width()
         wife_x_pos = family.wife.graphical_representations[0].get_x_position()[
             family.family_id][1]
-        wife_width = family.graphical_representations[0].wife_width
+        wife_width = family.graphical_representations[0].wife_width()
         children_width = family.graphical_representations[0].children_width
         if not children_width:
             children_width = self._formatting['vertical_step_size']
@@ -461,6 +461,7 @@ class BaseGraph():
             family.husb, family, husb_x_delta+1000000)
         self._move_individual_and_ancestors(family.wife, family, wife_x_delta)
         self._move_individual_and_ancestors(family.husb, family, -1000000)
+        self._instances.width_cache.clear()
         pass
 
     def _check_compressed_x_position(self, early_raise):

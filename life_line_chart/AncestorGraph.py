@@ -156,7 +156,7 @@ class AncestorGraph(BaseGraph):
                         None,
                         filter=filter)
                     marriage_family.graphical_representations[0].add_visible_children(child)
-                    child.graphical_representations[0].visible_parent_family = marriage_family
+                    child.graphical_representations[0].visible_parent_family = marriage_family.graphical_representations[0]
 
 
                     # parents = individual.get_father_and_mother()
@@ -202,11 +202,11 @@ class AncestorGraph(BaseGraph):
                     # father.graphical_representations[0].visual_placement_child = spouse_family
                     self.place_selected_individuals(
                         father, spouse_family, local_child_of_family, fathers_born_in_family, x_position)
-                    # x_position = father.graphical_representations[0].get_x_position()
                     width = father.graphical_representations[0].get_width(
-                        spouse_family)
+                        local_child_of_family)
                     if local_child_of_family:
-                        local_child_of_family.graphical_representations[0].husb_width = width
+                        local_child_of_family.graphical_representations[0].husb_width = \
+                            lambda gr=father.graphical_representations[0], cof=local_child_of_family: gr.get_width(cof)
                     x_position += width
 
         # add the main individual and its visible siblings
@@ -218,18 +218,18 @@ class AncestorGraph(BaseGraph):
             siblings = [individual]
         for sibling in siblings:
             if sibling.individual_id == individual.individual_id:
-                if sibling.graphical_representations[0].get_x_position() is None or spouse_family is not None and spouse_family.family_id not in sibling.graphical_representations[0].get_x_position() or False:
+                if sibling.graphical_representations[0].get_x_position() is None or spouse_family is not None and spouse_family.family_id not in sibling.graphical_representations[0].get_x_position():
+                    # add new position of this spouse family
                     sibling.graphical_representations[0].set_x_position(
                         x_position, spouse_family)
 
                     if child_of_family and child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
-                        # not added yet, so do it
+                        # not added yet, so this is the primary cof placement
                         sibling.graphical_representations[0].set_x_position(
                             x_position, child_of_family, True)
-                        x_position += 1
-                    else:
-                        # already added, so just move forward
-                        x_position += 1
+
+                    x_position += 1
+
             elif not sibling.graphical_representations[0].get_x_position() or child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
                 if not sibling.graphical_representations[0].visual_placement_child:
                     sibling.graphical_representations[
@@ -259,36 +259,15 @@ class AncestorGraph(BaseGraph):
                     # mother.graphical_representations[0].visual_placement_child = spouse_family
                     self.place_selected_individuals(
                         mother, spouse_family, local_child_of_family, mothers_born_in_family, x_position)
-                    # x_position = mother.graphical_representations[0].get_x_position()
-                    width = mother.graphical_representations[0].get_width(
-                        spouse_family)
+                    x_min, x_max = mother.graphical_representations[0].get_range(
+                        local_child_of_family)
+                    width = x_max - x_min + 1
                     if local_child_of_family:
-                        local_child_of_family.graphical_representations[0].wife_width = width
+                        local_child_of_family.graphical_representations[0].wife_width = \
+                            lambda gr=mother.graphical_representations[0], cof=local_child_of_family: gr.get_width(cof)
                     x_position += width
 
-        # set width, range, x_end
         self.max_x_index = max(self.max_x_index, x_position)
-        graphical_individual_representation.x_end = x_position
-        if child_of_family:
-            if child_of_family.family_id not in graphical_individual_representation.widths:
-                graphical_individual_representation.widths[child_of_family.family_id] = max(
-                    0, graphical_individual_representation.x_end - graphical_individual_representation.x_start)
-                graphical_individual_representation.range[child_of_family.family_id] = (
-                    graphical_individual_representation.x_start, graphical_individual_representation.x_end)
-
-        if child_family:
-            child_family_id = child_family.family_id
-        else:
-            child_family_id = None
-        if not child_of_family or not child_of_family.graphical_representations:
-            if child_family not in graphical_individual_representation.widths:
-                graphical_individual_representation.widths[child_family_id] = 1
-        else:
-            for _, _, sibling in sorted(child_of_family.graphical_representations[0].visible_children.values()):
-                sibling.graphical_representations[0].widths[child_family_id] = max(
-                    0, graphical_individual_representation.x_end - graphical_individual_representation.x_start)
-                sibling.graphical_representations[0].range[child_family_id] = (
-                    graphical_individual_representation.x_start, graphical_individual_representation.x_end)
 
         # recalculate
         birth_ordinal_value = graphical_individual_representation.get_birth_date_ov()
@@ -364,8 +343,11 @@ class AncestorGraph(BaseGraph):
                             self._compress_single_individual_position(
                                 individual, cof, 1)
                             # self._move_single_individual(individual, cof, parent_x_pos - this_individual_x_pos - 1)
-                    self._compress_graph_ancestor_graph(
-                        cof.graphical_representations[0])
+                    try:
+                        self._compress_graph_ancestor_graph(
+                            cof.graphical_representations[0])
+                    except KeyError as e:
+                        pass
         for original_direction_factor, individual in sorted(individuals):
             if individual is None:
                 continue
@@ -407,11 +389,13 @@ class AncestorGraph(BaseGraph):
                         individual, individual.graphical_representations[0].visible_parent_family, direction_factor*1)
                     self._check_compressed_x_position(True)
                     i += 1
-            except LifeLineChartCollisionDetected:
+            except LifeLineChartCollisionDetected as e:
                 # print("   collision of " + " and ".join([" ".join(a.name) for a in e.args]))
                 self._move_individual_and_ancestors(
                     individual, individual.graphical_representations[0].visible_parent_family, -direction_factor*1)
-            except LifeLineChartCannotMoveIndividual:
+            except LifeLineChartCannotMoveIndividual as e:
+                pass
+            except KeyError as e:
                 pass
             if i != 0:
                 logger.info('moved ' + ' '.join(individual.name) +
@@ -492,7 +476,7 @@ class AncestorGraph(BaseGraph):
             keys = sorted(list(self.position_to_person_map.keys()))
             for key in keys:
                 self.position_to_person_map[key - (
-                    old_x_min_index - min_index_x) * 1] = self.position_to_person_map.pop(key)
+                    min_index_x - old_x_min_index) * 1] = self.position_to_person_map.pop(key)
             width = (max_index_x - min_index_x)
             self.min_x_index = 0
             self.max_x_index = width
@@ -522,6 +506,7 @@ class AncestorGraph(BaseGraph):
         self.min_x_index = 0
         self.max_x_index = 0
         self.clear_svg_items()
+        self._instances.width_cache.clear()
         BaseGraph.clear_graphical_representations(self)
 
     def define_svg_items(self):

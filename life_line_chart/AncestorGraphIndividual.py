@@ -5,11 +5,17 @@ class ancestor_graph_individual():
     """
     Class which represents one appearance of an individual
     """
+    # x positions in different family appearances
     _x_position = None
     visible_parent_family = None
-    x_start = None
-    x_end = None
+    # color of this individual
     color = [200, 200, 255]
+    # tuple: child individual where this individual was placed, family where that child individual is child
+    visual_placement_child = None
+    # ordinal value of the birth date
+    __birth_date_ov = None
+    # ordinal value of the death date
+    __death_date_ov = None
 
     def __init__(self, instances, individual_id, distance):
         self._distance = distance
@@ -18,41 +24,73 @@ class ancestor_graph_individual():
         self.__instances = instances
         self.individual = self.__instances[('i', self.individual_id)]
         self.individual.graphical_representations.append(self)
-        self.widths = {}
-        self.range = {}
-        self.visual_placement_child = None
-        self.__birth_date_ov = None
-        self.__death_date_ov = None
         pass
 
     def get_marriages(self):
         marriages = self.individual.marriages
         return [m.graphical_representations[0] for m in marriages if m.has_graphical_representation()]
 
-    def get_width(self, family):
-        if family or family not in self.widths:
-            if family.family_id in self.widths:
-                return self.widths[family.family_id]
-            else:
-                return self._distance
-        else:
-            return self.widths[family]
-            # return max(0, self.x_end - self.x_start)
-        width = 0
-        for child_of_family in self.individual.get_child_of_family():
-            father, mother = child_of_family.get_husband_and_wife()
-            if father and father.graphical_representations:
-                width += father.graphical_representations[0].get_width(
-                    child_of_family)
-            if mother and mother.graphical_representations:
-                width += mother.graphical_representations[0].get_width(
-                    child_of_family)
-        if self.visible_parent_family and family.family_id == self.visible_parent_family.family_id:
-            width += self._distance * \
-                len(self.visible_parent_family.visible_children)
-        else:
-            width += self._distance
+    def get_width(self, family, recursive=False):
+        x_min, x_max = self.get_range(family)
+        width = x_max - x_min + 1
         return width
+
+    def get_range(self, family):
+        family_id = None
+        if family is not None:
+            family_id = family.family_id
+        if (self.individual_id, family_id) in self.__instances.width_cache:
+            return self.__instances.width_cache[(self.individual_id, family_id)]
+        width = 0
+        child_of_family = self.visible_parent_family
+        # spouse_placement_family_id = self.visual_placement_child[0].graphical_representations[0].visible_parent_family.family_id
+        # spouse_placement_family = self.visual_placement_child[0].graphical_representations[0].visible_parent_family
+        # if self.visible_parent_family and False:# and family_id == self.visible_parent_family.family_id:
+        #     width += len(self.visible_parent_family.visible_children)
+        #     x_v = [c[2].graphical_representations[0].get_x_position()[self.visible_parent_family.family_id][1] for c_id, c in self.visible_parent_family.visible_children.items()]
+        # el
+        if family_id in self.x_position:
+            x_v = [self._x_position[family_id][1]]
+        # else:
+        #     x_v = [self._x_position[spouse_placement_family_id][1]]
+        x_min = x_v.copy()
+        x_max = x_v.copy()
+        i = 1 if self._x_position[list(self._x_position.keys())[0]][3] else 0
+        if child_of_family and list(self._x_position.keys())[i] == family_id and list(self._x_position.values())[0][1]==list(self._x_position.values())[i][1]:
+            father, mother = child_of_family.family.get_husband_and_wife()
+            if father and father.has_graphical_representation():
+                f_x_positions = father.graphical_representations[0].get_x_position()
+                i = 1 if f_x_positions[list(f_x_positions.keys())[0]][3] else 0
+                if list(f_x_positions.keys())[i] == child_of_family.family_id:
+                    f_x_min, f_x_max = father.graphical_representations[0].get_range(
+                        child_of_family)
+                    x_min.append(f_x_min)
+                    x_max.append(f_x_max)
+                else:
+                    x_pos = father.graphical_representations[0].get_x_position()[child_of_family.family_id][1]
+                    x_min.append(x_pos)
+                    x_max.append(x_pos)
+            if mother and mother.has_graphical_representation():
+                m_x_positions = mother.graphical_representations[0].get_x_position()
+                i = 1 if m_x_positions[list(m_x_positions.keys())[0]][3] else 0
+                if list(m_x_positions.keys())[i] == child_of_family.family_id:
+                    m_x_min, m_x_max = mother.graphical_representations[0].get_range(
+                        child_of_family)
+                    x_min.append(m_x_min)
+                    x_max.append(m_x_max)
+                else:
+                    x_pos = mother.graphical_representations[0].get_x_position()[child_of_family.family_id][1]
+                    x_min.append(x_pos)
+                    x_max.append(x_pos)
+            # add siblings
+            x_v = [c[2].graphical_representations[0].get_x_position()[self.visible_parent_family.family_id][1] for c_id, c in self.visible_parent_family.visible_children.items()
+                        if self.visible_parent_family.family_id in c[2].graphical_representations[0].get_x_position()]
+            x_min += x_v
+            x_max += x_v
+        x_min = min(x_min)
+        x_max = max(x_max)
+        self.__instances.width_cache[(self.individual_id, family_id)] = x_min, x_max
+        return x_min, x_max
 
     def __get_name(self):
         return self.individual.name

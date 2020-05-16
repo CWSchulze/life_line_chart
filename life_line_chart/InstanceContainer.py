@@ -19,6 +19,7 @@ class InstanceContainer():
         self._family_constructor = family_constructor
         self._individual_constructor = individual_constructor
         self.instantiate_all = instantiate_all
+        self.width_cache = {}
 
     def __iter__(self):  # iterate over all keys
         for type_id, instance in self._data.keys():
