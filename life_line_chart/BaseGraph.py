@@ -284,7 +284,7 @@ class BaseGraph():
             ancestor_graph_inidividual: created instance
         """
         new_instance = self._graphical_individual_class(
-            self._instances, individual.individual_id, self._formatting['vertical_step_size'])
+            self._instances, individual.individual_id)
         if new_instance.birth_date is None or new_instance.death_date is None:
             del new_instance
             return None

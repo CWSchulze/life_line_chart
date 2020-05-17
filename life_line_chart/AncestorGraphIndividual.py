@@ -17,8 +17,7 @@ class ancestor_graph_individual():
     # ordinal value of the death date
     __death_date_ov = None
 
-    def __init__(self, instances, individual_id, distance):
-        self._distance = distance
+    def __init__(self, instances, individual_id):
         self.items = []
         self.individual_id = individual_id
         self.__instances = instances
