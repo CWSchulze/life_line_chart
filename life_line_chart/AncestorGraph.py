@@ -216,17 +216,6 @@ class AncestorGraph(BaseGraph):
                         x_position,
                         child_of_family)
                     x_position += 1
-            for marriage in sibling.marriages:
-                if marriage.has_graphical_representation() and marriage.family_id not in discovery_cache:
-                    for child in marriage.children:
-                        if child.has_graphical_representation():
-                            child.graphical_representations[0].set_x_position(
-                                x_position,
-                                marriage)
-                            x_position += 1
-                            # print(child.plain_name)
-
-
 
         if child_of_family and child_of_family.has_graphical_representation() and not child_of_family.graphical_representations[0].children_width:
             child_of_family.graphical_representations[0].children_width = x_position - \
