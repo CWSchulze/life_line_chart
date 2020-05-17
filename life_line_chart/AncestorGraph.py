@@ -150,11 +150,7 @@ class AncestorGraph(BaseGraph):
             spouse_family (BaseFamily): Spouse family of this individual
             child_of_family (BaseFamily): child-of-family of this individual
         """
-
-        if child_of_family and child_of_family.family_id not in discovery_cache:
-            discovery_cache.append(child_of_family.family_id)
-        elif child_of_family:
-            return
+        discovery_cache.append(individual.plain_name)
 
         logger.info(f"discovering {individual.plain_name}")
         x_position = x_offset
@@ -257,7 +253,6 @@ class AncestorGraph(BaseGraph):
         elif death_ordinal_value and birth_ordinal_value:
             self.min_ordinal = birth_ordinal_value
             self.max_ordinal = death_ordinal_value
-
 
     def _compress_single_individual_position(self, individual, cof, direction):
         """
