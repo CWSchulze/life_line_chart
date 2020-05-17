@@ -298,6 +298,8 @@ class AncestorGraph(BaseGraph):
         """
         compress the graph vertically.
 
+        # TODO: compressing fails if siblings are dragged apart which reunite families in later generations (Andreas Adam Lindner)
+
         Args:
             graphical_family_representation (AncestorGraphFamily): graphical family representation instance
         """
