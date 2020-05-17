@@ -972,12 +972,24 @@ class AncestorGraph(BaseGraph):
 
         for item in additional_items + sorted_individual_items:
                 if item['type'] == 'text':
-                    args = item['config']
-                    # args = deepcopy(item['config'])
-                    # args['insert'] = (args['insert'][0], args['insert'][1])
-                    svg_text = svg_document.text(
-                        **args)
-                    x = svg_document.add(svg_text)
+                    if '\n' in item['config']['text']:
+                        font_size = item['font_size']
+                        if 'dy' in item['config']:
+                            dy = float(item['config']['dy'][0][:-2])
+                        else:
+                            dy = 0
+                        for index, line in enumerate([v for v in item['config']['text'].split('\n') if v]):
+                            args = deepcopy(item['config'])
+                            args['text'] = line
+                            args['dy'] = [str(dy + 1.2*index*font_size) + 'px']
+                            svg_text = svg_document.text(
+                                **args)
+                            svg_document.add(svg_text)
+                    else:
+                        args = item['config']
+                        svg_text = svg_document.text(
+                            **args)
+                        svg_document.add(svg_text)
                 elif item['type'] == 'path':
                     arguments = deepcopy(item['config']['arguments'])
                     arguments = [individual_id for individual_id in arguments]
