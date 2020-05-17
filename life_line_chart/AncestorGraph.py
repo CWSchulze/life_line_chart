@@ -224,7 +224,7 @@ class AncestorGraph(BaseGraph):
                                 x_position,
                                 marriage)
                             x_position += 1
-                            print(child.plain_name)
+                            # print(child.plain_name)
 
 
 
