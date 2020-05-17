@@ -744,13 +744,13 @@ class AncestorGraph(BaseGraph):
                                 self._formatting['fade_individual_color_black_age']*365+birth_date_ov))
                         )
                     )
-                    if self._formatting['individual_foto_active'] and len(graphical_individual_representation.individual.images) > 0:
+                    if self._formatting['individual_photo_active'] and len(graphical_individual_representation.individual.images) > 0:
                         index = 0
                         svg_path = Path_types[data[-1][0]
                                               ['type']](*data[-1][0]['arguments'])
                         for ov, filename in graphical_individual_representation.individual.images.items():
                             if ov >= knots[index][1] and ov <= knots[index + 1][1]:
-                                foto_size = self._formatting['individual_foto_relative_size'] * \
+                                photo_size = self._formatting['individual_photo_relative_size'] * \
                                     self._formatting['relative_line_thickness'] * \
                                     self._formatting['vertical_step_size']
                                 if type(svg_path) == Line:
@@ -772,9 +772,9 @@ class AncestorGraph(BaseGraph):
                                         'type': 'image',
                                         'config': {
                                                 'insert': (
-                                                    xpos.real - foto_size/2,
-                                                    xpos.imag - foto_size/2),
-                                                'size': (foto_size, foto_size),
+                                                    xpos.real - photo_size/2,
+                                                    xpos.imag - photo_size/2),
+                                                'size': (photo_size, photo_size),
                                         },
                                         'filename': filename
                                     }
@@ -814,12 +814,12 @@ class AncestorGraph(BaseGraph):
                                         self._formatting['fade_individual_color_black_age']*365+birth_date_ov))
                                 )
                             )
-                        if self._formatting['individual_foto_active'] and len(graphical_individual_representation.individual.images) > 0:
+                        if self._formatting['individual_photo_active'] and len(graphical_individual_representation.individual.images) > 0:
                             svg_path = Path_types[data[-1][0]
                                                   ['type']](*data[-1][0]['arguments'])
                             for ov, filename in graphical_individual_representation.individual.images.items():
                                 if ov > knots[index][1] and ov < knots[index + 1][1]:
-                                    foto_size = self._formatting['individual_foto_relative_size'] * \
+                                    photo_size = self._formatting['individual_photo_relative_size'] * \
                                         self._formatting['relative_line_thickness'] * \
                                         self._formatting['vertical_step_size']
                                     if type(svg_path) == Line:
@@ -842,9 +842,9 @@ class AncestorGraph(BaseGraph):
                                             'type': 'image',
                                             'config': {
                                                     'insert': (
-                                                        xpos.real - foto_size/2,
-                                                        xpos.imag - foto_size/2),
-                                                    'size': (foto_size, foto_size),
+                                                        xpos.real - photo_size/2,
+                                                        xpos.imag - photo_size/2),
+                                                    'size': (photo_size, photo_size),
                                             },
                                             'filename': filename
                                         }
