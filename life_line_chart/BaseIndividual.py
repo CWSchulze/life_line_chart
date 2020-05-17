@@ -102,19 +102,6 @@ class BaseIndividual():
     """
     Base class for individuals. This class is used as interface to the database.
     """
-    date_label_translation = {
-        'Calculated': '{symbol}\xa0berechnet\xa0{datum}',
-        'Estimated': '{symbol}\xa0geschätzt\xa0{datum}',
-        'Estimated (min 25 at marriage)': '{symbol}\xa0geschätzt\xa0{datum}',
-        'Estimated (max age 75)': '{symbol}\xa0geschätzt\xa0{datum}',
-        'Estimated (max age 100)': '{symbol}\xa0geschätzt\xa0{datum}',
-        'Estimated (min 1 after parents marriage)': '{symbol}\xa0geschätzt\xa0{datum}',
-        'Still alive': '',
-        'About': '{symbol}\xa0etwa\xa0{datum}',
-        'Before': '{symbol}\xa0vor\xa0{datum}',
-        'After': '{symbol}\xa0nach\xa0{datum}',
-        'YearPrecision': '{symbol}\xa0{datum}'
-    }
 
     def __init__(self, instances, individual_id):
         self._instances = instances
@@ -193,7 +180,7 @@ class BaseIndividual():
         if self.events['birth_or_christening']:
             event = self.events['birth_or_christening']
             if event['comment']:
-                string = self.date_label_translation[event['comment']].format(
+                string = self._instances.date_label_translation[event['comment']].format(
                     symbol='*', datum=str(event['date'].date().year))
                 # string += ' ' + self.events['birth_or_christening']['comment']
             else:
@@ -212,7 +199,7 @@ class BaseIndividual():
         if self.events['death_or_burial']:
             event = self.events['death_or_burial']
             if event['comment']:
-                string = self.date_label_translation[event['comment']].format(
+                string = self._instances.date_label_translation[event['comment']].format(
                     symbol='\u2020', datum=str(event['date'].date().year))
                 # string += ' ' + self.events['birth_or_christening']['comment']
             else:

@@ -14,6 +14,20 @@ class InstanceContainer():
     Container class for all kinds of instances. This class reads the database.
     """
 
+    date_label_translation = {
+        'Calculated': '{symbol}\xa0berechnet\xa0{datum}',
+        'Estimated': '{symbol}\xa0geschätzt\xa0{datum}',
+        'Estimated (min 25 at marriage)': '{symbol}\xa0geschätzt\xa0{datum}',
+        'Estimated (max age 75)': '{symbol}\xa0geschätzt\xa0{datum}',
+        'Estimated (max age 100)': '{symbol}\xa0geschätzt\xa0{datum}',
+        'Estimated (min 1 after parents marriage)': '{symbol}\xa0geschätzt\xa0{datum}',
+        'Still alive': '',
+        'About': '{symbol}\xa0etwa\xa0{datum}',
+        'Before': '{symbol}\xa0vor\xa0{datum}',
+        'After': '{symbol}\xa0nach\xa0{datum}',
+        'YearPrecision': '{symbol}\xa0{datum}'
+    }
+
     def __init__(self, family_constructor, individual_constructor, instantiate_all):
         self._data = {('i', None): None, ('f', None): None}
         self._family_constructor = family_constructor

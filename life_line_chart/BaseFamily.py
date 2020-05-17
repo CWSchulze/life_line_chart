@@ -3,19 +3,6 @@ class BaseFamily():
     """
     Base class for families. This class is used as interface to the database.
     """
-    date_label_translation = {
-        'Calculated': '{symbol} berechnet {datum}',
-        'Estimated': '{symbol} geschätzt {datum}',
-        'Estimated (min 25 at marriage)': '{symbol} geschätzt {datum}',
-        'Estimated (max age 75)': '{symbol} geschätzt {datum}',
-        'Estimated (max age 100)': '{symbol} geschätzt {datum}',
-        'Estimated (min 1 after parents marriage)': '{symbol} geschätzt {datum}',
-        'Still alive': '',
-        'About': '{symbol} etwa {datum}',
-        'Before': '{symbol} vor {datum}',
-        'After': '{symbol} nach {datum}',
-        'YearPrecision': '{symbol} {datum}'
-    }
 
     def __init__(self, instances, family_id):
         self._instances = instances
@@ -139,7 +126,7 @@ class BaseFamily():
         # label = self.marriage['date'].date().strftime('%d.%m.%Y')
         event = self.marriage
         if event['comment']:
-            string = BaseFamily.date_label_translation[event['comment']].format(
+            string = self._instances.date_label_translation[event['comment']].format(
                 symbol='', datum=str(event['date'].date().year)).strip()
             # string += ' ' + self.events['birth_or_christening']['comment']
         else:
