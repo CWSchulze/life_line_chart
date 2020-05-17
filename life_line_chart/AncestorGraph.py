@@ -104,31 +104,29 @@ class AncestorGraph(BaseGraph):
                         mother, generations - 1, filter=filter)
             # family.visible_children.sort()
 
-    def select_individual_children(self, individual, generations=None, color=None, filter=None):
+    def select_family_children(self, family, filter=None):
         """
-        Select children of an individual. This is done by creating instances of graphical representations.
+        Select children of a family. This is done by creating instances of graphical representations.
 
         Args:
             individual (BaseIndividual): starting point for selection
-            generations (int, optional): number of generations to search for ancestors. Defaults to None.
-            color (list, optional): RGB color. Defaults to None.
             filter (lambda, optional): lambda(BaseIndividual) : return Boolean. Defaults to None.
         """
 
-        if filter and filter(individual):
-            return
+        if not family.has_graphical_representation():
+            gfr = self._create_family_graphical_representation(
+                family)
+        for child in family.get_children():
+            if filter and filter(child):
+                continue
 
-        if generations is None:
-            generations = 2 # self._positioning['generations']
+            if not child.has_graphical_representation():
+                individual_representation = self._create_individual_graphical_representation(
+                    child)
 
-        if not individual.has_graphical_representation():
-            individual_representation = self._create_individual_graphical_representation(
-                individual)
+                if individual_representation is None:
+                    return
 
-            if individual_representation is None:
-                return
-
-            if color is None:
                 i = int(hashlib.sha1(" ".join(individual_representation.name).encode(
                     'utf8')).hexdigest(), 16) % (10 ** 8)
                 c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
@@ -137,37 +135,10 @@ class AncestorGraph(BaseGraph):
                 f = min(1, 500/sum(c))
                 c = [int(x*f) for x in c]
                 individual_representation.color = c
-            else:
-                individual_representation.color = color
-        else:
-            individual_representation = individual.graphical_representations[0]
 
-        marriage_families = individual.marriages
-        for marriage_family in marriage_families:
-            family = self._create_family_graphical_representation(
-                marriage_family)
-            #family.add_visible_children(individual)
-            #individual_representation.visible_parent_family = family
-            if generations > 0 or generations < 0:
-                for child in marriage_family.get_children():
-                    self.select_individual_children(
-                        child,
-                        generations - 1,
-                        None,
-                        filter=filter)
-                    marriage_family.graphical_representations[0].add_visible_children(child)
-                    child.graphical_representations[0].visible_parent_family = marriage_family.graphical_representations[0]
+                family.graphical_representations[0].add_visible_children(child)
+                child.graphical_representations[0].visible_parent_family = family.graphical_representations[0]
 
-
-                    # parents = individual.get_father_and_mother()
-                    # father, mother = marriage_family.get_husband_and_wife()
-                    # if father:
-                    #     self.select_individuals(
-                    #         father, generations - 1, color=individual_representation.color if self._positioning['fathers_have_the_same_color'] else None, filter=filter)
-                    # if mother:
-                    #     self.select_individuals(
-                    #         mother, generations - 1, filter=filter)
-            # family.visible_children.sort()
 
     def place_selected_individuals(self, individual, child_family, spouse_family, child_of_family, x_offset=0, discovery_cache=[]):
         """
@@ -245,6 +216,17 @@ class AncestorGraph(BaseGraph):
                         x_position,
                         child_of_family)
                     x_position += 1
+            for marriage in sibling.marriages:
+                if marriage.has_graphical_representation() and marriage.family_id not in discovery_cache:
+                    for child in marriage.children:
+                        if child.has_graphical_representation():
+                            child.graphical_representations[0].set_x_position(
+                                x_position,
+                                marriage)
+                            x_position += 1
+                            print(child.plain_name)
+
+
 
         if child_of_family and child_of_family.has_graphical_representation() and not child_of_family.graphical_representations[0].children_width:
             child_of_family.graphical_representations[0].children_width = x_position - \
