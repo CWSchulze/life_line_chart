@@ -204,13 +204,14 @@ class AncestorGraph(BaseGraph):
                 if not father.graphical_representations[0].get_x_position() or local_child_of_family.family_id not in father.graphical_representations[0].get_x_position():
                     father.graphical_representations[0].visual_placement_child = (
                         individual, spouse_family)
-                    local_child_of_family.graphical_representations[0].visual_placement_child = individual
+                    if local_child_of_family.has_graphical_representation():
+                        local_child_of_family.graphical_representations[0].visual_placement_child = individual
                     # father.graphical_representations[0].visual_placement_child = spouse_family
                     self.place_selected_individuals(
                         father, spouse_family, local_child_of_family, fathers_born_in_family, x_position, discovery_cache)
                     width = father.graphical_representations[0].get_width(
                         local_child_of_family)
-                    if local_child_of_family:
+                    if local_child_of_family.has_graphical_representation():
                         local_child_of_family.graphical_representations[0].husb_width = \
                             lambda gr=father.graphical_representations[0], cof=local_child_of_family: gr.get_width(cof)
                     x_position += width
@@ -261,14 +262,15 @@ class AncestorGraph(BaseGraph):
                 if not mother.graphical_representations[0].get_x_position() or local_child_of_family.family_id not in mother.graphical_representations[0].get_x_position():
                     mother.graphical_representations[0].visual_placement_child = (
                         individual, spouse_family)
-                    local_child_of_family.graphical_representations[0].visual_placement_child = individual
+                    if local_child_of_family.has_graphical_representation():
+                        local_child_of_family.graphical_representations[0].visual_placement_child = individual
                     # mother.graphical_representations[0].visual_placement_child = spouse_family
                     self.place_selected_individuals(
                         mother, spouse_family, local_child_of_family, mothers_born_in_family, x_position, discovery_cache)
                     x_min, x_max = mother.graphical_representations[0].get_range(
                         local_child_of_family)
                     width = x_max - x_min + 1
-                    if local_child_of_family:
+                    if local_child_of_family.has_graphical_representation():
                         local_child_of_family.graphical_representations[0].wife_width = \
                             lambda gr=mother.graphical_representations[0], cof=local_child_of_family: gr.get_width(cof)
                     x_position += width
