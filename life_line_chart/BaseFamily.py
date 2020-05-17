@@ -127,7 +127,7 @@ class BaseFamily():
         event = self.marriage
         if event['comment']:
             string = self._instances.date_label_translation[event['comment']].format(
-                symbol='', datum=str(event['date'].date().year)).strip()
+                symbol='', date=str(event['date'].date().year)).strip()
             # string += ' ' + self.events['birth_or_christening']['comment']
         else:
             string = event['date'].date().strftime('%d.%m.%Y')

@@ -15,17 +15,17 @@ class InstanceContainer():
     """
 
     date_label_translation = {
-        'Calculated': '{symbol}\xa0berechnet\xa0{datum}',
-        'Estimated': '{symbol}\xa0geschätzt\xa0{datum}',
-        'Estimated (min 25 at marriage)': '{symbol}\xa0geschätzt\xa0{datum}',
-        'Estimated (max age 75)': '{symbol}\xa0geschätzt\xa0{datum}',
-        'Estimated (max age 100)': '{symbol}\xa0geschätzt\xa0{datum}',
-        'Estimated (min 1 after parents marriage)': '{symbol}\xa0geschätzt\xa0{datum}',
+        'Calculated': '{symbol}\xa0berechnet\xa0{date}',
+        'Estimated': '{symbol}\xa0geschätzt\xa0{date}',
+        'Estimated (min 25 at marriage)': '{symbol}\xa0geschätzt\xa0{date}',
+        'Estimated (max age 75)': '{symbol}\xa0geschätzt\xa0{date}',
+        'Estimated (max age 100)': '{symbol}\xa0geschätzt\xa0{date}',
+        'Estimated (min 1 after parents marriage)': '{symbol}\xa0geschätzt\xa0{date}',
         'Still alive': '',
-        'About': '{symbol}\xa0etwa\xa0{datum}',
-        'Before': '{symbol}\xa0vor\xa0{datum}',
-        'After': '{symbol}\xa0nach\xa0{datum}',
-        'YearPrecision': '{symbol}\xa0{datum}'
+        'About': '{symbol}\xa0etwa\xa0{date}',
+        'Before': '{symbol}\xa0vor\xa0{date}',
+        'After': '{symbol}\xa0nach\xa0{date}',
+        'YearPrecision': '{symbol}\xa0{date}'
     }
 
     def __init__(self, family_constructor, individual_constructor, instantiate_all):

@@ -181,7 +181,7 @@ class BaseIndividual():
             event = self.events['birth_or_christening']
             if event['comment']:
                 string = self._instances.date_label_translation[event['comment']].format(
-                    symbol='*', datum=str(event['date'].date().year))
+                    symbol='*', date=str(event['date'].date().year))
                 # string += ' ' + self.events['birth_or_christening']['comment']
             else:
                 string += '*\xa0' + event['date'].date().strftime('%d.%m.%Y')
@@ -200,7 +200,7 @@ class BaseIndividual():
             event = self.events['death_or_burial']
             if event['comment']:
                 string = self._instances.date_label_translation[event['comment']].format(
-                    symbol='\u2020', datum=str(event['date'].date().year))
+                    symbol='\u2020', date=str(event['date'].date().year))
                 # string += ' ' + self.events['birth_or_christening']['comment']
             else:
                 string += '\u2020\xa0' + event['date'].date().strftime('%d.%m.%Y')
