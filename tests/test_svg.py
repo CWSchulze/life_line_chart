@@ -124,11 +124,9 @@ def test_generate_svg_file_ancestor_and_children():
                 if cof.wife.get_child_of_family():
                     individual2_id = cof.wife.individual_id
                     break
+        graph.select_family_children(
+            graph._instances[('f', cof.family_id)])
         i += 1
-    graph.select_individuals(
-        graph._instances[('i', individual_id)], generations=max_generations)
-    graph.select_individual_children(
-        graph._instances[('i', individual2_id)], generations=3)
 
     cof_ids = graph._instances[('i', individual_id)].child_of_family_id
     child_of_family = None
