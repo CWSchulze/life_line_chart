@@ -20,36 +20,36 @@ class BaseGraph():
         'margin_year_max': 5,
         'margin_year_min': 10,
         'vertical_step_size': 40,
-        'relative_line_thickness': 0.5,
-        'total_height': 2000,
+        'relative_line_thickness': 0.4,
+        'total_height': 1500,
         'display_factor': -1,
         'font_size_description': 0.7,
         'font_description_letter_offset': [str(30 / 12.0)],
         'font_name': 'Arial',
         'birth_label_active': True,
         'birth_label_along_path': False,
-        'birth_label_rotation': -90,
-        'birth_label_anchor': 'start',
-        'birth_label_wrapping_active': False,
-        'birth_label_letter_x_offset': 0.8,
-        'birth_label_letter_y_offset': 0,
+        'birth_label_rotation': 0,
+        'birth_label_anchor': 'middle',
+        'birth_label_wrapping_active': True,
+        'birth_label_letter_x_offset': 0,
+        'birth_label_letter_y_offset': 1,
         'fade_individual_color': True,
-        'fade_individual_color_black_age': 150,
-        'marriage_label_active': True,
+        'fade_individual_color_black_age': 200,
+        'marriage_label_active': False,
         'no_ring': False,
         'death_label_active': True,
-        'death_label_rotation': -90,
-        'death_label_anchor': 'start',
-        'death_label_wrapping_active': False,
-        'death_label_letter_x_offset': 0.8,
-        'death_label_letter_y_offset': 0,
+        'death_label_rotation': 0,
+        'death_label_anchor': 'middle',
+        'death_label_wrapping_active': True,
+        'death_label_letter_x_offset': 0,
+        'death_label_letter_y_offset': -1,
         'warp_shape': 'normal',
         'family_shape': 0,
         'individual_foto_active': False,
         'individual_foto_relative_size': 2.5
     }
     _default_positioning = {
-        'generations': 4,
+        'generations': 5,
         'compression_steps': -1,  # debugging option
         'compress': False,
         'flip_to_optimize': False,
@@ -441,6 +441,8 @@ class BaseGraph():
         children_width = family.graphical_representations[0].children_width
         if not children_width:
             children_width = self._formatting['vertical_step_size']
+        if children_width != len(family.graphical_representations[0].visible_children):
+            print("G")
 
         if husb_x_pos < wife_x_pos:
             husb_x_delta = wife_width + children_width
