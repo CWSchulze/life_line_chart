@@ -41,13 +41,41 @@ def Cardano(a, b, c, d):
 
 class AncestorGraph(BaseGraph):
     """
-    This class enables setting up ancestor graphs and save them
+    Ancestor Graph
+    ==============
+
+    The ancestor graph shows the ancestors of one or more root individuals.
+    The parents only enclose direct children. Both, father and mother are
+    visible. Usually ancestors are visible, optionally all children of a
+    visible family can be added.
+
+    Each individual appears once. So in case of a second marriage, the
+    individual is connected across the chart to the second spouse. Because
+    of that, ancestor collapse is visualized.
     """
 
     def __init__(self, positioning=None, formatting=None, instance_container=get_gedcom_instance_container):
         BaseGraph.__init__(self, positioning, formatting, instance_container)
+
+        # configuration of this graph
+        self._chart_configuration.update(self.get_default_chart_configuration())
         # self._graphical_family_class = ancestor_graph_family # TODO: necessary if other graphs are implemented
         # self._graphical_individual_class = ancestor_graph_individual # TODO: necessary if other graphs are implemented
+
+    @staticmethod
+    def get_default_chart_configuration():
+        """
+        get the default chart configuration
+
+        Returns:
+            dict: default chart configuration dict
+        """
+
+        return {
+            'root_individuals': [],
+            'family_children': [],
+            'discovery_blacklist': []
+        }
 
     def select_individuals(self, individual, generations=None, color=None, filter=None):
         """
@@ -55,16 +83,13 @@ class AncestorGraph(BaseGraph):
 
         Args:
             individual (BaseIndividual): starting point for selection
-            generations (int, optional): number of generations to search for ancestors. Defaults to None.
+            generations (int): number of generations to search for ancestors.
             color (list, optional): RGB color. Defaults to None.
             filter (lambda, optional): lambda(BaseIndividual) : return Boolean. Defaults to None.
         """
 
         if filter and filter(individual):
             return
-
-        if generations is None:
-            generations = self._positioning['generations']
 
         if not individual.has_graphical_representation():
             individual_representation = self._create_individual_graphical_representation(
@@ -453,7 +478,7 @@ class AncestorGraph(BaseGraph):
             for key in keys:
                 self.position_to_person_map[key - (
                     min_index_x - old_x_min_index) * 1] = self.position_to_person_map.pop(key)
-            width = (max_index_x - min_index_x)
+            width = (max_index_x - min_index_x) + 1
             self.min_x_index = 0
             self.max_x_index = width
             logger.info(
@@ -466,14 +491,6 @@ class AncestorGraph(BaseGraph):
         #         print("collision of " + " ".join(collision[0].name))
         #     else:
         #         print("collision of " + " ".join(collision[0].name) + " with " + " ".join(collision[1].name))
-
-    def clear_svg_items(self):
-        """
-        clear all graphical items to render the graph with different settings
-        """
-        self.additional_graphical_items.clear()
-        for graphical_individual_representation in self.graphical_individual_representations:
-            graphical_individual_representation.items.clear()
 
     def clear_graphical_representations(self):
         """
@@ -1081,3 +1098,73 @@ class AncestorGraph(BaseGraph):
 
         logger.debug('start saving document')
         svg_document.save(True)
+
+    def update_chart(self, filter_lambda=None, color_lambda=None, images_lambda=None, rebuild_all=False, update_view=False):
+        rebuild_all = rebuild_all or self._positioning != self._backup_positioning or \
+            self._chart_configuration != self._backup_chart_configuration
+        update_view = update_view or rebuild_all or self._formatting != self._backup_formatting
+        def local_filter_lambda(individual, _filter_lambda=filter_lambda):
+            if individual.individual_id in self._chart_configuration['discovery_blacklist']:
+                return True
+            if _filter_lambda is not None:
+                return _filter_lambda(individual)
+            return False
+
+        if rebuild_all:
+            self.clear_graphical_representations()
+            for settings in self._chart_configuration['root_individuals']:
+                root_individual_id = settings['individual_id']
+                generations = settings['generations']
+                root_individual = self._instances[(
+                    'i', root_individual_id)]
+                self.select_individuals(root_individual, generations, filter=local_filter_lambda)
+
+            for family_id in self._chart_configuration['family_children']:
+                family = self._instances[(
+                    'f', family_id)]
+                self.select_family_children(family, filter=local_filter_lambda)
+
+            x_pos = 0
+            for settings in self._chart_configuration['root_individuals']:
+                root_individual_id = settings['individual_id']
+                generations = settings['generations']
+                root_individual = self._instances[(
+                    'i', root_individual_id)]
+                cof_family_id = None
+                if root_individual.child_of_family_id:
+                    cof_family_id = root_individual.child_of_family_id[0]
+                self.place_selected_individuals(
+                    root_individual, None, None, self._instances[('f', cof_family_id)], x_pos)
+
+                x_pos += root_individual.graphical_representations[0].get_width(None)
+
+            for settings in self._chart_configuration['root_individuals']:
+                root_individual_id = settings['individual_id']
+                generations = settings['generations']
+                try:
+                    self.modify_layout(root_individual_id)
+                except Exception as e:
+                    pass
+
+            #backup color
+            for gir in self.graphical_individual_representations:
+                gir.color_backup = gir.color
+
+            self.define_svg_items()
+
+        elif update_view:
+            self.clear_svg_items()
+
+            for gir in self.graphical_individual_representations:
+                gir.color = gir.color_backup
+                if color_lambda:
+                    color = color_lambda(gir.individual_id)
+                    if color:
+                        gir.color = color
+                if images_lambda:
+                    gir.individual.images = images_lambda(gir.individual.individual_id)
+            self.define_svg_items()
+        self._backup_chart_configuration = deepcopy(self._chart_configuration)
+        self._backup_formatting = deepcopy(self._formatting)
+        self._backup_positioning = deepcopy(self._positioning)
+        return update_view or rebuild_all

@@ -49,7 +49,6 @@ class BaseGraph():
         'individual_photo_relative_size': 2.5
     }
     _default_positioning = {
-        'generations': 5,
         'compression_steps': -1,  # debugging option
         'compress': False,
         'flip_to_optimize': False,
@@ -194,10 +193,6 @@ class BaseGraph():
         }
     }
     _positioning_description = {
-        'generations': {
-            'short_description': 'Maximum number of generations',
-            'long_description': 'When this number of generations has been reached, the algorithm doesn´\'t go any deeper'
-        },
         'compress': {
             'short_description': 'Compress the graph vertically',
             'long_description': 'By default every individual has a unique vertical slot. This can be inefficient with many generations. This algorithm lets several people share a vertical slot, if they do not overlap.'
@@ -212,6 +207,12 @@ class BaseGraph():
         },
 
     }
+    _chart_configuration_root_individual_description = {
+        'generations': {
+            'short_description': 'Maximum number of generations',
+            'long_description': 'When this number of generations has been reached, the algorithm doesn´\'t go any deeper'
+        },
+    }
     _available_warp_shapes = list(_formatting_description['warp_shape']['choices'].keys())
     # TODO: extract base class for other graph types
     _graphical_family_class = ancestor_graph_family
@@ -219,14 +220,11 @@ class BaseGraph():
     _graphical_individual_class = ancestor_graph_individual
 
     def __init__(self, positioning=None, formatting=None, instance_container=get_gedcom_instance_container):
-        # renderer = HighlightRenderer()
-        # self._markdown_to_spans = mistune.Markdown(renderer=renderer)
-
         self.position_to_person_map = {}
-        self._positioning = deepcopy(self._default_positioning)
+        self._positioning = BaseGraph.get_default_positioning()
         if positioning:
             self._positioning.update(positioning)
-        self._formatting = deepcopy(self._default_formatting)
+        self._formatting = BaseGraph.get_default_formatting()
         if formatting:
             self._formatting.update(formatting)
         self._instances = instance_container()
@@ -243,11 +241,63 @@ class BaseGraph():
         self.chart_min_ordinal = None
         self.chart_max_ordinal = None
 
-    def get_default_formatting_and_description(self):
-        return deepcopy(self._default_formatting), deepcopy(self._formatting_description)
+        # configuration of this graph
+        self._chart_configuration = {}
+        self._default_chart_configuration = {}
 
-    def get_default_positioning_and_description(self):
-        return deepcopy(self._default_positioning), deepcopy(self._positioning_description)
+        self._backup_positioning = None
+        self._backup_formatting = None
+        self._backup_chart_configuration = None
+
+    @staticmethod
+    def get_default_formatting():
+        """
+        get the default formatting
+
+        Returns:
+            dict: formatting dict
+        """
+        return deepcopy(BaseGraph._default_formatting)
+
+    @staticmethod
+    def get_formatting_description():
+        """
+        get the formatting description to build UI
+
+        Returns:
+            dict: description of the formatting
+        """
+        return deepcopy(BaseGraph._formatting_description)
+
+    @staticmethod
+    def get_default_positioning():
+        """
+        get the deafult positioning
+
+        Returns:
+            dict: positioning dict
+        """
+        return deepcopy(BaseGraph._default_positioning)
+
+    @staticmethod
+    def get_positioning_description():
+        """
+        get the positioning description to build UI
+
+        Returns:
+            dict: description of the positioning
+        """
+        return deepcopy(BaseGraph._positioning_description)
+
+    @staticmethod
+    def get_chart_configuration_root_individual_description():
+        """
+        get the chart configuration root individual description to build UI
+
+        Returns:
+            dict: description of chart configuration root individual
+        """
+        return deepcopy(BaseGraph._chart_configuration_root_individual_description)
 
     def instantiate_all(self):
         """
@@ -272,6 +322,24 @@ class BaseGraph():
             positioning (dict): positioning dict
         """
         self._positioning.update(positioning)
+
+    def set_chart_configuration(self, chart_configuration):
+        """
+        set the chart configuration of the graph
+
+        Args:
+            chart_configuration (dict): chart configuration dict
+        """
+        self._chart_configuration.update(chart_configuration)
+
+    def get_chart_configuration(self):
+        """
+        get the chart configuration
+
+        Returns:
+            dict: chart configuration dict
+        """
+        return deepcopy(self._chart_configuration)
 
     def _create_individual_graphical_representation(self, individual):
         """
@@ -736,6 +804,14 @@ class BaseGraph():
                 if possible_match['start'] < ordinal_value and possible_match['end'] > ordinal_value:
                     return possible_match['individual']
         return None
+
+    def clear_svg_items(self):
+        """
+        clear all graphical items to render the graph with different settings
+        """
+        self.additional_graphical_items.clear()
+        for graphical_individual_representation in self.graphical_individual_representations:
+            graphical_individual_representation.items.clear()
 
     def clear_graphical_representations(self):
         """
