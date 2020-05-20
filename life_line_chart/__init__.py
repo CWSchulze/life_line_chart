@@ -22,7 +22,7 @@ from .GedcomParsing import get_date_dict_from_tag, estimate_marriage_date
 
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 
-__version__ = "1.2.26"
+__version__ = "1.2.27"
 
 import logging
 logging.basicConfig()
