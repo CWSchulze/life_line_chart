@@ -1,6 +1,29 @@
 import datetime
-from dateutil.parser import parse
+import re
 
+_months = [
+    "JAN",
+    "FEB",
+    "MAR",
+    "APR",
+    "MAY",
+    "JUN",
+    "JUL",
+    "AUG",
+    "SEP",
+    "OCT",
+    "NOV",
+    "DEC"
+]
+_precision = [
+    'ABT',
+    'CAL',
+    'EST',
+    'AFT',
+    'BEF'
+]
+_date_expr = re.compile('(?:(' + '|'.join(_precision) + ') )?(?:(\\d+) )?(?:(' + '|'.join(_months) + ') )?(\\d{4})')
+_interval_expr = re.compile('(BET) (?:(\\d+) (' + '|'.join(_months) + ') )?(\\d{4}) AND (?:(\\d+) (' + '|'.join(_months) + ') )?(\\d{4})')
 
 def get_date_dict_from_tag(parent_item, tag_name):
     """
@@ -17,51 +40,55 @@ def get_date_dict_from_tag(parent_item, tag_name):
             return
         if 'DATE' not in parent_item[tag_name]:
             return
-        content = parent_item[tag_name]['DATE']['tag_data']
         comment = None
-        if content.startswith('EST'):
+        content = parent_item[tag_name]['DATE']['tag_data']
+        date_info = _date_expr.match(content)
+        if date_info is None:
+            date_info = _interval_expr.match(content)
+        if date_info.group(1) == 'EST':
             comment = 'Estimated'
-            content = content[4:]
-        if content.startswith('ABT'):
+        elif date_info.group(1) == 'ABT':
             comment = 'About'
-            content = content[4:]
-        if content.startswith('CAL'):
+        elif date_info.group(1) == 'CAL':
             comment = 'Calculated'
-            content = content[4:]
-        if content.startswith('AFT'):
+        elif date_info.group(1) == 'AFT':
             comment = 'After'
-            content = content[4:]
-        if content.startswith('BEF'):
+        elif date_info.group(1) == 'BEF':
             comment = 'Before'
-            content = content[4:]
-        if content.isnumeric():
-            try:
-                test = int(content)
-                if tag_name in ['BURI', 'DEAT']:
-                    date = datetime.datetime(test, 12, 31, 0, 0, 0, 0)
-                else:
-                    date = datetime.datetime(test, 1, 1, 0, 0, 0, 0)
-                if comment is None:
-                    comment = 'YearPrecision'
-            except:
-                date = parse(content)
-            return {
-                'tag_name': tag_name,
-                'date': date,
-                'ordinal_value': date.toordinal(),
-                'comment': comment
-            }
+        elif date_info.group(2) is None and date_info.group(3) is None and date_info.group(4) is not None:
+            comment = 'YearPrecision'
+
+        if tag_name in ['BURI', 'DEAT']:
+            # if unknown move to the end of the year
+            month, day = 12, 31
         else:
-            try:
-                date = parse(content.split('\n')[0])
-                return {
-                    'tag_name': tag_name,
-                    'date': date,
-                    'ordinal_value': date.toordinal(),
-                    'comment': comment
-                }
-            except:
-                pass
+            # if unknown move to the beginning of the year
+            month, day = 1, 1
+
+        if date_info.group(1) == 'BET' and tag_name in ['BURI', 'DEAT']:
+            # move to the end of the interval
+            if date_info.group(5):
+                day = int(date_info.group(5))
+            if date_info.group(6):
+                month = _months.index(date_info.group(6)) + 1
+            if date_info.group(7):
+                year = int(date_info.group(7))
+        else:
+            if date_info.group(2):
+                day = int(date_info.group(2))
+            if date_info.group(3):
+                month = _months.index(date_info.group(3)) + 1
+            if date_info.group(4):
+                year = int(date_info.group(4))
+
+        date = datetime.datetime(year, month, day, 0, 0, 0, 0)
+        return {
+            'tag_name': tag_name,
+            'date': date,
+            'ordinal_value': date.toordinal(),
+            'comment': comment
+        }
+
     except:
         pass
 
