@@ -25,7 +25,8 @@ class InstanceContainer():
         'About': '{symbol}\xa0etwa\xa0{date}',
         'Before': '{symbol}\xa0vor\xa0{date}',
         'After': '{symbol}\xa0nach\xa0{date}',
-        'YearPrecision': '{symbol}\xa0{date}'
+        'YearPrecision': '{symbol}\xa0{date}',
+        'Between': '{symbol}\xa0{date}'
     }
 
     def __init__(self, family_constructor, individual_constructor, instantiate_all):
