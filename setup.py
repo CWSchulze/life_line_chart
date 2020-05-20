@@ -53,7 +53,10 @@ setup(
     package_data={'life_line_chart': ['*.png']},
     include_package_data=True,
     packages=setuptools.find_packages(),
-    install_requires=['numpy', 'svgwrite', 'svgpathtools', 'python-dateutil', 'pillow'],
+    extras_require= {
+        "photo_tests": ["pillow"],
+    },
+    install_requires=['svgwrite'],
     ext_modules=[]
 )
 
@@ -62,4 +65,4 @@ setup(
 
 # to upload to pypi
 # python setup.py sdist
-# twine upload 
+# twine upload

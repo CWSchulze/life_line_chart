@@ -696,7 +696,8 @@ class AncestorGraph(BaseGraph):
                                     self._formatting['vertical_step_size']*2,
                                     self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*2),
                             },
-                            'filename': os.path.join(os.path.dirname(__file__), "ringe.png")
+                            'filename': os.path.join(os.path.dirname(__file__), "ringe.png"),
+                            'size': (119,75)
                         }
                     )
                 if self._formatting['marriage_label_active']:
@@ -765,7 +766,9 @@ class AncestorGraph(BaseGraph):
                         index = 0
                         svg_path = Path_types[data[-1][0]
                                               ['type']](*data[-1][0]['arguments'])
-                        for ov, filename in graphical_individual_representation.individual.images.items():
+                        for ov, image_dict in graphical_individual_representation.individual.images.items():
+                            image_filename = image_dict['filename']
+                            image_size = image_dict['size']
                             if ov >= knots[index][1] and ov <= knots[index + 1][1]:
                                 photo_size = self._formatting['individual_photo_relative_size'] * \
                                     self._formatting['relative_line_thickness'] * \
@@ -793,7 +796,8 @@ class AncestorGraph(BaseGraph):
                                                     xpos.imag - photo_size/2),
                                                 'size': (photo_size, photo_size),
                                         },
-                                        'filename': filename
+                                        'filename': image_filename,
+                                        'size': image_size
                                     }
                                 )
                 else:
@@ -834,7 +838,9 @@ class AncestorGraph(BaseGraph):
                         if self._formatting['individual_photo_active'] and len(graphical_individual_representation.individual.images) > 0:
                             svg_path = Path_types[data[-1][0]
                                                   ['type']](*data[-1][0]['arguments'])
-                            for ov, filename in graphical_individual_representation.individual.images.items():
+                            for ov, image_dict in graphical_individual_representation.individual.images.items():
+                                image_filename = image_dict['filename']
+                                image_size = image_dict['size']
                                 if ov > knots[index][1] and ov < knots[index + 1][1]:
                                     photo_size = self._formatting['individual_photo_relative_size'] * \
                                         self._formatting['relative_line_thickness'] * \
@@ -863,7 +869,8 @@ class AncestorGraph(BaseGraph):
                                                         xpos.imag - photo_size/2),
                                                     'size': (photo_size, photo_size),
                                             },
-                                            'filename': filename
+                                            'filename': image_filename,
+                                            'size': image_size
                                         }
                                     )
             life_line_bezier_paths = []
@@ -973,7 +980,6 @@ class AncestorGraph(BaseGraph):
                                             str(self.get_full_width()),
                                             str(self.get_full_height())))
 
-        from PIL import Image
         import base64
 
         image_defs = {}
@@ -1074,8 +1080,7 @@ class AncestorGraph(BaseGraph):
                             this_def['image_data']).decode()
                         this_def['pngdata'] = 'data:image/png;base64,{}'.format(
                             this_def['encoded'])
-                        image = Image.open(item['filename'])
-                        this_def['size'] = image.size
+                        this_def['size'] = item['size']
                         this_def['image_content'] = svg_document.image(
                             href=(this_def['pngdata']), preserveAspectRatio='xMidYMid', size=(1, 1))
                         this_def['image_def'] = svg_document.defs.add(
