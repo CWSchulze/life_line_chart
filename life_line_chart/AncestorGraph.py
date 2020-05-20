@@ -534,6 +534,8 @@ class AncestorGraph(BaseGraph):
         max_x_index = self.max_x_index
         if 'grid' not in self.additional_graphical_items:
             self.additional_graphical_items['grid'] = []
+        if 'axis' not in self.additional_graphical_items:
+            self.additional_graphical_items['axis'] = []
         for year in range(min_year, max_year + 2, 2):
             year_pos = self._map_y_position(
                 datetime.date(year, 1, 1).toordinal())
@@ -546,7 +548,7 @@ class AncestorGraph(BaseGraph):
                             'stroke_width': 1
                 }
                 )
-                self.additional_graphical_items['grid'].append({
+                self.additional_graphical_items['axis'].append({
                     'type': 'text',
                             'config': {
                                 'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
