@@ -7,6 +7,7 @@ This module can be used to generate genealogy charts.
 
 from .BaseGraph import BaseGraph
 from .AncestorGraph import AncestorGraph
+from .DescendantGraph import DescendantGraph
 
 from .AncestorGraphIndividual import ancestor_graph_individual
 from .AncestorGraphFamily import ancestor_graph_family

@@ -147,6 +147,8 @@ class ancestor_graph_individual():
         marriages = self.individual.marriages
         if len(marriages) > 0:
             for marriage in marriages:
+                if not marriage.has_graphical_representation():
+                    continue
                 gr_marriage = marriage.graphical_representations[0]
                 if gr_marriage.visual_placement_parent_family is not None and \
                     gr_marriage.visual_placement_parent_family.family_id == family_id:

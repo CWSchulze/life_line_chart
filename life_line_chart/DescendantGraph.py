@@ -108,11 +108,10 @@ class DescendantGraph(BaseGraph):
             if marriage.has_graphical_representation():
                 continue
 
-            gr_marriage = self._create_family_graphical_representation(
-                marriage)
-
             #individual_representation.visible_parent_family = gr_marriage
             if generations > 0 or generations < 0:
+                gr_marriage = self._create_family_graphical_representation(
+                    marriage)
                 # parents = individual.get_father_and_mother()
 
                 spouse = marriage.get_spouse(individual.individual_id)
@@ -139,9 +138,9 @@ class DescendantGraph(BaseGraph):
                     if child.has_graphical_representation():
                         gr_marriage.add_visible_children(child)
                         child.graphical_representations[0].visible_parent_family = gr_marriage
-            cofs = individual.get_child_of_family()
-            if len(cofs) > 0:
-                gr_marriage.visual_placement_parent_family = individual.get_child_of_family()[0]
+                cofs = individual.get_child_of_family()
+                if len(cofs) > 0:
+                    gr_marriage.visual_placement_parent_family = individual.get_child_of_family()[0]
 
     def select_family_children(self, family, filter=None):
         """
@@ -199,17 +198,20 @@ class DescendantGraph(BaseGraph):
         graphical_individual_representation.x_start = x_position
         self.min_x_index = min(self.min_x_index, x_position)
 
+        visible_marriages = \
+            [marriage for marriage in individual.marriages if marriage.has_graphical_representation()]
 
-        if len(individual.marriages)==0:
+
+        if len(visible_marriages) == 0:
             graphical_individual_representation.set_x_position(
                     x_position, child_of_family)
             x_position += 1
 
-        for marriage_index, marriage in enumerate(reversed(individual.marriages)):
+        for marriage_index, marriage in enumerate(reversed(visible_marriages)):
             if not marriage.has_graphical_representation():
                 continue
 
-            if marriage_index == len(individual.marriages) - 1:
+            if marriage_index == len(visible_marriages) - 1:
                 if graphical_individual_representation.get_x_position() is None or \
                         child_of_family is not None and child_of_family.family_id not in graphical_individual_representation.get_x_position():
                     graphical_individual_representation.set_x_position(
