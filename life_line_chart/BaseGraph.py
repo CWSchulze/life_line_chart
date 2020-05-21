@@ -822,5 +822,6 @@ class BaseGraph():
         self.additional_graphical_items.clear()
         self.graphical_individual_representations.clear()
         self.graphical_family_representations.clear()
+        self.position_to_person_map = {}
         for key, instance in self._instances.items():
             instance.graphical_representations.clear()
