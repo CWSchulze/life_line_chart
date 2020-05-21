@@ -113,6 +113,9 @@ class BaseIndividual():
         self.graphical_representations = [] # : instances of graphical representations
         self.images = {}  # : mapping of ordinal values to photos of this individual
 
+    def __repr__(self):
+        return 'individual "' + self.plain_name + '" ' + self.birth_date
+
     def _initialize(self):
         self._marriage_family_ids = self._get_marriage_family_ids()
         unsorted_marriages = [

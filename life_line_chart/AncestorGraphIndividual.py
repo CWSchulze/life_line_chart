@@ -25,6 +25,9 @@ class ancestor_graph_individual():
         self.individual.graphical_representations.append(self)
         pass
 
+    def __repr__(self):
+        return 'gr_individual "' + self.individual.plain_name + '" ' + self.individual.birth_date
+
     def get_marriages(self):
         marriages = self.individual.marriages
         return [m.graphical_representations[0] for m in marriages if m.has_graphical_representation()]

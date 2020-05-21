@@ -14,6 +14,9 @@ class BaseFamily():
         self.marriage = None
         self.location = None
 
+    def __repr__(self):
+        return 'family "' + self.husb_name + '"+"' + self.wife_name + '"'
+
     def _initialize(self):
         self.husband_individual_id, self.wife_individual_id = self._get_husband_and_wife_id()
         self.children_individual_ids = self._get_children_ids()

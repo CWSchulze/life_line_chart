@@ -13,10 +13,17 @@ class ancestor_graph_family():
         self.family = self.__instances[('f', self.family_id)]
         self.family.graphical_representations.append(self)
         self.marriage = self.family.marriage
+
+        # Tells which children are visible
         self.visible_children = {}
+
+        # Ancestor graph: Tells which child was used to place this family (this
+        # is a strong connection)
         self.visual_placement_child = None
         self.children_width = None
-        pass
+
+    def __repr__(self):
+        return 'gr_family "' + self.family.husb_name + '"+"' + self.family.wife_name + '"'
 
     def get_spouse(self, individual):
         spouse = self.family.get_spouse(
