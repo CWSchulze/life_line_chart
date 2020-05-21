@@ -139,8 +139,7 @@ class AncestorGraph(BaseGraph):
         """
 
         if not family.has_graphical_representation():
-            gfr = self._create_family_graphical_representation(
-                family)
+            return
         for child in family.get_children():
             if filter and filter(child):
                 continue

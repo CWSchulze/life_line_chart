@@ -20,6 +20,11 @@ class ancestor_graph_family():
         # Ancestor graph: Tells which child was used to place this family (this
         # is a strong connection)
         self.visual_placement_child = None
+
+        # Descendant graph: Used to define under which family this family has
+        # been placed (e.g. if wife/husband are from different branches of the
+        # family)
+        self.visual_placement_parent_family = None
         self.children_width = None
 
     def __repr__(self):
