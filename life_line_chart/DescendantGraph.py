@@ -116,21 +116,22 @@ class DescendantGraph(BaseGraph):
 
                 spouse = marriage.get_spouse(individual.individual_id)
                 if spouse is not None and not spouse.has_graphical_representation():
-                    spouse_representation = self._create_individual_graphical_representation(
-                        spouse)
+                    if filter is None or filter(spouse) == False:
+                        spouse_representation = self._create_individual_graphical_representation(
+                            spouse)
 
-                    if spouse_representation is not None:
-                        if color is None:
-                            i = int(hashlib.sha1(" ".join(spouse_representation.name).encode(
-                                'utf8')).hexdigest(), 16) % (10 ** 8)
-                            c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
-                            f = 255/max(c)
-                            c = [int(x*f) for x in c]
-                            f = min(1, 500/sum(c))
-                            c = [int(x*f) for x in c]
-                            spouse_representation.color = c
-                        else:
-                            spouse_representation.color = color
+                        if spouse_representation is not None:
+                            if color is None:
+                                i = int(hashlib.sha1(" ".join(spouse_representation.name).encode(
+                                    'utf8')).hexdigest(), 16) % (10 ** 8)
+                                c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
+                                f = 255/max(c)
+                                c = [int(x*f) for x in c]
+                                f = min(1, 500/sum(c))
+                                c = [int(x*f) for x in c]
+                                spouse_representation.color = c
+                            else:
+                                spouse_representation.color = color
 
                 for child in marriage.children:
                     self.select_descendants(
@@ -199,12 +200,14 @@ class DescendantGraph(BaseGraph):
         self.min_x_index = min(self.min_x_index, x_position)
 
         visible_marriages = \
-            [marriage for marriage in individual.marriages if marriage.has_graphical_representation()]
+            [marriage for marriage in individual.marriages \
+                if marriage.has_graphical_representation() and (child_of_family is None or \
+                    marriage.graphical_representations[0].visual_placement_parent_family.family_id == child_of_family.family_id)]
 
 
         if len(visible_marriages) == 0:
             graphical_individual_representation.set_x_position(
-                    x_position, child_of_family)
+                    x_position, child_of_family, True)
             x_position += 1
 
         for marriage_index, marriage in enumerate(reversed(visible_marriages)):
@@ -230,93 +233,17 @@ class DescendantGraph(BaseGraph):
                     child, None, None, marriage, x_position,
                     discovery_cache=discovery_cache)
                 if child.has_graphical_representation():
-                    range = child.graphical_representations[0].get_range2(
+                    width = child.graphical_representations[0].get_width2(
                         marriage)
-                    width= range[1] - range[0] + 1
                     x_position += width
-
-
 
             spouse = marriage.get_spouse(individual.individual_id)
             if spouse is not None and spouse.has_graphical_representation():
                 spouse_representation = spouse.graphical_representations[0]
-                # spouse_representation = self._create_individual_graphical_representation(
-                #     spouse)
                 if not spouse.graphical_representations[0].get_x_position() or marriage.family_id not in spouse.graphical_representations[0].get_x_position():
-                    # spouse.graphical_representations[0].visual_placement_child = (
-                    #     individual, spouse_family)
-                    # if marriage.has_graphical_representation():
-                    #     marriage.graphical_representations[0].visual_placement_child = individual
-                    # spouse.graphical_representations[0].visual_placement_child = spouse_family
-                    # self.place_selected_individuals(
-                    #     spouse, spouse_family, marriage, None, x_position, discovery_cache)
-
                     spouse_representation.set_x_position(
                         x_position, marriage)
                     x_position += 1
-
-
-
-
-
-        # # add the main individual and its visible siblings
-        # children_start_x = x_position
-
-        # if child_of_family is not None and child_of_family.has_graphical_representation() and child_of_family.graphical_representations[0].visible_children:
-        #     siblings = [sibling for _, _, sibling in sorted(child_of_family.graphical_representations[0].visible_children.values())]
-        # else:
-        #     siblings = [individual]
-        # for sibling in siblings:
-        #     if sibling.individual_id == individual.individual_id:
-        #         if sibling.graphical_representations[0].get_x_position() is None or spouse_family is not None and spouse_family.family_id not in sibling.graphical_representations[0].get_x_position():
-        #             # add new position of this spouse family
-        #             sibling.graphical_representations[0].set_x_position(
-        #                 x_position, spouse_family)
-
-        #             if child_of_family and child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
-        #                 # not added yet, so this is the primary cof placement
-        #                 sibling.graphical_representations[0].set_x_position(
-        #                     x_position, child_of_family, True)
-
-        #             x_position += 1
-
-        #     elif not sibling.graphical_representations[0].get_x_position() or child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
-        #         if not sibling.graphical_representations[0].visual_placement_child:
-        #             sibling.graphical_representations[
-        #                 0].visual_placement_child = graphical_individual_representation.visual_placement_child
-        #             sibling.graphical_representations[0].set_x_position(
-        #                 x_position,
-        #                 child_of_family)
-        #             x_position += 1
-
-        # if child_of_family and child_of_family.has_graphical_representation() and not child_of_family.graphical_representations[0].children_width:
-        #     child_of_family.graphical_representations[0].children_width = x_position - \
-        #         children_start_x
-
-        # # recursively add the mother branch
-        # for local_child_of_family in child_of_families:
-        #     father, mother = local_child_of_family.get_husband_and_wife()
-        #     if mother and mother.has_graphical_representation():
-        #         mothers_child_of_families = mother.get_child_of_family()
-        #         if mothers_child_of_families:
-        #             mothers_born_in_family = mothers_child_of_families[0]
-        #         else:
-        #             mothers_born_in_family = None
-        #         if not mother.graphical_representations[0].get_x_position() or local_child_of_family.family_id not in mother.graphical_representations[0].get_x_position():
-        #             mother.graphical_representations[0].visual_placement_child = (
-        #                 individual, spouse_family)
-        #             if local_child_of_family.has_graphical_representation():
-        #                 local_child_of_family.graphical_representations[0].visual_placement_child = individual
-        #             # mother.graphical_representations[0].visual_placement_child = spouse_family
-        #             self.place_selected_individuals(
-        #                 mother, spouse_family, local_child_of_family, mothers_born_in_family, x_position, discovery_cache)
-        #             x_min, x_max = mother.graphical_representations[0].get_range(
-        #                 local_child_of_family)
-        #             width = x_max - x_min + 1
-        #             if local_child_of_family.has_graphical_representation():
-        #                 local_child_of_family.graphical_representations[0].wife_width = \
-        #                     lambda gr=mother.graphical_representations[0], cof=local_child_of_family: gr.get_width(cof)
-        #             x_position += width
 
         self.max_x_index = max(self.max_x_index, x_position)
 
@@ -330,128 +257,53 @@ class DescendantGraph(BaseGraph):
             self.min_ordinal = birth_ordinal_value
             self.max_ordinal = death_ordinal_value
 
-    def _compress_single_individual_position(self, individual, cof, direction):
+    def check_unique_x_position(self):
         """
-        move single individual until it collides
+        check if every individual position has a unique vertical slot
+
+        Raises:
+            RuntimeError: overlap was found
+
+        Returns:
+            tuple: (list of failures, min_x_index, max_x_index)
         """
-        try:
-            i = 0
-            while i < 5000:
-                i += 1
-                self._move_single_individual(individual, cof, direction)
-                self._check_compressed_x_position(True)
-        except LifeLineChartCollisionDetected:
-            pass
-        self._move_single_individual(individual, cof, - direction)
+        failed = []
+        v = {}
+        for graphical_individual_representation in self.graphical_individual_representations:
+            x_pos = graphical_individual_representation.get_x_position()
+            for value in x_pos.values():
+                x_index = value[1]
+                ###################
+                # if value[3]:
+                #     continue
 
-    def _compress_graph_ancestor_graph(self, graphical_family_representation):
-        """
-        compress the graph vertically.
-
-        # TODO: compressing fails if siblings are dragged apart which reunite families in later generations (Andreas Adam Lindner)
-
-        Args:
-            graphical_family_representation (AncestorGraphFamily): graphical family representation instance
-        """
-        individuals = []
-        if graphical_family_representation is None:
-            return
-
-        family_was_flipped = False
-        x_pos_husb = None
-        x_pos_wife = None
-        if graphical_family_representation.husb is not None and graphical_family_representation.husb.has_graphical_representation():
-            x_pos_husb = graphical_family_representation.husb.graphical_representations[0].get_x_position()[
-                graphical_family_representation.family_id][1]
-            individuals.append((1, graphical_family_representation.husb))
-        if graphical_family_representation.wife is not None and graphical_family_representation.wife.has_graphical_representation():
-            x_pos_wife = graphical_family_representation.wife.graphical_representations[0].get_x_position()[
-                graphical_family_representation.family_id][1]
-            individuals.append((-1, graphical_family_representation.wife))
-        if x_pos_husb and x_pos_wife and x_pos_husb > x_pos_wife:
-            family_was_flipped = True
-
-        for _, individual in sorted(individuals):
-            cofs = individual.get_child_of_family()
-            for cof in cofs:
-                if cof.has_graphical_representation():
-                    if cof.husb is None or cof.wife is None \
-                            or not cof.husb.has_graphical_representation() \
-                            or not cof.wife.has_graphical_representation():
-                        this_individual_x_pos = individual.graphical_representations[0].get_x_position()[
-                            cof.family_id][1]
-                        parent_x_pos = None
-                        if cof.husb is not None and cof.husb.has_graphical_representation():
-                            parent_x_pos = cof.husb.graphical_representations[0].get_x_position()[
-                                cof.family_id][1]
-                        if cof.wife is not None and cof.wife.has_graphical_representation():
-                            parent_x_pos = cof.wife.graphical_representations[0].get_x_position()[
-                                cof.family_id][1]
-                        if parent_x_pos is not None and this_individual_x_pos > parent_x_pos:
-                            self._compress_single_individual_position(
-                                individual, cof, -1)
-                            # self._move_single_individual(individual, cof, parent_x_pos - this_individual_x_pos + 1)
-                        elif parent_x_pos is not None and this_individual_x_pos < parent_x_pos:
-                            self._compress_single_individual_position(
-                                individual, cof, 1)
-                            # self._move_single_individual(individual, cof, parent_x_pos - this_individual_x_pos - 1)
-                    try:
-                        self._compress_graph_ancestor_graph(
-                            cof.graphical_representations[0])
-                    except KeyError as e:
-                        pass
-        for original_direction_factor, individual in sorted(individuals):
-            if individual is None:
-                continue
-            i = 0
-            if family_was_flipped:
-                direction_factor = - original_direction_factor
-            else:
-                direction_factor = original_direction_factor
-
-            self.compression_steps -= 1
-            if self.compression_steps <= 0:
-                continue
-
-            if not individual.graphical_representations[0].visible_parent_family or not individual.graphical_representations[0].visible_parent_family.family_id in individual.graphical_representations[0].get_x_position():
-                # try:
-                #     while i < 50000:
-                #         self._move_single_individual(
-                #             individual, individual.graphical_representations[0].visible_parent_family, direction_factor*1)
-                #         self._check_compressed_x_position(True)
-                #         i += 1
-                # except LifeLineChartCollisionDetected:
-                #     # print("   collision of " + " and ".join([" ".join(a.name) for a in e.args]))
-                #     self._move_single_individual(
-                #         individual, individual.graphical_representations[0].visible_parent_family, -direction_factor*1)
-                # except LifeLineChartCannotMoveIndividual:
-                #     pass
-                continue
-            # try:
-            #     while i < 50000:
-            #         _move_single_individual(individual, individual.graphical_representations[0].visible_parent_family, direction_factor*1)
-            #         _check_compressed_x_position(True)
-            #         i += 1
-            # except:
-            #     _move_single_individual(individual, individual.graphical_representations[0].visible_parent_family, -direction_factor*1)
-
-            try:
-                while i < 50000:
-                    self._move_individual_and_ancestors(
-                        individual, individual.graphical_representations[0].visible_parent_family, direction_factor*1)
-                    self._check_compressed_x_position(True)
-                    i += 1
-            except LifeLineChartCollisionDetected as e:
-                # print("   collision of " + " and ".join([" ".join(a.name) for a in e.args]))
-                self._move_individual_and_ancestors(
-                    individual, individual.graphical_representations[0].visible_parent_family, -direction_factor*1)
-            except LifeLineChartCannotMoveIndividual as e:
-                pass
-            except KeyError as e:
-                pass
-            if i != 0:
-                logger.info('moved ' + ' '.join(individual.name) +
-                            ' by ' + str(i * direction_factor * 1))
+                # if not value[2] is None and graphical_individual_representation.individual_id not in value[2].children_individual_ids:
+                #     continue
+            #     x_indices.add(x_index)
+            #     index_map[x_index] = value[2]
+            # for x_index in x_indices:
+                if x_index not in v:
+                    v[x_index] = graphical_individual_representation.individual_id
+                else:
+                    failed.append(x_index)
+                    # value = index_map[x_index]
+                    logger.error(
+                        "failed: " + str((x_index, value[2].family_id, graphical_individual_representation.name, v[x_index])))
+                    # raise RuntimeError((x_index, key, graphical_individual_representation.name))
+        full_index_list = list(sorted(v.keys()))
+        for i in range(max(full_index_list)):
+            if i not in full_index_list:
+                graphical_individual_representation.items.append({
+                    'type': 'rect',
+                    'config': {
+                        'insert': (self._map_x_position(i), 0),
+                        'size': (self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'], self._formatting['total_height']),
+                        'fill': 'black',
+                        'fill-opacity': "0.5"
+                    }
+                })
+                failed.append(('missing', i))
+        return failed, full_index_list[0], full_index_list[-1]
 
     def modify_layout(self, root_individual_id):
         """
@@ -461,87 +313,6 @@ class DescendantGraph(BaseGraph):
             root_individual_id (str): root individual id used as root node for compression
         """
         self.check_unique_x_position()
-
-        if self._positioning['flip_to_optimize']:
-            width, loli = self._calculate_sum_of_distances()
-            old_width = width
-            candidantes = set()
-            for key in sorted(loli.keys()):
-                # continue
-                # if index == 1:
-                #     continue
-                def collect_candidates(children):
-                    for child in children:
-                        if len(child.graphical_representations) > 0:
-                            candidantes.add(child)
-                            collect_candidates(child.children)
-
-                individual = loli[key]
-                collect_candidates(individual.children)
-                for cof in individual.individual.get_child_of_family():
-                    collect_candidates(cof.get_children())
-
-            # candidantes = set()
-            items = list(reversed(sorted([(child.graphical_representations[0].get_birth_date_ov(), index, child) for index, child in enumerate(candidantes)])))
-            failed = []
-            for ov, _, child in items:
-                c_pos = list(
-                    child.graphical_representations[0].get_x_position().values())[1:]
-                for x_pos in c_pos:
-                    if x_pos[2] is None:
-                        continue
-                    # family_id = key2[2]
-                    # x_pos = c_pos[key2]
-                    self._flip_family(x_pos[2])
-                    failed, _, _ = self.check_unique_x_position()
-                    if len(failed) > 0:
-                        logger.error("failed flipping " +
-                                     str((x_pos[2].family_id, ov)))
-                        break
-                    new_width, _ = self._calculate_sum_of_distances()
-                    if new_width >= width:
-                        self._flip_family(x_pos[2])
-                    else:
-                        width = new_width
-                # print (x_pos)
-                if len(failed) > 0:
-                    break
-
-            logger.info(
-                f"flipping reduced the cross connections by {width - old_width} (i.e. from {old_width} to {width})")
-
-        # for graphical_family_representation in self.graphical_family_representations:
-        if self._positioning['compress']:
-            failed, old_x_min_index, old_x_max_index = self.check_unique_x_position()
-            old_width = old_x_max_index - old_x_min_index
-            self.compression_steps = 1e30
-            if 'compression_steps' in self._formatting and self._formatting['compression_steps'] > 0:
-                self.compression_steps = self._formatting['compression_steps']
-            self._compress_graph_ancestor_graph(self._instances[(
-                'i', root_individual_id)].graphical_representations[0].visible_parent_family)
-
-            # compressed graph should be aligned left
-            _, min_index_x, max_index_x, self.position_to_person_map = self._check_compressed_x_position(
-                False)
-            self._move_individual_and_ancestors(self._instances[('i', root_individual_id)], sorted(list(self._instances[(
-                'i', root_individual_id)].graphical_representations[0].get_x_position().values()))[0][2], -(min_index_x-old_x_min_index)*1)
-            keys = sorted(list(self.position_to_person_map.keys()))
-            for key in keys:
-                self.position_to_person_map[key - (
-                    min_index_x - old_x_min_index) * 1] = self.position_to_person_map.pop(key)
-            width = (max_index_x - min_index_x) + 1
-            self.min_x_index = 0
-            self.max_x_index = width
-            logger.info(
-                f"compression reduced the total width by {width - old_width} (i.e. from {old_width} to {width})")
-        else:
-            _, _, _, self.position_to_person_map = self._check_compressed_x_position(
-                False)
-        # for collision in collisions:
-        #     if collision[1] is None:
-        #         print("collision of " + " ".join(collision[0].name))
-        #     else:
-        #         print("collision of " + " ".join(collision[0].name) + " with " + " ".join(collision[1].name))
 
     def clear_graphical_representations(self):
         """
@@ -1194,7 +965,7 @@ class DescendantGraph(BaseGraph):
                 self.place_selected_individuals(
                     root_individual, None, None, self._instances[('f', cof_family_id)], x_pos)
 
-                x_pos += root_individual.graphical_representations[0].get_width(self._instances[('f', cof_family_id)])
+                x_pos += root_individual.graphical_representations[0].get_width2(self._instances[('f', cof_family_id)])
 
             for settings in self._chart_configuration['root_individuals']:
                 root_individual_id = settings['individual_id']
