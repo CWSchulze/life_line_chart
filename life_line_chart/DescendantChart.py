@@ -15,7 +15,7 @@ logger = logging.getLogger("life_line_chart")
 class DescendantChart(BaseSVGChart):
     """
     Descendant Chart
-    ==============
+    ================
 
     The descendant chart shows the descendants of one or more root individuals.
     The parents enclose direct children. Both, father and mother are visible.
