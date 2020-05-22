@@ -5,7 +5,7 @@ import hashlib
 import datetime
 import svgwrite
 from copy import deepcopy
-from .BaseGraph import BaseGraph, get_gedcom_instance_container
+from .BaseChart import BaseChart, get_gedcom_instance_container
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 #from cmath import sqrt, exp, pi
 from math import floor, ceil, sqrt, exp, pi
@@ -39,12 +39,12 @@ def Cardano(a, b, c, d):
     return u+v-z0, u*J+v*Jc-z0, u*Jc+v*J-z0
 
 
-class DescendantGraph(BaseGraph):
+class DescendantChart(BaseChart):
     """
-    Descendant Graph
+    Descendant Chart
     ==============
 
-    # The ancestor graph shows the ancestors of one or more root individuals.
+    # The ancestor chart shows the ancestors of one or more root individuals.
     # The parents only enclose direct children. Both, father and mother are
     # visible. Usually ancestors are visible, optionally all children of a
     # visible family can be added.
@@ -55,13 +55,13 @@ class DescendantGraph(BaseGraph):
     """
 
     def __init__(self, positioning=None, formatting=None, instance_container=get_gedcom_instance_container):
-        BaseGraph.__init__(self, positioning, formatting, instance_container)
+        BaseChart.__init__(self, positioning, formatting, instance_container)
         self.x_pos = 0
 
-        # configuration of this graph
+        # configuration of this chart
         self._chart_configuration.update(self.get_default_chart_configuration())
-        # self._graphical_family_class = ancestor_graph_family # TODO: necessary if other graphs are implemented
-        # self._graphical_individual_class = ancestor_graph_individual # TODO: necessary if other graphs are implemented
+        # self._graphical_family_class = GraphicalFamily # TODO: necessary if other graphs are implemented
+        # self._graphical_individual_class = GraphicalIndividual # TODO: necessary if other graphs are implemented
 
     @staticmethod
     def get_default_chart_configuration():
@@ -84,31 +84,31 @@ class DescendantGraph(BaseGraph):
             return None
 
         if not individual.has_graphical_representation():
-            individual_representation = self._create_individual_graphical_representation(
+            gr_individual = self._create_individual_graphical_representation(
                 individual)
 
-            if individual_representation is None:
+            if gr_individual is None:
                 return
 
             if color is None:
-                i = int(hashlib.sha1(" ".join(individual_representation.name).encode(
+                i = int(hashlib.sha1(" ".join(gr_individual.name).encode(
                     'utf8')).hexdigest(), 16) % (10 ** 8)
                 c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
                 f = 255/max(c)
                 c = [int(x*f) for x in c]
                 f = min(1, 500/sum(c))
                 c = [int(x*f) for x in c]
-                individual_representation.color = c
+                gr_individual.color = c
             else:
-                individual_representation.color = color
+                gr_individual.color = color
         else:
-            individual_representation = individual.graphical_representations[0]
+            gr_individual = individual.graphical_representations[0]
 
         for marriage in individual.marriages:
             if marriage.has_graphical_representation():
                 continue
 
-            #individual_representation.visible_parent_family = gr_marriage
+            #gr_individual.visible_parent_family = gr_marriage
             if generations > 0 or generations < 0:
                 gr_marriage = self._create_family_graphical_representation(
                     marriage)
@@ -160,20 +160,20 @@ class DescendantGraph(BaseGraph):
                 continue
 
             if not child.has_graphical_representation():
-                individual_representation = self._create_individual_graphical_representation(
+                gr_individual = self._create_individual_graphical_representation(
                     child)
 
-                if individual_representation is None:
+                if gr_individual is None:
                     return
 
-                i = int(hashlib.sha1(" ".join(individual_representation.name).encode(
+                i = int(hashlib.sha1(" ".join(gr_individual.name).encode(
                     'utf8')).hexdigest(), 16) % (10 ** 8)
                 c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
                 f = 255/max(c)
                 c = [int(x*f) for x in c]
                 f = min(1, 500/sum(c))
                 c = [int(x*f) for x in c]
-                individual_representation.color = c
+                gr_individual.color = c
 
                 family.graphical_representations[0].add_visible_children(child)
                 child.graphical_representations[0].visible_parent_family = family.graphical_representations[0]
@@ -195,8 +195,8 @@ class DescendantGraph(BaseGraph):
         if not individual.has_graphical_representation():
             return
         x_position = x_offset
-        graphical_individual_representation = individual.graphical_representations[0]
-        graphical_individual_representation.x_start = x_position
+        gr_individual = individual.graphical_representations[0]
+        gr_individual.x_start = x_position
         self.min_x_index = min(self.min_x_index, x_position)
 
         visible_marriages = \
@@ -206,7 +206,7 @@ class DescendantGraph(BaseGraph):
 
 
         if len(visible_marriages) == 0:
-            graphical_individual_representation.set_x_position(
+            gr_individual.set_x_position(
                     x_position, child_of_family, True)
             x_position += 1
 
@@ -215,14 +215,14 @@ class DescendantGraph(BaseGraph):
                 continue
 
             if marriage_index == len(visible_marriages) - 1:
-                if graphical_individual_representation.get_x_position() is None or \
-                        child_of_family is not None and child_of_family.family_id not in graphical_individual_representation.get_x_position():
-                    graphical_individual_representation.set_x_position(
+                if gr_individual.get_x_position() is None or \
+                        child_of_family is not None and child_of_family.family_id not in gr_individual.get_x_position():
+                    gr_individual.set_x_position(
                         x_position, child_of_family)
 
-            if graphical_individual_representation.get_x_position() is None or \
-                    marriage.family_id not in graphical_individual_representation.get_x_position():
-                graphical_individual_representation.set_x_position(
+            if gr_individual.get_x_position() is None or \
+                    marriage.family_id not in gr_individual.get_x_position():
+                gr_individual.set_x_position(
                     x_position, marriage)
                 x_position += 1
             # parents = individual.get_father_and_mother()
@@ -248,8 +248,8 @@ class DescendantGraph(BaseGraph):
         self.max_x_index = max(self.max_x_index, x_position)
 
         # recalculate
-        birth_ordinal_value = graphical_individual_representation.get_birth_date_ov()
-        death_ordinal_value = graphical_individual_representation.get_death_date_ov()
+        birth_ordinal_value = gr_individual.get_birth_date_ov()
+        death_ordinal_value = gr_individual.get_death_date_ov()
         if self.min_ordinal is not None and self.max_ordinal is not None:
             self.min_ordinal = min(self.min_ordinal, birth_ordinal_value)
             self.max_ordinal = max(self.max_ordinal, death_ordinal_value)
@@ -269,31 +269,31 @@ class DescendantGraph(BaseGraph):
         """
         failed = []
         v = {}
-        for graphical_individual_representation in self.graphical_individual_representations:
-            x_pos = graphical_individual_representation.get_x_position()
+        for gr_individual in self.graphical_individual_representations:
+            x_pos = gr_individual.get_x_position()
             for value in x_pos.values():
                 x_index = value[1]
                 ###################
                 # if value[3]:
                 #     continue
 
-                # if not value[2] is None and graphical_individual_representation.individual_id not in value[2].children_individual_ids:
+                # if not value[2] is None and gr_individual.individual_id not in value[2].children_individual_ids:
                 #     continue
             #     x_indices.add(x_index)
             #     index_map[x_index] = value[2]
             # for x_index in x_indices:
                 if x_index not in v:
-                    v[x_index] = graphical_individual_representation.individual_id
+                    v[x_index] = gr_individual.individual_id
                 else:
                     failed.append(x_index)
                     # value = index_map[x_index]
                     logger.error(
-                        "failed: " + str((x_index, value[2].family_id, graphical_individual_representation.name, v[x_index])))
-                    # raise RuntimeError((x_index, key, graphical_individual_representation.name))
+                        "failed: " + str((x_index, value[2].family_id, gr_individual.name, v[x_index])))
+                    # raise RuntimeError((x_index, key, gr_individual.name))
         full_index_list = list(sorted(v.keys()))
         for i in range(max(full_index_list)):
             if i not in full_index_list:
-                graphical_individual_representation.items.append({
+                gr_individual.items.append({
                     'type': 'rect',
                     'config': {
                         'insert': (self._map_x_position(i), 0),
@@ -322,7 +322,7 @@ class DescendantGraph(BaseGraph):
         self.max_x_index = 0
         self.clear_svg_items()
         self._instances.ancestor_width_cache.clear()
-        BaseGraph.clear_graphical_representations(self)
+        BaseChart.clear_graphical_representations(self)
 
     def define_svg_items(self):
         """
@@ -395,10 +395,10 @@ class DescendantGraph(BaseGraph):
 
         min_x_index = 9e99
         max_x_index = -9e99
-        for graphical_individual_representation in self.graphical_individual_representations:
-            x_positions = graphical_individual_representation.get_x_position()
+        for gr_individual in self.graphical_individual_representations:
+            x_positions = gr_individual.get_x_position()
             if x_positions is None:
-                logger.error(graphical_individual_representation.individual.plain_name + ' has a graphical representation, but was not placed!')
+                logger.error(gr_individual.individual.plain_name + ' has a graphical representation, but was not placed!')
                 continue
             for _, x_position in x_positions.items():
                 min_x_index = min(min_x_index, x_position[1])
@@ -409,25 +409,25 @@ class DescendantGraph(BaseGraph):
         self.min_x_index = min_x_index  # -1000
         self.max_x_index = max_x_index + 1  # +200
 
-        for graphical_individual_representation in self.graphical_individual_representations:
-            birth_date_ov = graphical_individual_representation.get_birth_date_ov()
+        for gr_individual in self.graphical_individual_representations:
+            birth_date_ov = gr_individual.get_birth_date_ov()
             if not birth_date_ov:
                 continue
-            death_event = graphical_individual_representation.get_death_event()
+            death_event = gr_individual.get_death_event()
 
-            # individual_id = graphical_individual_representation.individual_id
-            individual_name = graphical_individual_representation.name
+            # individual_id = gr_individual.individual_id
+            individual_name = gr_individual.name
             # positions[individual_id]
 
             # individual = self._instances[('i',individual_id)]
-            x_pos = graphical_individual_representation.get_x_position()
+            x_pos = gr_individual.get_x_position()
             if x_pos is None:
-                # logger.error(graphical_individual_representation.individual.plain_name + ' has a graphical representation, but was not placed!')
+                # logger.error(gr_individual.individual.plain_name + ' has a graphical representation, but was not placed!')
                 continue
             x_pos_list = sorted([(ov, pos, index, family_id, flag)
                                  for index, (family_id, (ov, pos, f, flag)) in enumerate(x_pos.items())])
-            birth_label = graphical_individual_representation.birth_label
-            death_label = graphical_individual_representation.death_label
+            birth_label = gr_individual.birth_label
+            death_label = gr_individual.death_label
 
             # collect information about marriages
             marriage_ordinals = []
@@ -437,15 +437,15 @@ class DescendantGraph(BaseGraph):
             new_x_position_after_marriage = []
             new_x_indices_after_marriage = []
             marriage_labels = []
-            if graphical_individual_representation.get_marriages():
-                for graphical_representation_marriage_family in graphical_individual_representation.get_marriages():
+            if gr_individual.get_marriages():
+                for graphical_representation_marriage_family in gr_individual.get_marriages():
                     if graphical_representation_marriage_family.marriage is None:
                         continue
                     if graphical_representation_marriage_family.family_id not in x_pos:
                         logger.error(graphical_representation_marriage_family.family_id + ' has a graphical representation, but was not placed!')
                         continue
                     spouse_representation = graphical_representation_marriage_family.get_spouse(
-                        graphical_individual_representation.individual)
+                        gr_individual.individual)
                     marriage_x_index = x_pos[graphical_representation_marriage_family.family_id][1]
                     new_x_position_after_marriage.append(
                         self._map_x_position(marriage_x_index))
@@ -586,11 +586,11 @@ class DescendantGraph(BaseGraph):
                                 self._formatting['fade_individual_color_black_age']*365+birth_date_ov))
                         )
                     )
-                    if self._formatting['individual_photo_active'] and len(graphical_individual_representation.individual.images) > 0:
+                    if self._formatting['individual_photo_active'] and len(gr_individual.individual.images) > 0:
                         index = 0
                         svg_path = Path_types[data[-1][0]
                                               ['type']](*data[-1][0]['arguments'])
-                        for ov, image_dict in graphical_individual_representation.individual.images.items():
+                        for ov, image_dict in gr_individual.individual.images.items():
                             image_filename = image_dict['filename']
                             image_size = image_dict['size']
                             if ov >= knots[index][1] and ov <= knots[index + 1][1]:
@@ -659,10 +659,10 @@ class DescendantGraph(BaseGraph):
                                         self._formatting['fade_individual_color_black_age']*365+birth_date_ov))
                                 )
                             )
-                        if self._formatting['individual_photo_active'] and len(graphical_individual_representation.individual.images) > 0:
+                        if self._formatting['individual_photo_active'] and len(gr_individual.individual.images) > 0:
                             svg_path = Path_types[data[-1][0]
                                                   ['type']](*data[-1][0]['arguments'])
-                            for ov, image_dict in graphical_individual_representation.individual.images.items():
+                            for ov, image_dict in gr_individual.individual.images.items():
                                 image_filename = image_dict['filename']
                                 image_size = image_dict['size']
                                 if ov > knots[index][1] and ov < knots[index + 1][1]:
@@ -702,17 +702,17 @@ class DescendantGraph(BaseGraph):
 
             # create item setup
             for path, color_pos in life_line_bezier_paths:
-                graphical_individual_representation.items.append({
+                gr_individual.items.append({
                     'type': 'path',
                     'config': path,
-                    'color': graphical_individual_representation.color,
+                    'color': gr_individual.color,
                     'color_pos': color_pos,
                     'stroke_width': self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']
                 }
                 )
             if self._formatting['birth_label_active']:
                 if self._formatting['birth_label_along_path']:
-                    graphical_individual_representation.items.append(
+                    gr_individual.items.append(
                         {
                             'type': 'textPath',
                             'config': {
@@ -737,7 +737,7 @@ class DescendantGraph(BaseGraph):
                     birth_label_text = " ".join(individual_name + [birth_label])
                     if self._formatting['birth_label_wrapping_active']:
                         birth_label_text = birth_label_text.strip().replace(' ', '\n')
-                    graphical_individual_representation.items.append(
+                    gr_individual.items.append(
                         {
                             'type': 'text',
                             'config': {
@@ -755,7 +755,7 @@ class DescendantGraph(BaseGraph):
             if self._formatting['death_label_active']:
                 if self._formatting['death_label_wrapping_active']:
                     death_label = death_label.strip().replace(' ', '\n')
-                graphical_individual_representation.items.append(
+                gr_individual.items.append(
                     {
                         'type': 'text',
                         'config': {
@@ -772,7 +772,7 @@ class DescendantGraph(BaseGraph):
 
                     }
                 )
-            graphical_individual_representation.items += images
+            gr_individual.items += images
 
     def paint_and_save(self, individual_id, filename=None):
         """
@@ -814,8 +814,8 @@ class DescendantGraph(BaseGraph):
                               for index, gr in enumerate(self.graphical_individual_representations)]
         sorted_individuals.sort()
         sorted_individual_items = []
-        for _, _, graphical_individual_representation in sorted_individuals:
-            sorted_individual_items += graphical_individual_representation.items
+        for _, _, gr_individual in sorted_individuals:
+            sorted_individual_items += gr_individual.items
 
         for item in additional_items + sorted_individual_items:
                 if item['type'] == 'text':
@@ -859,7 +859,7 @@ class DescendantGraph(BaseGraph):
                             default='currentColor'), fill='none', stroke_width=item['stroke_width']))
                     else:
                         # arguments['fill'] = fill
-                        # graphical_individual_representation.color
+                        # gr_individual.color
                         svg_document.add(svg_document.path(d=svg_path.d(), stroke="rgb({},{},{})".format(
                             *item['color']), fill='none', stroke_width=item['stroke_width']))
                 elif item['type'] == 'textPath':

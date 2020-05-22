@@ -1,6 +1,6 @@
 from .InstanceContainer import get_gedcom_instance_container
-from .AncestorGraphFamily import ancestor_graph_family
-from .AncestorGraphIndividual import ancestor_graph_individual
+from .AncestorGraphFamily import GraphicalFamily
+from .AncestorGraphIndividual import GraphicalIndividual
 from .Exceptions import LifeLineChartCollisionDetected, LifeLineChartCannotMoveIndividual
 
 import os
@@ -10,7 +10,7 @@ import logging
 logger = logging.getLogger("life_line_chart")
 
 
-class BaseGraph():
+class BaseChart():
     """
     Base class for life line charts.
     """
@@ -194,7 +194,7 @@ class BaseGraph():
     }
     _positioning_description = {
         'compress': {
-            'short_description': 'Compress the graph vertically',
+            'short_description': 'Compress the chart vertically',
             'long_description': 'By default every individual has a unique vertical slot. This can be inefficient with many generations. This algorithm lets several people share a vertical slot, if they do not overlap.'
         },
         'flip_to_optimize': {
@@ -214,17 +214,17 @@ class BaseGraph():
         },
     }
     _available_warp_shapes = list(_formatting_description['warp_shape']['choices'].keys())
-    # TODO: extract base class for other graph types
-    _graphical_family_class = ancestor_graph_family
-    # TODO: extract base class for other graph types
-    _graphical_individual_class = ancestor_graph_individual
+    # TODO: extract base class for other chart types
+    _graphical_family_class = GraphicalFamily
+    # TODO: extract base class for other chart types
+    _graphical_individual_class = GraphicalIndividual
 
     def __init__(self, positioning=None, formatting=None, instance_container=get_gedcom_instance_container):
         self.position_to_person_map = {}
-        self._positioning = BaseGraph.get_default_positioning()
+        self._positioning = BaseChart.get_default_positioning()
         if positioning:
             self._positioning.update(positioning)
-        self._formatting = BaseGraph.get_default_formatting()
+        self._formatting = BaseChart.get_default_formatting()
         if formatting:
             self._formatting.update(formatting)
         self._instances = instance_container()
@@ -241,7 +241,7 @@ class BaseGraph():
         self.chart_min_ordinal = None
         self.chart_max_ordinal = None
 
-        # configuration of this graph
+        # configuration of this chart
         self._chart_configuration = {}
         self._default_chart_configuration = {}
 
@@ -257,7 +257,7 @@ class BaseGraph():
         Returns:
             dict: formatting dict
         """
-        return deepcopy(BaseGraph._default_formatting)
+        return deepcopy(BaseChart._default_formatting)
 
     @staticmethod
     def get_formatting_description():
@@ -267,7 +267,7 @@ class BaseGraph():
         Returns:
             dict: description of the formatting
         """
-        return deepcopy(BaseGraph._formatting_description)
+        return deepcopy(BaseChart._formatting_description)
 
     @staticmethod
     def get_default_positioning():
@@ -277,7 +277,7 @@ class BaseGraph():
         Returns:
             dict: positioning dict
         """
-        return deepcopy(BaseGraph._default_positioning)
+        return deepcopy(BaseChart._default_positioning)
 
     @staticmethod
     def get_positioning_description():
@@ -287,7 +287,7 @@ class BaseGraph():
         Returns:
             dict: description of the positioning
         """
-        return deepcopy(BaseGraph._positioning_description)
+        return deepcopy(BaseChart._positioning_description)
 
     @staticmethod
     def get_chart_configuration_root_individual_description():
@@ -297,7 +297,7 @@ class BaseGraph():
         Returns:
             dict: description of chart configuration root individual
         """
-        return deepcopy(BaseGraph._chart_configuration_root_individual_description)
+        return deepcopy(BaseChart._chart_configuration_root_individual_description)
 
     def instantiate_all(self):
         """
@@ -307,7 +307,7 @@ class BaseGraph():
 
     def set_formatting(self, formatting):
         """
-        set the formatting configuration of the graph
+        set the formatting configuration of the chart
 
         Args:
             formatting (dict): formatting dict
@@ -316,7 +316,7 @@ class BaseGraph():
 
     def set_positioning(self, positioning):
         """
-        set the positioning configuration of the graph
+        set the positioning configuration of the chart
 
         Args:
             positioning (dict): positioning dict
@@ -325,7 +325,7 @@ class BaseGraph():
 
     def set_chart_configuration(self, chart_configuration):
         """
-        set the chart configuration of the graph
+        set the chart configuration of the chart
 
         Args:
             chart_configuration (dict): chart configuration dict
@@ -349,7 +349,7 @@ class BaseGraph():
             individual (BaseIndividual): individual
 
         Returns:
-            ancestor_graph_inidividual: created instance
+            ancestor_chart_inidividual: created instance
         """
         new_instance = self._graphical_individual_class(
             self._instances, individual.individual_id)
@@ -367,7 +367,7 @@ class BaseGraph():
             family (BaseFamily): family
 
         Returns:
-            ancestor_graph_family: created instance
+            GraphicalFamily: created instance
         """
         if not family.graphical_representations:
             new_instance = self._graphical_family_class(
@@ -387,8 +387,8 @@ class BaseGraph():
         """
         total_distance = 0
         list_of_linked_individuals = {}
-        for index, graphical_individual_representation in enumerate(self.graphical_individual_representations):
-            x_positions = graphical_individual_representation.get_x_position()
+        for index, gr_individual in enumerate(self.graphical_individual_representations):
+            x_positions = gr_individual.get_x_position()
             distance_of_this_individual = 0
             if x_positions:
                 vector = [p[1] for k, p in x_positions.items()]
@@ -396,7 +396,7 @@ class BaseGraph():
             total_distance += distance_of_this_individual
             if distance_of_this_individual > 0:
                 list_of_linked_individuals[(
-                    distance_of_this_individual, index)] = graphical_individual_representation
+                    distance_of_this_individual, index)] = gr_individual
         return total_distance, list_of_linked_individuals
 
     def _move_single_individual(self, individual, family, x_index_offset):
@@ -536,7 +536,7 @@ class BaseGraph():
 
     def _check_compressed_x_position(self, early_raise):
         """
-        check the compressed graph for overlapping individuals
+        check the compressed chart for overlapping individuals
 
         Args:
             early_raise (bool): raise an exception if the first individual overlap was found
@@ -553,34 +553,34 @@ class BaseGraph():
         min_x = 999999
         max_x = 0
         # assign the individuals to all x_indices in which they appear
-        for graphical_individual_representation in self.graphical_individual_representations:
-            x_pos = graphical_individual_representation.get_x_position()
+        for gr_individual in self.graphical_individual_representations:
+            x_pos = gr_individual.get_x_position()
             for i, value in enumerate(x_pos.values()):
                 x_index = value[1]
                 # if value[3]:
                 #     continue
                 # if x_index < 0:
                 #     if early_raise:
-                #         raise LifeLineChartCollisionDetected(graphical_individual_representation)
-                #     collisions.append((graphical_individual_representation, None))
+                #         raise LifeLineChartCollisionDetected(gr_individual)
+                #     collisions.append((gr_individual, None))
                 if x_index not in v:
                     v[x_index] = []
                     position_to_person_map[x_index] = []
                 if i == 0:
-                    start_y = graphical_individual_representation.get_birth_date_ov()
+                    start_y = gr_individual.get_birth_date_ov()
                 else:
                     start_y = list(x_pos.values())[i][0]
                 if i < len(x_pos) - 1:
                     end_y = list(x_pos.values())[i+1][0]
                 else:
-                    end_y = graphical_individual_representation.get_death_date_ov()
+                    end_y = gr_individual.get_death_date_ov()
                 position_to_person_map[x_index].append({
                     'start': start_y,
                     'end': end_y,
-                    'individual': graphical_individual_representation
+                    'individual': gr_individual
                 })
 
-                v[x_index].append(graphical_individual_representation)
+                v[x_index].append(gr_individual)
                 max_x = max(max_x, x_index)
                 min_x = min(min_x, x_index)
         if len(collisions) > 0:
@@ -623,29 +623,29 @@ class BaseGraph():
         """
         failed = []
         v = {}
-        for graphical_individual_representation in self.graphical_individual_representations:
-            x_pos = graphical_individual_representation.get_x_position()
+        for gr_individual in self.graphical_individual_representations:
+            x_pos = gr_individual.get_x_position()
             for value in x_pos.values():
                 x_index = value[1]
                 if value[3]:
                     continue
-                # if not value[2] is None and graphical_individual_representation.individual_id not in value[2].children_individual_ids:
+                # if not value[2] is None and gr_individual.individual_id not in value[2].children_individual_ids:
                 #     continue
             #     x_indices.add(x_index)
             #     index_map[x_index] = value[2]
             # for x_index in x_indices:
                 if x_index not in v:
-                    v[x_index] = graphical_individual_representation.individual_id
+                    v[x_index] = gr_individual.individual_id
                 else:
                     failed.append(x_index)
                     # value = index_map[x_index]
                     logger.error(
-                        "failed: " + str((x_index, value[2].family_id, graphical_individual_representation.name, v[x_index])))
-                    # raise RuntimeError((x_index, key, graphical_individual_representation.name))
+                        "failed: " + str((x_index, value[2].family_id, gr_individual.name, v[x_index])))
+                    # raise RuntimeError((x_index, key, gr_individual.name))
         full_index_list = list(sorted(v.keys()))
         for i in range(max(full_index_list)):
             if i not in full_index_list:
-                graphical_individual_representation.items.append({
+                gr_individual.items.append({
                     'type': 'rect',
                     'config': {
                         'insert': (self._map_x_position(i), 0),
@@ -689,7 +689,7 @@ class BaseGraph():
 
     def _map_position(self, pos_x, pos_y):
         """
-        map date information and vertical index to x and y axis. This function also supports warping of the whole graph.
+        map date information and vertical index to x and y axis. This function also supports warping of the whole chart.
 
         Args:
             pos_x (float or int): vertical index
@@ -716,7 +716,7 @@ class BaseGraph():
 
     def _orientation_angle(self, pos_x, pos_y):
         """
-        get the rotation of the lines which is caused by the warping of the whole graph
+        get the rotation of the lines which is caused by the warping of the whole chart
 
         Args:
             pos_x (float or int): vertical index
@@ -769,25 +769,25 @@ class BaseGraph():
 
     def get_full_width(self):
         """
-        get the full width of the graph including margins
+        get the full width of the chart including margins
 
         Returns:
-            float: graph width
+            float: chart width
         """
         return (self._map_x_position(self.max_x_index) + self._formatting['margin_right'])
 
     def get_full_height(self):
         """
-        get the full height of the graph including margins
+        get the full height of the chart including margins
 
         Returns:
-            float: graph height
+            float: chart height
         """
         return abs(self._map_y_position(self.chart_min_ordinal) - self._map_y_position(self.chart_max_ordinal))
 
     def get_individual_from_position(self, pos_x, pos_y):
         """
-        inverse mapping from graph position to individual instance
+        inverse mapping from chart position to individual instance
 
         Args:
             pos_x (float or int): x position
@@ -807,11 +807,11 @@ class BaseGraph():
 
     def clear_svg_items(self):
         """
-        clear all graphical items to render the graph with different settings
+        clear all graphical items to render the chart with different settings
         """
         self.additional_graphical_items.clear()
-        for graphical_individual_representation in self.graphical_individual_representations:
-            graphical_individual_representation.items.clear()
+        for gr_individual in self.graphical_individual_representations:
+            gr_individual.items.clear()
 
     def clear_graphical_representations(self):
         """

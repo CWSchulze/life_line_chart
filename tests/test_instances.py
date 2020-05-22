@@ -1,5 +1,5 @@
 # import pytest
-from life_line_chart import GedcomParsing, InstanceContainer, GedcomIndividual, ancestor_graph_individual, ancestor_graph_family, GedcomFamily
+from life_line_chart import GedcomParsing, InstanceContainer, GedcomIndividual, GraphicalIndividual, GraphicalFamily, GedcomFamily
 from life_line_chart import ReadGedcom, get_gedcom_instance_container
 import os
 

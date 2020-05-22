@@ -1,5 +1,5 @@
 
-class ancestor_graph_family():
+class GraphicalFamily():
     """
     Class which represents one appearance of a family
     """
@@ -17,11 +17,11 @@ class ancestor_graph_family():
         # Tells which children are visible
         self.visible_children = {}
 
-        # Ancestor graph: Tells which child was used to place this family (this
+        # Ancestor chart: Tells which child was used to place this family (this
         # is a strong connection)
         self.visual_placement_child = None
 
-        # Descendant graph: Used to define under which family this family has
+        # Descendant chart: Used to define under which family this family has
         # been placed (e.g. if wife/husband are from different branches of the
         # family)
         self.visual_placement_parent_family = None

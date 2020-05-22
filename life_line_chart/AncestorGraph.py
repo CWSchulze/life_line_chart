@@ -5,7 +5,7 @@ import hashlib
 import datetime
 import svgwrite
 from copy import deepcopy
-from .BaseGraph import BaseGraph, get_gedcom_instance_container
+from .BaseChart import BaseChart, get_gedcom_instance_container
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 from cmath import sqrt, exp, pi
 from math import floor, ceil
@@ -39,12 +39,12 @@ def Cardano(a, b, c, d):
     return u+v-z0, u*J+v*Jc-z0, u*Jc+v*J-z0
 
 
-class AncestorGraph(BaseGraph):
+class AncestorChart(BaseChart):
     """
-    Ancestor Graph
+    Ancestor Chart
     ==============
 
-    The ancestor graph shows the ancestors of one or more root individuals.
+    The ancestor chart shows the ancestors of one or more root individuals.
     The parents only enclose direct children. Both, father and mother are
     visible. Usually ancestors are visible, optionally all children of a
     visible family can be added.
@@ -55,12 +55,12 @@ class AncestorGraph(BaseGraph):
     """
 
     def __init__(self, positioning=None, formatting=None, instance_container=get_gedcom_instance_container):
-        BaseGraph.__init__(self, positioning, formatting, instance_container)
+        BaseChart.__init__(self, positioning, formatting, instance_container)
 
-        # configuration of this graph
+        # configuration of this chart
         self._chart_configuration.update(self.get_default_chart_configuration())
-        # self._graphical_family_class = ancestor_graph_family # TODO: necessary if other graphs are implemented
-        # self._graphical_individual_class = ancestor_graph_individual # TODO: necessary if other graphs are implemented
+        # self._graphical_family_class = GraphicalFamily # TODO: necessary if other graphs are implemented
+        # self._graphical_individual_class = GraphicalIndividual # TODO: necessary if other graphs are implemented
 
     @staticmethod
     def get_default_chart_configuration():
@@ -92,38 +92,38 @@ class AncestorGraph(BaseGraph):
             return
 
         if not individual.has_graphical_representation():
-            individual_representation = self._create_individual_graphical_representation(
+            gr_individual = self._create_individual_graphical_representation(
                 individual)
 
-            if individual_representation is None:
+            if gr_individual is None:
                 return
 
             if color is None:
-                i = int(hashlib.sha1(" ".join(individual_representation.name).encode(
+                i = int(hashlib.sha1(" ".join(gr_individual.name).encode(
                     'utf8')).hexdigest(), 16) % (10 ** 8)
                 c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
                 f = 255/max(c)
                 c = [int(x*f) for x in c]
                 f = min(1, 500/sum(c))
                 c = [int(x*f) for x in c]
-                individual_representation.color = c
+                gr_individual.color = c
             else:
-                individual_representation.color = color
+                gr_individual.color = color
         else:
-            individual_representation = individual.graphical_representations[0]
+            gr_individual = individual.graphical_representations[0]
 
         child_of_families = individual.get_child_of_family()[:1]
         for child_of_family in child_of_families:
             family = self._create_family_graphical_representation(
                 child_of_family)
             family.add_visible_children(individual)
-            individual_representation.visible_parent_family = family
+            gr_individual.visible_parent_family = family
             if generations > 0 or generations < 0:
                 # parents = individual.get_father_and_mother()
                 father, mother = child_of_family.get_husband_and_wife()
                 if father:
                     self.select_individuals(
-                        father, generations - 1, color=individual_representation.color if self._positioning['fathers_have_the_same_color'] else None, filter=filter)
+                        father, generations - 1, color=gr_individual.color if self._positioning['fathers_have_the_same_color'] else None, filter=filter)
                 if mother:
                     self.select_individuals(
                         mother, generations - 1, filter=filter)
@@ -145,20 +145,20 @@ class AncestorGraph(BaseGraph):
                 continue
 
             if not child.has_graphical_representation():
-                individual_representation = self._create_individual_graphical_representation(
+                gr_individual = self._create_individual_graphical_representation(
                     child)
 
-                if individual_representation is None:
+                if gr_individual is None:
                     return
 
-                i = int(hashlib.sha1(" ".join(individual_representation.name).encode(
+                i = int(hashlib.sha1(" ".join(gr_individual.name).encode(
                     'utf8')).hexdigest(), 16) % (10 ** 8)
                 c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
                 f = 255/max(c)
                 c = [int(x*f) for x in c]
                 f = min(1, 500/sum(c))
                 c = [int(x*f) for x in c]
-                individual_representation.color = c
+                gr_individual.color = c
 
                 family.graphical_representations[0].add_visible_children(child)
                 child.graphical_representations[0].visible_parent_family = family.graphical_representations[0]
@@ -178,8 +178,8 @@ class AncestorGraph(BaseGraph):
 
         logger.info(f"discovering {individual.plain_name}")
         x_position = x_offset
-        graphical_individual_representation = individual.graphical_representations[0]
-        graphical_individual_representation.x_start = x_position
+        gr_individual = individual.graphical_representations[0]
+        gr_individual.x_start = x_position
         self.min_x_index = min(self.min_x_index, x_position)
         child_of_families = individual.get_child_of_family()
 
@@ -231,7 +231,7 @@ class AncestorGraph(BaseGraph):
             elif not sibling.graphical_representations[0].get_x_position() or child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
                 if not sibling.graphical_representations[0].visual_placement_child:
                     sibling.graphical_representations[
-                        0].visual_placement_child = graphical_individual_representation.visual_placement_child
+                        0].visual_placement_child = gr_individual.visual_placement_child
                     sibling.graphical_representations[0].set_x_position(
                         x_position,
                         child_of_family)
@@ -269,8 +269,8 @@ class AncestorGraph(BaseGraph):
         self.max_x_index = max(self.max_x_index, x_position)
 
         # recalculate
-        birth_ordinal_value = graphical_individual_representation.get_birth_date_ov()
-        death_ordinal_value = graphical_individual_representation.get_death_date_ov()
+        birth_ordinal_value = gr_individual.get_birth_date_ov()
+        death_ordinal_value = gr_individual.get_death_date_ov()
         if self.min_ordinal is not None and self.max_ordinal is not None:
             self.min_ordinal = min(self.min_ordinal, birth_ordinal_value)
             self.max_ordinal = max(self.max_ordinal, death_ordinal_value)
@@ -292,30 +292,30 @@ class AncestorGraph(BaseGraph):
             pass
         self._move_single_individual(individual, cof, - direction)
 
-    def _compress_graph_ancestor_graph(self, graphical_family_representation):
+    def _compress_chart_ancestor_graph(self, gr_family):
         """
-        compress the graph vertically.
+        compress the chart vertically.
 
         # TODO: compressing fails if siblings are dragged apart which reunite families in later generations (Andreas Adam Lindner)
 
         Args:
-            graphical_family_representation (AncestorGraphFamily): graphical family representation instance
+            gr_family (AncestorGraphFamily): graphical family representation instance
         """
         individuals = []
-        if graphical_family_representation is None:
+        if gr_family is None:
             return
 
         family_was_flipped = False
         x_pos_husb = None
         x_pos_wife = None
-        if graphical_family_representation.husb is not None and graphical_family_representation.husb.has_graphical_representation():
-            x_pos_husb = graphical_family_representation.husb.graphical_representations[0].get_x_position()[
-                graphical_family_representation.family_id][1]
-            individuals.append((1, graphical_family_representation.husb))
-        if graphical_family_representation.wife is not None and graphical_family_representation.wife.has_graphical_representation():
-            x_pos_wife = graphical_family_representation.wife.graphical_representations[0].get_x_position()[
-                graphical_family_representation.family_id][1]
-            individuals.append((-1, graphical_family_representation.wife))
+        if gr_family.husb is not None and gr_family.husb.has_graphical_representation():
+            x_pos_husb = gr_family.husb.graphical_representations[0].get_x_position()[
+                gr_family.family_id][1]
+            individuals.append((1, gr_family.husb))
+        if gr_family.wife is not None and gr_family.wife.has_graphical_representation():
+            x_pos_wife = gr_family.wife.graphical_representations[0].get_x_position()[
+                gr_family.family_id][1]
+            individuals.append((-1, gr_family.wife))
         if x_pos_husb and x_pos_wife and x_pos_husb > x_pos_wife:
             family_was_flipped = True
 
@@ -344,7 +344,7 @@ class AncestorGraph(BaseGraph):
                                 individual, cof, 1)
                             # self._move_single_individual(individual, cof, parent_x_pos - this_individual_x_pos - 1)
                     try:
-                        self._compress_graph_ancestor_graph(
+                        self._compress_chart_ancestor_graph(
                             cof.graphical_representations[0])
                     except KeyError as e:
                         pass
@@ -458,17 +458,17 @@ class AncestorGraph(BaseGraph):
             logger.info(
                 f"flipping reduced the cross connections by {width - old_width} (i.e. from {old_width} to {width})")
 
-        # for graphical_family_representation in self.graphical_family_representations:
+        # for gr_family in self.graphical_family_representations:
         if self._positioning['compress']:
             failed, old_x_min_index, old_x_max_index = self.check_unique_x_position()
             old_width = old_x_max_index - old_x_min_index
             self.compression_steps = 1e30
             if 'compression_steps' in self._formatting and self._formatting['compression_steps'] > 0:
                 self.compression_steps = self._formatting['compression_steps']
-            self._compress_graph_ancestor_graph(self._instances[(
+            self._compress_chart_ancestor_graph(self._instances[(
                 'i', root_individual_id)].graphical_representations[0].visible_parent_family)
 
-            # compressed graph should be aligned left
+            # compressed chart should be aligned left
             _, min_index_x, max_index_x, self.position_to_person_map = self._check_compressed_x_position(
                 False)
             self._move_individual_and_ancestors(self._instances[('i', root_individual_id)], sorted(list(self._instances[(
@@ -499,7 +499,7 @@ class AncestorGraph(BaseGraph):
         self.max_x_index = 0
         self.clear_svg_items()
         self._instances.ancestor_width_cache.clear()
-        BaseGraph.clear_graphical_representations(self)
+        BaseChart.clear_graphical_representations(self)
 
     def define_svg_items(self):
         """
@@ -572,10 +572,10 @@ class AncestorGraph(BaseGraph):
 
         min_x_index = 9e99
         max_x_index = -9e99
-        for graphical_individual_representation in self.graphical_individual_representations:
-            x_positions = graphical_individual_representation.get_x_position()
+        for gr_individual in self.graphical_individual_representations:
+            x_positions = gr_individual.get_x_position()
             if x_positions is None:
-                logger.error(graphical_individual_representation.individual.plain_name + ' has a graphical representation, but was not placed!')
+                logger.error(gr_individual.individual.plain_name + ' has a graphical representation, but was not placed!')
                 continue
             for _, x_position in x_positions.items():
                 min_x_index = min(min_x_index, x_position[1])
@@ -586,25 +586,25 @@ class AncestorGraph(BaseGraph):
         self.min_x_index = min_x_index  # -1000
         self.max_x_index = max_x_index + 1  # +200
 
-        for graphical_individual_representation in self.graphical_individual_representations:
-            birth_date_ov = graphical_individual_representation.get_birth_date_ov()
+        for gr_individual in self.graphical_individual_representations:
+            birth_date_ov = gr_individual.get_birth_date_ov()
             if not birth_date_ov:
                 continue
-            death_event = graphical_individual_representation.get_death_event()
+            death_event = gr_individual.get_death_event()
 
-            # individual_id = graphical_individual_representation.individual_id
-            individual_name = graphical_individual_representation.name
+            # individual_id = gr_individual.individual_id
+            individual_name = gr_individual.name
             # positions[individual_id]
 
             # individual = self._instances[('i',individual_id)]
-            x_pos = graphical_individual_representation.get_x_position()
+            x_pos = gr_individual.get_x_position()
             if x_pos is None:
-                # logger.error(graphical_individual_representation.individual.plain_name + ' has a graphical representation, but was not placed!')
+                # logger.error(gr_individual.individual.plain_name + ' has a graphical representation, but was not placed!')
                 continue
             x_pos_list = sorted([(ov, pos, index, family_id, flag)
                                  for index, (family_id, (ov, pos, f, flag)) in enumerate(x_pos.items())])
-            birth_label = graphical_individual_representation.birth_label
-            death_label = graphical_individual_representation.death_label
+            birth_label = gr_individual.birth_label
+            death_label = gr_individual.death_label
 
             # collect information about marriages
             marriage_ordinals = []
@@ -614,15 +614,15 @@ class AncestorGraph(BaseGraph):
             new_x_position_after_marriage = []
             new_x_indices_after_marriage = []
             marriage_labels = []
-            if graphical_individual_representation.get_marriages():
-                for graphical_representation_marriage_family in graphical_individual_representation.get_marriages():
+            if gr_individual.get_marriages():
+                for graphical_representation_marriage_family in gr_individual.get_marriages():
                     if graphical_representation_marriage_family.marriage is None:
                         continue
                     if graphical_representation_marriage_family.family_id not in x_pos:
                         logger.error(graphical_representation_marriage_family.family_id + ' has a graphical representation, but was not placed!')
                         continue
                     spouse_representation = graphical_representation_marriage_family.get_spouse(
-                        graphical_individual_representation.individual)
+                        gr_individual.individual)
                     marriage_x_index = x_pos[graphical_representation_marriage_family.family_id][1]
                     new_x_position_after_marriage.append(
                         self._map_x_position(marriage_x_index))
@@ -763,11 +763,11 @@ class AncestorGraph(BaseGraph):
                                 self._formatting['fade_individual_color_black_age']*365+birth_date_ov))
                         )
                     )
-                    if self._formatting['individual_photo_active'] and len(graphical_individual_representation.individual.images) > 0:
+                    if self._formatting['individual_photo_active'] and len(gr_individual.individual.images) > 0:
                         index = 0
                         svg_path = Path_types[data[-1][0]
                                               ['type']](*data[-1][0]['arguments'])
-                        for ov, image_dict in graphical_individual_representation.individual.images.items():
+                        for ov, image_dict in gr_individual.individual.images.items():
                             image_filename = image_dict['filename']
                             image_size = image_dict['size']
                             if ov >= knots[index][1] and ov <= knots[index + 1][1]:
@@ -836,10 +836,10 @@ class AncestorGraph(BaseGraph):
                                         self._formatting['fade_individual_color_black_age']*365+birth_date_ov))
                                 )
                             )
-                        if self._formatting['individual_photo_active'] and len(graphical_individual_representation.individual.images) > 0:
+                        if self._formatting['individual_photo_active'] and len(gr_individual.individual.images) > 0:
                             svg_path = Path_types[data[-1][0]
                                                   ['type']](*data[-1][0]['arguments'])
-                            for ov, image_dict in graphical_individual_representation.individual.images.items():
+                            for ov, image_dict in gr_individual.individual.images.items():
                                 image_filename = image_dict['filename']
                                 image_size = image_dict['size']
                                 if ov > knots[index][1] and ov < knots[index + 1][1]:
@@ -879,17 +879,17 @@ class AncestorGraph(BaseGraph):
 
             # create item setup
             for path, color_pos in life_line_bezier_paths:
-                graphical_individual_representation.items.append({
+                gr_individual.items.append({
                     'type': 'path',
                     'config': path,
-                    'color': graphical_individual_representation.color,
+                    'color': gr_individual.color,
                     'color_pos': color_pos,
                     'stroke_width': self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']
                 }
                 )
             if self._formatting['birth_label_active']:
                 if self._formatting['birth_label_along_path']:
-                    graphical_individual_representation.items.append(
+                    gr_individual.items.append(
                         {
                             'type': 'textPath',
                             'config': {
@@ -914,7 +914,7 @@ class AncestorGraph(BaseGraph):
                     birth_label_text = " ".join(individual_name + [birth_label])
                     if self._formatting['birth_label_wrapping_active']:
                         birth_label_text = birth_label_text.strip().replace(' ', '\n')
-                    graphical_individual_representation.items.append(
+                    gr_individual.items.append(
                         {
                             'type': 'text',
                             'config': {
@@ -932,7 +932,7 @@ class AncestorGraph(BaseGraph):
             if self._formatting['death_label_active']:
                 if self._formatting['death_label_wrapping_active']:
                     death_label = death_label.strip().replace(' ', '\n')
-                graphical_individual_representation.items.append(
+                gr_individual.items.append(
                     {
                         'type': 'text',
                         'config': {
@@ -949,7 +949,7 @@ class AncestorGraph(BaseGraph):
 
                     }
                 )
-            graphical_individual_representation.items += images
+            gr_individual.items += images
 
     def paint_and_save(self, individual_id, filename=None):
         """
@@ -991,8 +991,8 @@ class AncestorGraph(BaseGraph):
                               for index, gr in enumerate(self.graphical_individual_representations)]
         sorted_individuals.sort()
         sorted_individual_items = []
-        for _, _, graphical_individual_representation in sorted_individuals:
-            sorted_individual_items += graphical_individual_representation.items
+        for _, _, gr_individual in sorted_individuals:
+            sorted_individual_items += gr_individual.items
 
         for item in additional_items + sorted_individual_items:
                 if item['type'] == 'text':
@@ -1036,7 +1036,7 @@ class AncestorGraph(BaseGraph):
                             default='currentColor'), fill='none', stroke_width=item['stroke_width']))
                     else:
                         # arguments['fill'] = fill
-                        # graphical_individual_representation.color
+                        # gr_individual.color
                         svg_document.add(svg_document.path(d=svg_path.d(), stroke="rgb({},{},{})".format(
                             *item['color']), fill='none', stroke_width=item['stroke_width']))
                 elif item['type'] == 'textPath':

@@ -1,7 +1,7 @@
 from .GedcomIndividual import GedcomIndividual
 
 
-class ancestor_graph_individual():
+class GraphicalIndividual():
     """
     Class which represents one appearance of an individual
     """
