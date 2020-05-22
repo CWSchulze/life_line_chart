@@ -117,6 +117,20 @@ class ancestor_graph_individual():
         return x_min, x_max
 
 
+    def get_width2(self, family):
+        """
+        width of the ancestor individuals which are strongly connected
+
+        Args:
+            family (BaseFamily): family which is examined
+
+        Returns:
+            int: width
+        """
+        x_min, x_max = self.get_range2(family)
+        width = x_max - x_min + 1
+        return width
+
     def get_range2(self, family):
         """
         get the x range from min to max
