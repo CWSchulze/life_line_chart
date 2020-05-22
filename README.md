@@ -1,5 +1,5 @@
 # life_line_chart
-Generate ancestor (genealogy) chart. SVG export is supported.
+Generate ancestor and descendants (genealogy) chart. SVG export is supported.
 
 ## Getting started
 
