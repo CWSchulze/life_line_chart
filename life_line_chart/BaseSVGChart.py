@@ -6,37 +6,46 @@ import datetime
 import svgwrite
 from copy import deepcopy
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
-from cmath import sqrt, exp, pi
-from math import floor, ceil #, sqrt, exp, pi
+from math import floor, ceil, pi, e
 from .BaseChart import BaseChart
 
 logger = logging.getLogger("life_line_chart")
 
-J = exp(2j*pi/3)
-Jc = 1/J
+cardano_instance = None
+class Cardano:
+    J = None
+    Jc = None
+    def __init__(self):
+        self.J = e**(2j*pi/3)
+        self.Jc = 1/self.J
 
+    def solve(self, a, b, c, d):
+        z0 = b/3/a
+        a2, b2 = a*a, b*b
+        p = -b2/3/a2 + c/a
+        q = (b/27*(2*b2/a2-9*c/a)+d)/a
+        D = -4*p*p*p-27*q*q
+        r = (-D/27+0j)**0.5
+        u = ((-q-r)/2)**0.33333333333333333333333
+        v = ((-q+r)/2)**0.33333333333333333333333
+        w = u*v
+        w0 = abs(w+p/3)
+        w1 = abs(w*self.J+p/3)
+        w2 = abs(w*self.Jc+p/3)
+        if w0 < w1:
+            if w2 < w0:
+                v *= self.Jc
+        elif w2 < w1:
+            v *= self.Jc
+        else:
+            v *= self.J
+        return u+v-z0, u*self.J+v*self.Jc-z0, u*self.Jc+v*self.J-z0
 
-def Cardano(a, b, c, d):
-    z0 = b/3/a
-    a2, b2 = a*a, b*b
-    p = -b2/3/a2 + c/a
-    q = (b/27*(2*b2/a2-9*c/a)+d)/a
-    D = -4*p*p*p-27*q*q
-    r = sqrt(-D/27+0j)
-    u = ((-q-r)/2)**0.33333333333333333333333
-    v = ((-q+r)/2)**0.33333333333333333333333
-    w = u*v
-    w0 = abs(w+p/3)
-    w1 = abs(w*J+p/3)
-    w2 = abs(w*Jc+p/3)
-    if w0 < w1:
-        if w2 < w0:
-            v *= Jc
-    elif w2 < w1:
-        v *= Jc
-    else:
-        v *= J
-    return u+v-z0, u*J+v*Jc-z0, u*Jc+v*J-z0
+def cardano(a,b,c,d):
+    global cardano_instance
+    if cardano_instance == None:
+        cardano_instance = Cardano()
+    return cardano_instance.solve(a,b,c,d)
 
 
 class BaseSVGChart(BaseChart):
@@ -391,7 +400,7 @@ class BaseSVGChart(BaseChart):
                                     coeffs = svg_path.poly()
                                     coeffs2 = (
                                         coeffs[0].imag, coeffs[1].imag, coeffs[2].imag, coeffs[3].imag - self._map_y_position(ov))
-                                    roots = Cardano(*coeffs2)
+                                    roots = cardano(*coeffs2)
                                     root = [root.real for root in roots if abs(
                                         root.imag) < 1e-5 and root.real >= 0 and root.real <= 1]
                                     if len(root) > 0:
@@ -464,7 +473,7 @@ class BaseSVGChart(BaseChart):
                                         coeffs2 = (
                                             coeffs[0].imag, coeffs[1].imag, coeffs[2].imag, coeffs[3].imag - self._map_y_position(ov))
                                         # coeffs2 = (coeffs[0] - self._map_y_position(ov)*1j, coeffs[1], coeffs[2], coeffs[3])
-                                        roots = Cardano(*coeffs2)
+                                        roots = cardano(*coeffs2)
                                         root = [root.real for root in roots if abs(
                                             root.imag) < 1e-5 and root.real >= 0 and root.real <= 1]
                                         if len(root) > 0:

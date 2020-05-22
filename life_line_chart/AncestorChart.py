@@ -7,8 +7,6 @@ import svgwrite
 from copy import deepcopy
 from .BaseSVGChart import BaseSVGChart
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
-from cmath import sqrt, exp, pi
-from math import floor, ceil
 
 logger = logging.getLogger("life_line_chart")
 
