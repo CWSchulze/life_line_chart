@@ -1,9 +1,8 @@
-import distutils
 from glob import glob
 # classifiers: https://pypi.org/pypi?%3Aaction=list_classifiers
 import shutil, os, sys
 
-from distutils.core import setup
+from setuptools import setup
 import shutil
 
 
@@ -50,8 +49,8 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     platforms="OS Independent",
-    package_data={'life_line_chart': ['ringe.png']},
-    data_files=[('./life_line_chart',['ringe.png'])],
+    # package_data={'life_line_chart': ['ringe.png']},
+    data_files=[('life_line_chart',['life_line_chart/ringe.png'])],
     include_package_data=True,
     packages=['life_line_chart'],
     extras_require= {
