@@ -4,6 +4,7 @@ import os
 import json
 from .GedcomIndividual import GedcomIndividual
 from .GedcomFamily import GedcomFamily
+from .Exceptions import LifeLineChartNotEnoughInformationToDisplay
 
 logging.basicConfig()  # level=20)
 logger = logging.getLogger("life_line_chart")
@@ -67,13 +68,21 @@ class InstanceContainer():
         elif key[0] == 'i':
             item = self._data.get(key)
             if item is None:
-                self._data[key] = self._individual_constructor(self, key)
-            return self._data[key]
+                try:
+                    item = self._individual_constructor(self, key)
+                    self._data[key] = item
+                except LifeLineChartNotEnoughInformationToDisplay:
+                    item = None
+            return item
         elif key[0] == 'f':
             item = self._data.get(key)
             if item is None:
-                self._data[key] = self._family_constructor(self, key)
-            return self._data[key]
+                try:
+                    item = self._family_constructor(self, key)
+                    self._data[key] = item
+                except LifeLineChartNotEnoughInformationToDisplay:
+                    item = None
+            return item
         return None
 
     def __setitem__(self, key, value):

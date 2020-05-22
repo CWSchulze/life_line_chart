@@ -8,3 +8,7 @@ class LifeLineChartCannotMoveIndividual(Exception):
 class LifeLineChartCollisionDetected(Exception):
    def __init__(self, *args):
       self.args = args
+
+class LifeLineChartNotEnoughInformationToDisplay(Exception):
+   def __init__(self, *args):
+      self.args = args
