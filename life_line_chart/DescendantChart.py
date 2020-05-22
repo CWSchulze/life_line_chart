@@ -54,7 +54,6 @@ class DescendantChart(BaseChart):
 
     def __init__(self, positioning=None, formatting=None, instance_container=None):
         BaseChart.__init__(self, positioning, formatting, instance_container)
-        self.x_pos = 0
 
         # configuration of this chart
         self._chart_configuration.update(self.get_default_chart_configuration())
