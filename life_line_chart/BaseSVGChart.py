@@ -6,13 +6,13 @@ import datetime
 import svgwrite
 from copy import deepcopy
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
-#from cmath import sqrt, exp, pi
-from math import floor, ceil, sqrt, exp, pi
+from cmath import sqrt, exp, pi
+from math import floor, ceil #, sqrt, exp, pi
 from .BaseChart import BaseChart
 
 logger = logging.getLogger("life_line_chart")
 
-J = 2#exp(2j*pi/3)
+J = exp(2j*pi/3)
 Jc = 1/J
 
 
