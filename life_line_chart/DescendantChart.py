@@ -44,14 +44,12 @@ class DescendantChart(BaseChart):
     Descendant Chart
     ==============
 
-    # The ancestor chart shows the ancestors of one or more root individuals.
-    # The parents only enclose direct children. Both, father and mother are
-    # visible. Usually ancestors are visible, optionally all children of a
-    # visible family can be added.
-#
-    # Each individual appears once. So in case of a second marriage, the
-    # individual is connected across the chart to the second spouse. Because
-    # of that, ancestor collapse is visualized.
+    The descendant chart shows the descendants of one or more root individuals.
+    The parents enclose direct children. Both, father and mother are visible.
+
+    Each individual appears once. So in case of a second marriage, the
+    individual is connected across the chart to the second spouse. Because
+    of that, ancestor collapse is visualized.
     """
 
     def __init__(self, positioning=None, formatting=None, instance_container=None):
@@ -143,53 +141,12 @@ class DescendantChart(BaseChart):
                 if len(cofs) > 0:
                     gr_marriage.visual_placement_parent_family = individual.get_child_of_family()[0]
 
-    def select_family_children(self, family, filter=None):
-        """
-        Select children of a family. This is done by creating instances of graphical representations.
-
-        Args:
-            individual (BaseIndividual): starting point for selection
-            filter (lambda, optional): lambda(BaseIndividual) : return Boolean. Defaults to None.
-        """
-
-        if not family.has_graphical_representation():
-            gr_family = self._create_family_graphical_representation(
-                family)
-        else:
-            gr_family = family.graphical_representations[0]
-
-        for child in family.get_children():
-            if filter and filter(child):
-                continue
-
-            if not child.has_graphical_representation():
-                gr_child = self._create_individual_graphical_representation(
-                    child)
-
-                if gr_child is None:
-                    return
-
-                i = int(hashlib.sha1(" ".join(gr_child.name).encode(
-                    'utf8')).hexdigest(), 16) % (10 ** 8)
-                c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
-                f = 255/max(c)
-                c = [int(x*f) for x in c]
-                f = min(1, 500/sum(c))
-                c = [int(x*f) for x in c]
-                gr_child.color = c
-
-                gr_family.add_visible_children(child)
-                gr_child.visible_parent_family = gr_family
-
-
-    def place_selected_individuals(self, individual, child_family, spouse_family, child_of_family, x_offset=0, discovery_cache=[]):
+    def place_selected_individuals(self, individual, child_of_family, x_offset=0, discovery_cache=[]):
         """
         Place the graphical representations in direction of x
 
         Args:
             individual (BaseIndividual): individual
-            child_family (BaseFamily): I dont remember
-            spouse_family (BaseFamily): Spouse family of this individual
             child_of_family (BaseFamily): child-of-family of this individual
         """
         discovery_cache.append(individual.plain_name)
@@ -233,7 +190,7 @@ class DescendantChart(BaseChart):
 
             for child in marriage.children:
                 self.place_selected_individuals(
-                    child, None, None, marriage, x_position,
+                    child, marriage, x_position,
                     discovery_cache=discovery_cache)
                 if child.has_graphical_representation():
                     width = child.graphical_representations[0].get_width2(
@@ -966,7 +923,7 @@ class DescendantChart(BaseChart):
                 if root_individual.child_of_family_id:
                     cof_family_id = root_individual.child_of_family_id[0]
                 self.place_selected_individuals(
-                    root_individual, None, None, self._instances[('f', cof_family_id)], x_pos)
+                    root_individual, self._instances[('f', cof_family_id)], x_pos)
 
                 x_pos += root_individual.graphical_representations[0].get_width2(self._instances[('f', cof_family_id)])
 
