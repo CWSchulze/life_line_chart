@@ -643,13 +643,13 @@ class BaseGraph():
                         "failed: " + str((x_index, value[2].family_id, graphical_individual_representation.name, v[x_index])))
                     # raise RuntimeError((x_index, key, graphical_individual_representation.name))
         full_index_list = list(sorted(v.keys()))
-        for i in range(len(full_index_list)):
+        for i in range(max(full_index_list)):
             if i not in full_index_list:
                 graphical_individual_representation.items.append({
                     'type': 'rect',
                     'config': {
-                        'insert': (self._map_x_position(i), self._map_y_position(self.max_ordinal)),
-                        'size': (self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'], self._map_y_position(self.min_ordinal)),
+                        'insert': (self._map_x_position(i), 0),
+                        'size': (self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'], self._formatting['total_height']),
                         'fill': 'black',
                         'fill-opacity': "0.5"
                     }
