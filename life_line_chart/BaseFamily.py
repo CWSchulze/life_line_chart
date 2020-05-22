@@ -75,7 +75,12 @@ class BaseFamily():
         Returns:
             list: list of children instances
         """
-        return [self._instances[('i', id)] for id in self.children_individual_ids]
+        children = []
+        for id in self.children_individual_ids:
+            child = self._instances[('i', id)]
+            if child:
+                children.append(child)
+        return children
     """
     children BaseIndividual instances
     """
