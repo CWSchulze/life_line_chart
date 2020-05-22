@@ -1,6 +1,7 @@
 # import pytest
-from life_line_chart import GedcomParsing, InstanceContainer, GedcomIndividual, GraphicalIndividual, GraphicalFamily, GedcomFamily
-from life_line_chart import ReadGedcom, get_gedcom_instance_container
+from life_line_chart import InstanceContainer, GedcomIndividual, GraphicalIndividual, GraphicalFamily, GedcomFamily
+from life_line_chart import ReadGedcom
+from life_line_chart.GedcomInstanceContainer import get_gedcom_instance_container
 import os
 
 

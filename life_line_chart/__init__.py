@@ -11,8 +11,8 @@ from .BaseChart import BaseChart
 from .AncestorChart import AncestorChart
 from .DescendantChart import DescendantChart
 
-from .AncestorGraphIndividual import GraphicalIndividual
-from .AncestorGraphFamily import GraphicalFamily
+from .GraphicalIndividual import GraphicalIndividual
+from .GraphicalFamily import GraphicalFamily
 
 from .BaseFamily import BaseFamily
 from .BaseIndividual import BaseIndividual, estimate_birth_date, estimate_death_date

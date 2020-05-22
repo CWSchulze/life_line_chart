@@ -1,6 +1,5 @@
-from .InstanceContainer import get_gedcom_instance_container
-from .AncestorGraphFamily import GraphicalFamily
-from .AncestorGraphIndividual import GraphicalIndividual
+from .GraphicalFamily import GraphicalFamily
+from .GraphicalIndividual import GraphicalIndividual
 from .Exceptions import LifeLineChartCollisionDetected, LifeLineChartCannotMoveIndividual
 
 import os
@@ -219,7 +218,7 @@ class BaseChart():
     # TODO: extract base class for other chart types
     _graphical_individual_class = GraphicalIndividual
 
-    def __init__(self, positioning=None, formatting=None, instance_container=get_gedcom_instance_container):
+    def __init__(self, positioning=None, formatting=None, instance_container=None):
         self.position_to_person_map = {}
         self._positioning = BaseChart.get_default_positioning()
         if positioning:
@@ -227,7 +226,7 @@ class BaseChart():
         self._formatting = BaseChart.get_default_formatting()
         if formatting:
             self._formatting.update(formatting)
-        self._instances = instance_container()
+        self._instances = instance_container
         self._instances[('i', None)] = None
         self.graphical_individual_representations = []
         self.graphical_family_representations = []
@@ -823,5 +822,5 @@ class BaseChart():
         self.graphical_individual_representations.clear()
         self.graphical_family_representations.clear()
         self.position_to_person_map = {}
-        for key, instance in self._instances.items():
+        for _, instance in self._instances.items():
             instance.graphical_representations.clear()

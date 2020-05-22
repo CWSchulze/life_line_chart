@@ -1,6 +1,4 @@
 import logging
-import os
-import json
 from .Exceptions import LifeLineChartNotEnoughInformationToDisplay
 
 logging.basicConfig()  # level=20)
