@@ -164,7 +164,7 @@ class ancestor_graph_individual():
                 if not marriage.has_graphical_representation():
                     continue
                 gr_marriage = marriage.graphical_representations[0]
-                if gr_marriage.visual_placement_parent_family is not None and \
+                if family_id is None or gr_marriage.visual_placement_parent_family is not None and \
                     gr_marriage.visual_placement_parent_family.family_id == family_id:
 
                     x_min.append(self._x_position[marriage.family_id][1])
