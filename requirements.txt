@@ -1,4 +1,2 @@
 svgwrite
 wheel
-python-dateutil
-pillow
