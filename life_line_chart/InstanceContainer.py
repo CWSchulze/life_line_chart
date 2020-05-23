@@ -1,4 +1,5 @@
 import logging
+import hashlib
 from .Exceptions import LifeLineChartNotEnoughInformationToDisplay
 
 logging.basicConfig()  # level=20)
@@ -90,3 +91,20 @@ class InstanceContainer():
         self._data.clear()
         self._data.update({('i', None): None, ('f', None): None})
 
+    def color_generator(self, individual):
+        """
+        generate color for an individual
+
+        Args:
+            individual (BaseIndividual): individual to generate a color for
+        """
+        i = int(hashlib.sha1(individual.plain_name.encode(
+            'utf8')).hexdigest(), 16) % (10 ** 8)
+        c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
+        f = 255/max(c)
+        c = [int(x*f) for x in c]
+        f = min(1, 500/sum(c))
+        return [int(x*f) for x in c]
+
+    def display_plain_name(self, individual):
+        return ' '.join([n.strip() for n in individual.get_name() if n.strip() != ''])

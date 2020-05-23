@@ -212,7 +212,7 @@ class BaseSVGChart(BaseChart):
             death_event = gr_individual.get_death_event()
 
             # individual_id = gr_individual.individual_id
-            individual_name = gr_individual.name
+            individual_name = gr_individual.get_name()
             # positions[individual_id]
 
             # individual = self._instances[('i',individual_id)]
@@ -265,7 +265,7 @@ class BaseSVGChart(BaseChart):
                                 child_x_indices.append(visible_child.graphical_representations[0].get_x_position()[
                                                        graphical_representation_marriage_family.family_id][1])
                             except:
-                                logger.error('something went wrong with ' + "".join(visible_child.name) +
+                                logger.error('something went wrong with ' + "".join(visible_child.get_name()) +
                                              ". The position family 0 is not equal to the placement...")
                         if len(child_x_indices) > 0:
                             # calculate the middle over the children
@@ -583,7 +583,7 @@ class BaseSVGChart(BaseChart):
 
         if filename is None:
             filename = 'ancestors_of_' + \
-                "".join(self._instances[('i', individual_id)].name).replace(
+                "".join(self._instances[('i', individual_id)].get_name()).replace(
                     ' ', '')
             if self._positioning['flip_to_optimize']:
                 filename += '_flipped'

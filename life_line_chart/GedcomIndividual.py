@@ -23,13 +23,11 @@ class GedcomIndividual(BaseIndividual):
         estimate_birth_date(self, self._instances)
         estimate_death_date(self)
 
-    def _get_name(self):
+    def get_name(self):
         if 'NAME' in self._database_indi[self.individual_id]:
             return self._database_indi[self.individual_id]['NAME']['tag_data'].split('/')
         else:
-            return [""]
-
-    name = property(_get_name)
+            return ["", ""]
 
     def _get_father_and_mother(self):
         family_id = self._database_indi[self.individual_id]['FAMC']['tag_data']

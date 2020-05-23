@@ -136,15 +136,15 @@ class BaseIndividual():
         """
         return self.plain_name < other.plain_name
 
-    def _get_name(self):
+    def get_name(self):
         if True:
             raise NotImplementedError()
         return ""
-    name = property(_get_name)
+    # name = property(get_name)
 
-    def _get_plain_name(self):
-        return ' '.join([n.strip() for n in self._get_name() if n.strip() != ''])
-    plain_name = property(_get_plain_name)
+    @property
+    def plain_name(self):
+        return self._instances.display_plain_name(self)
 
     def _get_children(self):
         """
@@ -252,7 +252,7 @@ class BaseIndividual():
 
     def _get_short_info_text(self):
         content = [
-            " ".join([n.strip() for n in self._get_name() if n != '']).strip(),
+            " ".join([n.strip() for n in self.get_name() if n != '']).strip(),
             self.birth_label,
             self.death_label,
         ]

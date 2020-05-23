@@ -59,14 +59,7 @@ class DescendantChart(BaseSVGChart):
                 return
 
             if color is None:
-                i = int(hashlib.sha1(" ".join(gr_individual.name).encode(
-                    'utf8')).hexdigest(), 16) % (10 ** 8)
-                c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
-                f = 255/max(c)
-                c = [int(x*f) for x in c]
-                f = min(1, 500/sum(c))
-                c = [int(x*f) for x in c]
-                gr_individual.color = c
+                gr_individual.color = self._instances.color_generator(individual)
             else:
                 gr_individual.color = color
         else:
@@ -90,14 +83,7 @@ class DescendantChart(BaseSVGChart):
 
                         if spouse_representation is not None:
                             if color is None:
-                                i = int(hashlib.sha1(" ".join(spouse_representation.name).encode(
-                                    'utf8')).hexdigest(), 16) % (10 ** 8)
-                                c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
-                                f = 255/max(c)
-                                c = [int(x*f) for x in c]
-                                f = min(1, 500/sum(c))
-                                c = [int(x*f) for x in c]
-                                spouse_representation.color = c
+                                spouse_representation.color = self._instances.color_generator(spouse)
                             else:
                                 spouse_representation.color = color
 

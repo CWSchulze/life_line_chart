@@ -341,26 +341,7 @@ class AncestorChart(BaseSVGChart):
                 continue
 
             if not individual.graphical_representations[0].visible_parent_family or not individual.graphical_representations[0].visible_parent_family.family_id in individual.graphical_representations[0].get_x_position():
-                # try:
-                #     while i < 50000:
-                #         self._move_single_individual(
-                #             individual, individual.graphical_representations[0].visible_parent_family, direction_factor*1)
-                #         self._check_compressed_x_position(True)
-                #         i += 1
-                # except LifeLineChartCollisionDetected:
-                #     # print("   collision of " + " and ".join([" ".join(a.name) for a in e.args]))
-                #     self._move_single_individual(
-                #         individual, individual.graphical_representations[0].visible_parent_family, -direction_factor*1)
-                # except LifeLineChartCannotMoveIndividual:
-                #     pass
                 continue
-            # try:
-            #     while i < 50000:
-            #         _move_single_individual(individual, individual.graphical_representations[0].visible_parent_family, direction_factor*1)
-            #         _check_compressed_x_position(True)
-            #         i += 1
-            # except:
-            #     _move_single_individual(individual, individual.graphical_representations[0].visible_parent_family, -direction_factor*1)
 
             try:
                 while i < 50000:
@@ -369,7 +350,6 @@ class AncestorChart(BaseSVGChart):
                     self._check_compressed_x_position(True)
                     i += 1
             except LifeLineChartCollisionDetected as e:
-                # print("   collision of " + " and ".join([" ".join(a.name) for a in e.args]))
                 self._move_individual_and_ancestors(
                     individual, individual.graphical_representations[0].visible_parent_family, -direction_factor*1)
             except LifeLineChartCannotMoveIndividual as e:
@@ -377,7 +357,7 @@ class AncestorChart(BaseSVGChart):
             except KeyError as e:
                 pass
             if i != 0:
-                logger.info('moved ' + ' '.join(individual.name) +
+                logger.info('moved ' + ' '.join(individual.get_name()) +
                             ' by ' + str(i * direction_factor * 1))
 
     def modify_layout(self, root_individual_id):
@@ -394,9 +374,6 @@ class AncestorChart(BaseSVGChart):
             old_width = width
             candidantes = set()
             for key in sorted(loli.keys()):
-                # continue
-                # if index == 1:
-                #     continue
                 def collect_candidates(children):
                     for child in children:
                         if len(child.graphical_representations) > 0:
@@ -464,11 +441,6 @@ class AncestorChart(BaseSVGChart):
         else:
             _, _, _, self.position_to_person_map = self._check_compressed_x_position(
                 False)
-        # for collision in collisions:
-        #     if collision[1] is None:
-        #         print("collision of " + " ".join(collision[0].name))
-        #     else:
-        #         print("collision of " + " ".join(collision[0].name) + " with " + " ".join(collision[1].name))
 
     def update_chart(self, filter_lambda=None, color_lambda=None, images_lambda=None, rebuild_all=False, update_view=False):
         rebuild_all = rebuild_all or self._positioning != self._backup_positioning or \

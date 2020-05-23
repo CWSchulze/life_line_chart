@@ -193,9 +193,9 @@ class GraphicalIndividual():
         self.__instances.ancestor_width_cache[(self.individual_id, family_id)] = x_min, x_max
         return x_min, x_max
 
-    def __get_name(self):
-        return self.individual.name
-    name = property(__get_name)
+    def get_name(self):
+        return self.individual.get_name()
+    #name = property(__get_name)
 
     def __get_birth_date(self):
         if self.individual.events['birth_or_christening']:
@@ -282,7 +282,7 @@ class GraphicalIndividual():
     def __get_death_label(self):
         string = self.individual.death_label
         if len(self._x_position) > 2 or len(self._x_position) == 2 and list(self._x_position.values())[0][1] != list(self._x_position.values())[1][1]:
-            string += ' ' + " ".join(self.name)
+            string += ' ' + self.individual.plain_name
         return string
     death_label = property(__get_death_label)
 
