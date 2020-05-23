@@ -163,24 +163,25 @@ class AncestorChart(BaseSVGChart):
         for local_child_of_family in child_of_families:
             father, mother = local_child_of_family.get_husband_and_wife()
             if father and father.has_graphical_representation():
+                gr_father = father.graphical_representations[0]
                 fathers_child_of_families = father.get_child_of_family()
                 if fathers_child_of_families:
                     fathers_born_in_family = fathers_child_of_families[0]
                 else:
                     fathers_born_in_family = None
-                if not father.graphical_representations[0].get_x_position() or local_child_of_family.family_id not in father.graphical_representations[0].get_x_position():
-                    father.graphical_representations[0].visual_placement_child = (
+                if not gr_father.get_x_position() or local_child_of_family.family_id not in gr_father.get_x_position():
+                    gr_father.visual_placement_child = (
                         individual, spouse_family)
                     if local_child_of_family.has_graphical_representation():
                         local_child_of_family.graphical_representations[0].visual_placement_child = individual
-                    # father.graphical_representations[0].visual_placement_child = spouse_family
+                    # gr_father.visual_placement_child = spouse_family
                     self.place_selected_individuals(
                         father, spouse_family, local_child_of_family, fathers_born_in_family, x_position, discovery_cache)
-                    width = father.graphical_representations[0].get_width(
+                    width = gr_father.get_width(
                         local_child_of_family)
                     if local_child_of_family.has_graphical_representation():
                         local_child_of_family.graphical_representations[0].husb_width = \
-                            lambda gr=father.graphical_representations[0], cof=local_child_of_family: gr.get_width(cof)
+                            lambda gr=gr_father, cof=local_child_of_family: gr.get_width(cof)
                     x_position += width
 
         # add the main individual and its visible siblings
@@ -191,24 +192,25 @@ class AncestorChart(BaseSVGChart):
         else:
             siblings = [individual]
         for sibling in siblings:
+            gr_sibling = sibling.graphical_representations[0]
             if sibling.individual_id == individual.individual_id:
-                if sibling.graphical_representations[0].get_x_position() is None or spouse_family is not None and spouse_family.family_id not in sibling.graphical_representations[0].get_x_position():
+                if gr_sibling.get_x_position() is None or spouse_family is not None and spouse_family.family_id not in gr_sibling.get_x_position():
                     # add new position of this spouse family
-                    sibling.graphical_representations[0].set_x_position(
+                    gr_sibling.set_x_position(
                         x_position, spouse_family)
 
-                    if child_of_family and child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
+                    if child_of_family and child_of_family.family_id not in gr_sibling.get_x_position():
                         # not added yet, so this is the primary cof placement
-                        sibling.graphical_representations[0].set_x_position(
+                        gr_sibling.set_x_position(
                             x_position, child_of_family, True)
 
                     x_position += 1
 
-            elif not sibling.graphical_representations[0].get_x_position() or child_of_family.family_id not in sibling.graphical_representations[0].get_x_position():
-                if not sibling.graphical_representations[0].visual_placement_child:
+            elif not gr_sibling.get_x_position() or child_of_family.family_id not in gr_sibling.get_x_position():
+                if not gr_sibling.visual_placement_child:
                     sibling.graphical_representations[
                         0].visual_placement_child = gr_individual.visual_placement_child
-                    sibling.graphical_representations[0].set_x_position(
+                    gr_sibling.set_x_position(
                         x_position,
                         child_of_family)
                     x_position += 1
@@ -221,25 +223,26 @@ class AncestorChart(BaseSVGChart):
         for local_child_of_family in child_of_families:
             father, mother = local_child_of_family.get_husband_and_wife()
             if mother and mother.has_graphical_representation():
+                gr_mother = mother.graphical_representations[0]
                 mothers_child_of_families = mother.get_child_of_family()
                 if mothers_child_of_families:
                     mothers_born_in_family = mothers_child_of_families[0]
                 else:
                     mothers_born_in_family = None
-                if not mother.graphical_representations[0].get_x_position() or local_child_of_family.family_id not in mother.graphical_representations[0].get_x_position():
-                    mother.graphical_representations[0].visual_placement_child = (
+                if not gr_mother.get_x_position() or local_child_of_family.family_id not in gr_mother.get_x_position():
+                    gr_mother.visual_placement_child = (
                         individual, spouse_family)
                     if local_child_of_family.has_graphical_representation():
                         local_child_of_family.graphical_representations[0].visual_placement_child = individual
-                    # mother.graphical_representations[0].visual_placement_child = spouse_family
+                    # gr_mother.visual_placement_child = spouse_family
                     self.place_selected_individuals(
                         mother, spouse_family, local_child_of_family, mothers_born_in_family, x_position, discovery_cache)
-                    x_min, x_max = mother.graphical_representations[0].get_range(
+                    x_min, x_max = gr_mother.get_range(
                         local_child_of_family)
                     width = x_max - x_min + 1
                     if local_child_of_family.has_graphical_representation():
                         local_child_of_family.graphical_representations[0].wife_width = \
-                            lambda gr=mother.graphical_representations[0], cof=local_child_of_family: gr.get_width(cof)
+                            lambda gr=gr_mother, cof=local_child_of_family: gr.get_width(cof)
                     x_position += width
 
         self.max_x_index = max(self.max_x_index, x_position)
