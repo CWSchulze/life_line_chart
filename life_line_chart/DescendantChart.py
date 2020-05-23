@@ -92,9 +92,9 @@ class DescendantChart(BaseSVGChart):
                     if child.has_graphical_representation():
                         gr_marriage.add_visible_children(child)
                         child.graphical_representations[0].visible_parent_family = gr_marriage
-                cofs = individual.get_child_of_family()
+                cofs = individual.child_of_families
                 if len(cofs) > 0:
-                    gr_marriage.visual_placement_parent_family = individual.get_child_of_family()[0]
+                    gr_marriage.visual_placement_parent_family = individual.child_of_families[0]
 
     def place_selected_individuals(self, individual, child_of_family, x_offset=0, discovery_cache=[]):
         """

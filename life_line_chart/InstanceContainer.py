@@ -108,3 +108,49 @@ class InstanceContainer():
 
     def display_plain_name(self, individual):
         return ' '.join([n.strip() for n in individual.get_name() if n.strip() != ''])
+
+    def display_short_info_text(self, individual):
+        content = [
+            " ".join([n.strip() for n in individual.get_name() if n != '']).strip(),
+            individual.birth_label,
+            individual.death_label,
+        ]
+        return '\n'.join(content)
+
+    def display_info_text(self, individual):
+        content = [
+            individual.plain_name,
+            individual.birth_label,
+            individual.death_label,
+            '',
+        ]
+        for cof in individual.child_of_families:
+            if cof.husb:
+                content.append('Vater: {} ({})'.format(cof.wife.plain_name,
+                    cof.wife.birth_label))
+            if cof.wife:
+                content.append('Mutter: {} ({})'.format(cof.wife.plain_name,
+                    cof.wife.birth_label))
+
+        content.append('')
+        for marriage in individual.marriages:
+            spouse = marriage.get_spouse(individual.individual_id)
+            content.append('Partner: {} ({}), Heirat: {}'.format(
+                spouse.plain_name, spouse.birth_label, marriage.label))
+            for index, child in enumerate(marriage.get_sorted_children()):
+                content.append(' {}. Kind: {} ({})'.format(
+                    index + 1, child.plain_name, child.birth_label))
+
+        return '\n'.join(content)
+
+    def display_death_date(self, individual):
+        """
+        get the death (or burial) date
+
+        Returns:
+            str: death date
+        """
+        if individual.events['death_or_burial']:
+            return individual.events['death_or_burial']['date'].date().strftime('%d.%m.%Y')
+        else:
+            return None

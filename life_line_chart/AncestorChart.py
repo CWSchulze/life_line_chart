@@ -81,7 +81,7 @@ class AncestorChart(BaseSVGChart):
         else:
             gr_individual = individual.graphical_representations[0]
 
-        child_of_families = individual.get_child_of_family()[:1]
+        child_of_families = individual.child_of_families[:1]
         for child_of_family in child_of_families:
             family = self._create_family_graphical_representation(
                 child_of_family)
@@ -142,14 +142,14 @@ class AncestorChart(BaseSVGChart):
         gr_individual = individual.graphical_representations[0]
         gr_individual.x_start = x_position
         self.min_x_index = min(self.min_x_index, x_position)
-        child_of_families = individual.get_child_of_family()
+        child_of_families = individual.child_of_families
 
         # recursively add the father branch
         for local_child_of_family in child_of_families:
             father, mother = local_child_of_family.get_husband_and_wife()
             if father and father.has_graphical_representation():
                 gr_father = father.graphical_representations[0]
-                fathers_child_of_families = father.get_child_of_family()
+                fathers_child_of_families = father.child_of_families
                 if fathers_child_of_families:
                     fathers_born_in_family = fathers_child_of_families[0]
                 else:
@@ -209,7 +209,7 @@ class AncestorChart(BaseSVGChart):
             father, mother = local_child_of_family.get_husband_and_wife()
             if mother and mother.has_graphical_representation():
                 gr_mother = mother.graphical_representations[0]
-                mothers_child_of_families = mother.get_child_of_family()
+                mothers_child_of_families = mother.child_of_families
                 if mothers_child_of_families:
                     mothers_born_in_family = mothers_child_of_families[0]
                 else:
@@ -284,7 +284,7 @@ class AncestorChart(BaseSVGChart):
             family_was_flipped = True
 
         for _, individual in sorted(individuals):
-            cofs = individual.get_child_of_family()
+            cofs = individual.child_of_families
             for cof in cofs:
                 if cof.has_graphical_representation():
                     if cof.husb is None or cof.wife is None \
@@ -368,7 +368,7 @@ class AncestorChart(BaseSVGChart):
 
                 individual = loli[key]
                 collect_candidates(individual.children)
-                for cof in individual.individual.get_child_of_family():
+                for cof in individual.individual.child_of_families:
                     collect_candidates(cof.get_children())
 
             # candidantes = set()

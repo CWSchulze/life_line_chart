@@ -211,65 +211,22 @@ class BaseIndividual():
 
     @property
     def death_date(self):
-        """
-        get the death (or burial) date
-
-        Returns:
-            str: death date
-        """
-        if self.events['death_or_burial']:
-            return self.events['death_or_burial']['date'].date().strftime('%d.%m.%Y')
-        else:
-            return None
+        return self._instances.display_death_date()
 
     @property
     def info_text(self):
-        content = [
-            self.plain_name,
-            self.birth_label,
-            self.death_label,
-            '',
-        ]
-        for cof in self.get_child_of_family():
-            if cof.husb:
-                content.append('Vater: {} ({})'.format(self.cof.wife.plain_name,
-                    self.cof.wife.birth_label))
-            if cof.wife:
-                content.append('Mutter: {} ({})'.format(cof.wife.plain_name,
-                    self.cof.wife.birth_label))
-
-        content.append('')
-        for marriage in self.marriages:
-            spouse = marriage.get_spouse(self.individual_id)
-            content.append('Partner: {} ({}), Heirat: {}'.format(
-                spouse.plain_name, spouse.birth_label, marriage.label))
-            for index, child in enumerate(marriage.get_sorted_children()):
-                content.append(' {}. Kind: {} ({})'.format(
-                    index + 1, child.plain_name, child.birth_label))
-
-        return '\n'.join(content)
+        return self._instances.display_info_text()
 
     @property
     def short_info_text(self):
-        content = [
-            " ".join([n.strip() for n in self.get_name() if n != '']).strip(),
-            self.birth_label,
-            self.death_label,
-        ]
-        return '\n'.join(content)
-
-    @property
-    def father_and_mother(self):
-        if True:
-            raise NotImplementedError()
-        return ()
+        return self._instances.display_short_info_text()
 
     def has_marriages(self):
         return len(self._marriage_family_ids) > 0
 
-    def get_child_of_family(self):
+    @property
+    def child_of_families(self):
         return [self._instances[('f', family_id)] for family_id in self.child_of_family_id]
-    child_of_family = property(get_child_of_family)
 
     def has_graphical_representation(self):
         return len(self.graphical_representations) > 0

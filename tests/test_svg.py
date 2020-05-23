@@ -122,13 +122,13 @@ def test_generate_svg_file_ancestor_and_children():
     individual2_id = individual_id
     i = 0
     while i < 4:
-        for cof in chart._instances[('i', individual2_id)].get_child_of_family():
+        for cof in chart._instances[('i', individual2_id)].child_of_families:
             if cof.husb.has_graphical_representation():
-                if cof.husb.get_child_of_family():
+                if cof.husb.child_of_families:
                     individual2_id = cof.husb.individual_id
                     break
             if cof.wife.has_graphical_representation():
-                if cof.wife.get_child_of_family():
+                if cof.wife.child_of_families:
                     individual2_id = cof.wife.individual_id
                     break
         chart.select_family_children(

@@ -257,7 +257,7 @@ class BaseChart():
                 # len(x_pos) <= 1 or
                 if list(sorted(x_pos.values()))[0][1] != x_pos[family_id][1]:
                     return
-                # for cof in individual.get_child_of_family():
+                # for cof in individual.child_of_families:
                 cof = individual.graphical_representations[0].visible_parent_family
                 if cof and cof.visual_placement_child and cof.visual_placement_child.individual_id == individual.individual_id:
                     if cof.husb:
