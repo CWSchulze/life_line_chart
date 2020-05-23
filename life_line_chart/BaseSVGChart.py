@@ -1,7 +1,6 @@
 import os
 from .SimpleSVGItems import Line, Path, CubicBezier
 import logging
-import hashlib
 import datetime
 import svgwrite
 from copy import deepcopy
@@ -12,6 +11,8 @@ from .BaseChart import BaseChart
 logger = logging.getLogger("life_line_chart")
 
 cardano_instance = None
+
+
 class Cardano:
     J = None
     Jc = None

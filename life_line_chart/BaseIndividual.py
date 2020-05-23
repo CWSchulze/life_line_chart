@@ -140,7 +140,6 @@ class BaseIndividual():
         if True:
             raise NotImplementedError()
         return ""
-    # name = property(get_name)
 
     @property
     def plain_name(self):

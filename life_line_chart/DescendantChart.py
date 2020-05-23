@@ -1,7 +1,6 @@
 import os
 from .SimpleSVGItems import Line, Path, CubicBezier
 import logging
-import hashlib
 import datetime
 import svgwrite
 from copy import deepcopy
@@ -11,6 +10,7 @@ from math import floor, ceil, sqrt, exp, pi
 from .BaseSVGChart import BaseSVGChart
 
 logger = logging.getLogger("life_line_chart")
+
 
 class DescendantChart(BaseSVGChart):
     """
@@ -78,14 +78,14 @@ class DescendantChart(BaseSVGChart):
                 spouse = marriage.get_spouse(individual.individual_id)
                 if spouse is not None and not spouse.has_graphical_representation():
                     if filter is None or filter(spouse) == False:
-                        spouse_representation = self._create_individual_graphical_representation(
+                        gr_spouse = self._create_individual_graphical_representation(
                             spouse)
 
-                        if spouse_representation is not None:
+                        if gr_spouse is not None:
                             if color is None:
-                                spouse_representation.color = self._instances.color_generator(spouse)
+                                gr_spouse.color = self._instances.color_generator(spouse)
                             else:
-                                spouse_representation.color = color
+                                gr_spouse.color = color
 
                 for child in marriage.children:
                     self.select_descendants(
@@ -155,9 +155,9 @@ class DescendantChart(BaseSVGChart):
 
             spouse = marriage.get_spouse(individual.individual_id)
             if spouse is not None and spouse.has_graphical_representation():
-                spouse_representation = spouse.graphical_representations[0]
-                if not spouse.graphical_representations[0].get_x_position() or marriage.family_id not in spouse.graphical_representations[0].get_x_position():
-                    spouse_representation.set_x_position(
+                gr_spouse = spouse.graphical_representations[0]
+                if not gr_spouse.get_x_position() or marriage.family_id not in gr_spouse.get_x_position():
+                    gr_spouse.set_x_position(
                         x_position, marriage)
                     x_position += 1
 

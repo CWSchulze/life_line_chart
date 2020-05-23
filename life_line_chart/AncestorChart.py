@@ -1,7 +1,6 @@
 import os
 from .SimpleSVGItems import Line, Path, CubicBezier
 import logging
-import hashlib
 import datetime
 import svgwrite
 from copy import deepcopy
@@ -13,6 +12,7 @@ logger = logging.getLogger("life_line_chart")
 
 _strings = get_strings('AncestorChart')
 _, _strings = recursive_merge_dict_members(BaseSVGChart.SETTINGS_DESCRIPTION, _strings, remove_unknown_keys=False)
+
 
 class AncestorChart(BaseSVGChart):
     """
@@ -75,14 +75,7 @@ class AncestorChart(BaseSVGChart):
                 return
 
             if color is None:
-                i = int(hashlib.sha1(individual.plain_name.encode(
-                    'utf8')).hexdigest(), 16) % (10 ** 8)
-                c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
-                f = 255/max(c)
-                c = [int(x*f) for x in c]
-                f = min(1, 500/sum(c))
-                c = [int(x*f) for x in c]
-                gr_individual.color = c
+                gr_individual.color = self._instances.color_generator(individual)
             else:
                 gr_individual.color = color
         else:
@@ -127,14 +120,7 @@ class AncestorChart(BaseSVGChart):
                 if gr_child is None:
                     return
 
-                i = int(hashlib.sha1(child.plain_name.encode(
-                    'utf8')).hexdigest(), 16) % (10 ** 8)
-                c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
-                f = 255/max(c)
-                c = [int(x*f) for x in c]
-                f = min(1, 500/sum(c))
-                c = [int(x*f) for x in c]
-                gr_child.color = c
+                gr_child.color = self._instances.color_generator(child)
 
                 family.graphical_representations[0].add_visible_children(child)
                 child.graphical_representations[0].visible_parent_family = family.graphical_representations[0]
@@ -330,6 +316,7 @@ class AncestorChart(BaseSVGChart):
         for original_direction_factor, individual in sorted(individuals):
             if individual is None:
                 continue
+            gr_individual = individual.graphical_representations[0]
             i = 0
             if family_was_flipped:
                 direction_factor = - original_direction_factor
@@ -340,18 +327,18 @@ class AncestorChart(BaseSVGChart):
             if self.compression_steps <= 0:
                 continue
 
-            if not individual.graphical_representations[0].visible_parent_family or not individual.graphical_representations[0].visible_parent_family.family_id in individual.graphical_representations[0].get_x_position():
+            if not gr_individual.visible_parent_family or not gr_individual.visible_parent_family.family_id in gr_individual.get_x_position():
                 continue
 
             try:
                 while i < 50000:
                     self._move_individual_and_ancestors(
-                        individual, individual.graphical_representations[0].visible_parent_family, direction_factor*1)
+                        individual, gr_individual.visible_parent_family, direction_factor*1)
                     self._check_compressed_x_position(True)
                     i += 1
             except LifeLineChartCollisionDetected as e:
                 self._move_individual_and_ancestors(
-                    individual, individual.graphical_representations[0].visible_parent_family, -direction_factor*1)
+                    individual, gr_individual.visible_parent_family, -direction_factor*1)
             except LifeLineChartCannotMoveIndividual as e:
                 pass
             except KeyError as e:
