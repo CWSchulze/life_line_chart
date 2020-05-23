@@ -12,7 +12,7 @@ from .Translation import get_strings, recursive_merge_dict_members
 logger = logging.getLogger("life_line_chart")
 
 _strings = get_strings('AncestorChart')
-_, _strings = recursive_merge_dict_members(BaseSVGChart.SETTINGS_DESCRIPTION, _strings)
+_, _strings = recursive_merge_dict_members(BaseSVGChart.SETTINGS_DESCRIPTION, _strings, remove_unknown_keys=False)
 
 class AncestorChart(BaseSVGChart):
     """
@@ -29,36 +29,29 @@ class AncestorChart(BaseSVGChart):
     of that, ancestor collapse is visualized.
     """
 
-    DEFAULT_POSITIONING = BaseSVGChart.DEFAULT_POSITIONING.update({
+    DEFAULT_POSITIONING = {
         'compression_steps': -1,  # debugging option
         'compress': False,
         'flip_to_optimize': False,
         'fathers_have_the_same_color': False,
-    })
+    }
+    DEFAULT_POSITIONING.update(BaseSVGChart.DEFAULT_POSITIONING)
+
+    DEFAULT_CHART_CONFIGURATION = {
+            'root_individuals': [],
+            'family_children': [],
+            'discovery_blacklist': []
+    }
+    DEFAULT_CHART_CONFIGURATION.update(BaseSVGChart.DEFAULT_CHART_CONFIGURATION)
+
     SETTINGS_DESCRIPTION = _strings
+
 
     def __init__(self, positioning=None, formatting=None, instance_container=None):
         BaseSVGChart.__init__(self, positioning, formatting, instance_container)
 
         # configuration of this chart
-        self._chart_configuration.update(self.get_default_chart_configuration())
-        # self._graphical_family_class = GraphicalFamily # TODO: necessary if other graphs are implemented
-        # self._graphical_individual_class = GraphicalIndividual # TODO: necessary if other graphs are implemented
-
-    @staticmethod
-    def get_default_chart_configuration():
-        """
-        get the default chart configuration
-
-        Returns:
-            dict: default chart configuration dict
-        """
-
-        return {
-            'root_individuals': [],
-            'family_children': [],
-            'discovery_blacklist': []
-        }
+        self._chart_configuration.update(AncestorChart.DEFAULT_CHART_CONFIGURATION)
 
     def select_individuals(self, individual, generations=None, color=None, filter=None):
         """

@@ -46,7 +46,7 @@ def translate_strings(data, source_language='en_EN.UTF-8', destination_language=
             data[k] = translate_strings(v, source_language, destination_language)
     return data
 
-def recursive_merge_dict_members(a, b, translate_function=None):
+def recursive_merge_dict_members(a, b, translate_function=None, remove_unknown_keys=True):
     """
     merge b into reference a, return merged dict
 
@@ -73,10 +73,14 @@ def recursive_merge_dict_members(a, b, translate_function=None):
         else:
             changed = changed or b_index != a_index
             if type(v) == dict:
-                sub_changed, sub_dict = recursive_merge_dict_members(v, b[k], translate_function)
+                sub_changed, sub_dict = recursive_merge_dict_members(v, b[k], translate_function, remove_unknown_keys)
                 changed =  sub_changed or changed
                 c[k] = sub_dict
             else:
+                c[k] = deepcopy(b[k])
+    if not remove_unknown_keys:
+        for k in b_key_list:
+            if k not in c:
                 c[k] = deepcopy(b[k])
     return changed, c
 

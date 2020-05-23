@@ -25,28 +25,18 @@ class DescendantChart(BaseSVGChart):
     of that, ancestor collapse is visualized.
     """
 
+    DEFAULT_CHART_CONFIGURATION = {
+            'root_individuals': [],
+            'discovery_blacklist': []
+    }
+    DEFAULT_CHART_CONFIGURATION.update(BaseSVGChart.DEFAULT_CHART_CONFIGURATION)
+
+
     def __init__(self, positioning=None, formatting=None, instance_container=None):
         BaseSVGChart.__init__(self, positioning, formatting, instance_container)
 
         # configuration of this chart
-        self._chart_configuration.update(self.get_default_chart_configuration())
-        # self._graphical_family_class = GraphicalFamily # TODO: necessary if other graphs are implemented
-        # self._graphical_individual_class = GraphicalIndividual # TODO: necessary if other graphs are implemented
-
-    @staticmethod
-    def get_default_chart_configuration():
-        """
-        get the default chart configuration
-
-        Returns:
-            dict: default chart configuration dict
-        """
-
-        return {
-            'root_individuals': [],
-            'family_children': [],
-            'discovery_blacklist': []
-        }
+        self._chart_configuration.update(DescendantChart.DEFAULT_CHART_CONFIGURATION)
 
     def select_descendants(self, individual, generations=None, color=None, filter=None):
         """
@@ -225,11 +215,6 @@ class DescendantChart(BaseSVGChart):
                 root_individual = self._instances[(
                     'i', root_individual_id)]
                 self.select_descendants(root_individual, generations, filter=local_filter_lambda)
-
-            for family_id in self._chart_configuration['family_children']:
-                family = self._instances[(
-                    'f', family_id)]
-                self.select_family_children(family, filter=local_filter_lambda)
 
             x_pos = 0
             for settings in self._chart_configuration['root_individuals']:
