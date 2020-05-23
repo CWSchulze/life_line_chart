@@ -1,19 +1,22 @@
-from .GraphicalFamily import GraphicalFamily
-from .GraphicalIndividual import GraphicalIndividual
-from .Exceptions import LifeLineChartCollisionDetected, LifeLineChartCannotMoveIndividual
-
 import os
 from copy import deepcopy
 import logging
 
+from .GraphicalFamily import GraphicalFamily
+from .GraphicalIndividual import GraphicalIndividual
+from .Exceptions import LifeLineChartCollisionDetected, LifeLineChartCannotMoveIndividual
+from .Translation import get_strings
+
 logger = logging.getLogger("life_line_chart")
+
+_strings = get_strings('BaseChart')
 
 
 class BaseChart():
     """
     Base class for life line charts.
     """
-    _default_formatting = {
+    DEFAULT_FORMATTING = {
         'margin_left': 50,
         'margin_right': 50,
         'margin_year_max': 5,
@@ -47,172 +50,12 @@ class BaseChart():
         'individual_photo_active': False,
         'individual_photo_relative_size': 2.5
     }
-    _default_positioning = {
-        'compression_steps': -1,  # debugging option
-        'compress': False,
-        'flip_to_optimize': False,
-        'fathers_have_the_same_color': False,
+    DEFAULT_POSITIONING = {
     }
-    _formatting_description = {
-        'warp_shape': {
-            'short_description': 'Warp the chart shape',
-            'long_description': 'The overall shape of the chart can be warped.',
-            'choices': {
-                'normal': 'Normal grid shape',
-                'sine': 'Sine shape',
-                'triangle': 'Triangular shape'
-            }
-        },
-        'individual_photo_active': {
-            'short_description': 'Show photos',
-            'long_description': 'Photos of the individual are shown.'
-        },
-        'individual_photo_relative_size': {
-            'short_description': 'Photo size',
-            'long_description': 'Photos which are shown are fitted into a square of this extent. The size is given relative to the line thickness.'
-        },
-        'total_height': {
-            'short_description': 'Total height',
-            'long_description': 'Total height of the whole chart.'
-        },
-        'relative_line_thickness': {
-            'short_description': 'Relative line thickness',
-            'long_description': 'The line thickness of an individual is given relatively to the vertical step size.'
-        },
-        'vertical_step_size': {
-            'short_description': 'Vertical step size',
-            'long_description': 'This is the distance from one line to another. This value is also used for scaling of other items.'
-        },
-        'birth_label_active': {
-            'short_description': 'Show birth label',
-            'long_description': 'Activate the birth label.'
-        },
-        'birth_label_along_path': {
-            'short_description': 'Birth label along path',
-            'long_description': 'The birth label is aligned to the individual line.',
-            'tab': 'Label Configuration'
-        },
-        'birth_label_rotation': {
-            'short_description': 'Birth label rotation',
-            'long_description': 'The birth label is written in a text frame rotated by this value.',
-            'tab': 'Label Configuration'
-        },
-        'birth_label_letter_x_offset': {
-            'short_description': 'Birth label x offset',
-            'long_description': 'The birth label is moved in x direction by this value, which is given relatively to the font size.',
-            'tab': 'Label Configuration'
-        },
-        'birth_label_letter_y_offset': {
-            'short_description': 'Birth label y offset',
-            'long_description': 'The birth label is moved in y direction by this value, which is given relatively to the font size.',
-            'tab': 'Label Configuration'
-        },
-        'birth_label_wrapping_active': {
-            'short_description': 'Wrap words in birth label',
-            'long_description': 'The birth label content is wrapped where possible.',
-            'tab': 'Label Configuration'
-        },
-        'birth_label_anchor': {
-            'short_description': 'Birth label anchor',
-            'long_description': 'Text alignment of the birth label.',
-            'choices': {
-                'start' : 'Left',
-                'middle' : 'Center',
-                'end' : 'Right'
-            },
-            'tab': 'Label Configuration'
-        },
-        'death_label_active': {
-            'short_description': 'Show death label',
-            'long_description': 'Activate the death label.'
-        },
-        'death_label_rotation': {
-            'short_description': 'Death label rotation',
-            'long_description': 'The death label is written in a text frame rotated by this value.',
-            'tab': 'Label Configuration'
-        },
-        'death_label_letter_x_offset': {
-            'short_description': 'Death label x offset',
-            'long_description': 'The death label is moved in x direction by this value, which is given relatively to the font size.',
-            'tab': 'Label Configuration'
-        },
-        'death_label_letter_y_offset': {
-            'short_description': 'Death label y offset',
-            'long_description': 'The death label is moved in y direction by this value, which is given relatively to the font size.',
-            'tab': 'Label Configuration'
-        },
-        'death_label_wrapping_active': {
-            'short_description': 'Wrap words in death label',
-            'long_description': 'The death label content is wrapped where possible.',
-            'tab': 'Label Configuration'
-        },
-        'death_label_anchor': {
-            'short_description': 'Death label anchor',
-            'long_description': 'Text alignment of the death label.',
-            'choices': {
-                'start' : 'Left',
-                'middle' : 'Center',
-                'end' : 'Right'
-            },
-            'tab': 'Label Configuration'
-        },
-        'marriage_label_active': {
-            'short_description': 'Show marriage label',
-            'long_description': 'Activate the marriage label.'
-        },
-        'fade_individual_color': {
-            'short_description': 'Fade individual color',
-            'long_description': 'The color of the individuals is faded to black with increasing age.'
-        },
-        'font_name': {
-            'short_description': 'Font name',
-            'long_description': 'Name of the font family used for labels.',
-            'tab': 'Label Configuration'
-        },
-        'font_size_description': {
-            'short_description': 'Relative font size',
-            'long_description': 'The font size is given relatively to the line thickness.',
-            'tab': 'Label Configuration'
-        },
-        'family_shape': {
-            'short_description': 'Family shape',
-            'long_description': 'The shape of the families can be varied.',
-            'choices': {
-                0 : 'Rectangular',
-                1 : 'Softer'
-            }
-        },
-        'margin_year_max': {
-            'short_description': 'Upper year minimum margin',
-            'long_description': 'The upper bound of the chart is extended by at least this number of years.'
-        },
-        'margin_year_min': {
-            'short_description': 'Lower year minimum margin',
-            'long_description': 'The lower bound of the chart is extended by at least this number of years.'
-        }
+    DEFAULT_CHART_CONFIGURATION = {
     }
-    _positioning_description = {
-        'compress': {
-            'short_description': 'Compress the chart vertically',
-            'long_description': 'By default every individual has a unique vertical slot. This can be inefficient with many generations. This algorithm lets several people share a vertical slot, if they do not overlap.'
-        },
-        'flip_to_optimize': {
-            'short_description': 'Flip families to reduce vertical connections',
-            'long_description': 'Switch the position of mother and father in a family, to reduce the overall vertical cross connections in larger graphs (pedigree collapse).'
-        },
-        'fathers_have_the_same_color': {
-            'short_description': 'Fathers have the same color',
-            'long_description': 'Starting from the root person, each father of an added individual has the same color as that individual.'
-        },
+    SETTINGS_DESCRIPTION = _strings
 
-    }
-    _chart_configuration_root_individual_description = {
-        'generations': {
-            'short_description': 'Maximum number of generations',
-            'long_description': 'When this number of generations has been reached, the algorithm doesn´\'t go any deeper'
-        },
-    }
-    _available_warp_shapes = list(_formatting_description['warp_shape']['choices'].keys())
     # TODO: extract base class for other chart types
     _graphical_family_class = GraphicalFamily
     # TODO: extract base class for other chart types
@@ -220,10 +63,10 @@ class BaseChart():
 
     def __init__(self, positioning=None, formatting=None, instance_container=None):
         self.position_to_person_map = {}
-        self._positioning = BaseChart.get_default_positioning()
+        self._positioning = deepcopy(self.DEFAULT_POSITIONING)
         if positioning:
             self._positioning.update(positioning)
-        self._formatting = BaseChart.get_default_formatting()
+        self._formatting = deepcopy(self.DEFAULT_FORMATTING)
         if formatting:
             self._formatting.update(formatting)
         self._instances = instance_container
@@ -241,62 +84,11 @@ class BaseChart():
         self.chart_max_ordinal = None
 
         # configuration of this chart
-        self._chart_configuration = {}
-        self._default_chart_configuration = {}
+        self._chart_configuration = deepcopy(self.DEFAULT_CHART_CONFIGURATION)
 
         self._backup_positioning = None
         self._backup_formatting = None
         self._backup_chart_configuration = None
-
-    @staticmethod
-    def get_default_formatting():
-        """
-        get the default formatting
-
-        Returns:
-            dict: formatting dict
-        """
-        return deepcopy(BaseChart._default_formatting)
-
-    @staticmethod
-    def get_formatting_description():
-        """
-        get the formatting description to build UI
-
-        Returns:
-            dict: description of the formatting
-        """
-        return deepcopy(BaseChart._formatting_description)
-
-    @staticmethod
-    def get_default_positioning():
-        """
-        get the deafult positioning
-
-        Returns:
-            dict: positioning dict
-        """
-        return deepcopy(BaseChart._default_positioning)
-
-    @staticmethod
-    def get_positioning_description():
-        """
-        get the positioning description to build UI
-
-        Returns:
-            dict: description of the positioning
-        """
-        return deepcopy(BaseChart._positioning_description)
-
-    @staticmethod
-    def get_chart_configuration_root_individual_description():
-        """
-        get the chart configuration root individual description to build UI
-
-        Returns:
-            dict: description of chart configuration root individual
-        """
-        return deepcopy(BaseChart._chart_configuration_root_individual_description)
 
     def instantiate_all(self):
         """

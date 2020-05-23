@@ -7,8 +7,12 @@ import svgwrite
 from copy import deepcopy
 from .BaseSVGChart import BaseSVGChart
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
+from .Translation import get_strings, recursive_merge_dict_members
 
 logger = logging.getLogger("life_line_chart")
+
+_strings = get_strings('AncestorChart')
+_, _strings = recursive_merge_dict_members(BaseSVGChart.SETTINGS_DESCRIPTION, _strings)
 
 class AncestorChart(BaseSVGChart):
     """
@@ -24,6 +28,14 @@ class AncestorChart(BaseSVGChart):
     individual is connected across the chart to the second spouse. Because
     of that, ancestor collapse is visualized.
     """
+
+    DEFAULT_POSITIONING = BaseSVGChart.DEFAULT_POSITIONING.update({
+        'compression_steps': -1,  # debugging option
+        'compress': False,
+        'flip_to_optimize': False,
+        'fathers_have_the_same_color': False,
+    })
+    SETTINGS_DESCRIPTION = _strings
 
     def __init__(self, positioning=None, formatting=None, instance_container=None):
         BaseSVGChart.__init__(self, positioning, formatting, instance_container)

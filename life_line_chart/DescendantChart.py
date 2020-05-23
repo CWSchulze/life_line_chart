@@ -49,9 +49,17 @@ class DescendantChart(BaseSVGChart):
         }
 
     def select_descendants(self, individual, generations=None, color=None, filter=None):
+        """
+        create graphical representations for all descendants.
 
+        Args:
+            individual (BaseIndividual): parent individual
+            generations (int, optional): number of generations to go deeper. Defaults to None.
+            color (tuple, optional): RGB value of the individuals. Defaults to None.
+            filter (lambda, optional): filter for individuals. Defaults to None.
+        """
         if filter and filter(individual):
-            return None
+            return
 
         if not individual.has_graphical_representation():
             gr_individual = self._create_individual_graphical_representation(
