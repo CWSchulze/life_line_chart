@@ -63,9 +63,8 @@ def recursive_merge_dict_members(a, b, translate_function=None, remove_unknown_k
     c = {}
     b_key_list = list(b.keys())
     for a_index, (k, v) in enumerate(a.items()):
-        try:
-            b_index = b_key_list.index(k)
-        except ValueError:
+        b_index = b_key_list.index(k) if k in b_key_list else None
+        if b_index is None:
             c[k] = deepcopy(v)
             if translate_function:
                 c[k] = translate_function(c[k])
