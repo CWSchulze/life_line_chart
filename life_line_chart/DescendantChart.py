@@ -195,6 +195,8 @@ class DescendantChart(BaseSVGChart):
             root_individual_id (str): root individual id used as root node for compression
         """
         self.check_unique_x_position(False)
+        _, _, _, self.position_to_person_map = self._check_compressed_x_position(
+                False)
 
     def update_chart(self, filter_lambda=None, color_lambda=None, images_lambda=None, rebuild_all=False, update_view=False):
         rebuild_all = rebuild_all or self._positioning != self._backup_positioning or \
