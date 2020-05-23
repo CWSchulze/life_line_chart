@@ -29,16 +29,6 @@ class GedcomIndividual(BaseIndividual):
         else:
             return ["", ""]
 
-    def _get_father_and_mother(self):
-        family_id = self._database_indi[self.individual_id]['FAMC']['tag_data']
-        husb = self._database_fam[family_id].get('HUSB')
-        wife = self._database_fam[family_id].get('WIFE')
-        if husb:
-            husb = husb['tag_data']
-        if wife:
-            wife = wife['tag_data']
-        return husb, wife
-
     def _get_marriage_family_ids(self):
         try:
             if 'FAMS' not in self._database_indi[self.individual_id]:

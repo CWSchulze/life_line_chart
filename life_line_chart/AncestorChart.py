@@ -88,7 +88,6 @@ class AncestorChart(BaseSVGChart):
             family.add_visible_children(individual)
             gr_individual.visible_parent_family = family
             if generations > 0 or generations < 0:
-                # parents = individual.get_father_and_mother()
                 father, mother = child_of_family.get_husband_and_wife()
                 if father:
                     self.select_individuals(

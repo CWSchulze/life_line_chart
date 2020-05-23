@@ -73,7 +73,6 @@ class DescendantChart(BaseSVGChart):
             if generations > 0 or generations < 0:
                 gr_marriage = self._create_family_graphical_representation(
                     marriage)
-                # parents = individual.get_father_and_mother()
 
                 spouse = marriage.get_spouse(individual.individual_id)
                 if spouse is not None and not spouse.has_graphical_representation():
@@ -141,7 +140,6 @@ class DescendantChart(BaseSVGChart):
                 gr_individual.set_x_position(
                     x_position, marriage)
                 x_position += 1
-            # parents = individual.get_father_and_mother()
 
 
             for child in marriage.children:

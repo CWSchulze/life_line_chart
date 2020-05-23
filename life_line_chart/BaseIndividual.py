@@ -145,7 +145,8 @@ class BaseIndividual():
     def plain_name(self):
         return self._instances.display_plain_name(self)
 
-    def _get_children(self):
+    @property
+    def children(self):
         """
         get the all children of this individual (all marriages)
 
@@ -156,9 +157,9 @@ class BaseIndividual():
         for m in self.marriages:
             children += m.children
         return children
-    children = property(_get_children)
 
-    def _get_birth_date(self):
+    @property
+    def birth_date(self):
         """
         get the birth (or christening or baptism) date
 
@@ -169,9 +170,9 @@ class BaseIndividual():
             return self.events['birth_or_christening']['date'].date().strftime('%d.%m.%Y')
         else:
             return None
-    birth_date = property(_get_birth_date)
 
-    def _get_birth_label(self):
+    @property
+    def birth_label(self):
         """
         get the birth label used for displaying
 
@@ -188,9 +189,9 @@ class BaseIndividual():
             else:
                 string += '*\xa0' + event['date'].date().strftime('%d.%m.%Y')
         return string
-    birth_label = property(_get_birth_label)
 
-    def _get_death_label(self):
+    @property
+    def death_label(self):
         """
         get death label used for displaying
 
@@ -207,9 +208,9 @@ class BaseIndividual():
             else:
                 string += '\u2020\xa0' + event['date'].date().strftime('%d.%m.%Y')
         return string
-    death_label = property(_get_death_label)
 
-    def _get_death_date(self):
+    @property
+    def death_date(self):
         """
         get the death (or burial) date
 
@@ -220,22 +221,22 @@ class BaseIndividual():
             return self.events['death_or_burial']['date'].date().strftime('%d.%m.%Y')
         else:
             return None
-    death_date = property(_get_death_date)
 
-    def _get_info_text(self):
+    @property
+    def info_text(self):
         content = [
             self.plain_name,
             self.birth_label,
             self.death_label,
             '',
         ]
-        for father, mother in self.get_father_and_mother():
-            if father:
-                content.append('Vater: {} ({})'.format(self.get_father_and_mother()[
-                               0][0].plain_name, self.get_father_and_mother()[0][0].birth_label))
-            if mother:
-                content.append('Mutter: {} ({})'.format(self.get_father_and_mother()[
-                               0][1].plain_name, self.get_father_and_mother()[0][1].birth_label))
+        for cof in self.get_child_of_family():
+            if cof.husb:
+                content.append('Vater: {} ({})'.format(self.cof.wife.plain_name,
+                    self.cof.wife.birth_label))
+            if cof.wife:
+                content.append('Mutter: {} ({})'.format(cof.wife.plain_name,
+                    self.cof.wife.birth_label))
 
         content.append('')
         for marriage in self.marriages:
@@ -247,27 +248,24 @@ class BaseIndividual():
                     index + 1, child.plain_name, child.birth_label))
 
         return '\n'.join(content)
-    info_text = property(_get_info_text)
 
-    def _get_short_info_text(self):
+    @property
+    def short_info_text(self):
         content = [
             " ".join([n.strip() for n in self.get_name() if n != '']).strip(),
             self.birth_label,
             self.death_label,
         ]
         return '\n'.join(content)
-    short_info_text = property(_get_short_info_text)
 
-    def _get_father_and_mother(self):
+    @property
+    def father_and_mother(self):
         if True:
             raise NotImplementedError()
         return ()
 
     def has_marriages(self):
         return len(self._marriage_family_ids) > 0
-
-    def get_father_and_mother(self):
-        return [self._instances[('f', family_id)].get_husband_and_wife() for family_id in self.child_of_family_id]
 
     def get_child_of_family(self):
         return [self._instances[('f', family_id)] for family_id in self.child_of_family_id]
