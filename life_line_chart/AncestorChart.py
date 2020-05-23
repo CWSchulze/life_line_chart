@@ -518,6 +518,15 @@ class AncestorChart(BaseSVGChart):
             for gir in self.graphical_individual_representations:
                 gir.color_backup = gir.color
 
+            for gir in self.graphical_individual_representations:
+                gir.color = gir.color_backup
+                if color_lambda:
+                    color = color_lambda(gir.individual_id)
+                    if color:
+                        gir.color = color
+                if images_lambda:
+                    gir.individual.images = images_lambda(gir.individual.individual_id)
+
             self.define_svg_items()
 
         elif update_view:
