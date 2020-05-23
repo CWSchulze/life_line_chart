@@ -92,7 +92,7 @@ def get_strings(class_name, default_language='en_US.UTF-8'):
         class_name (str): name of the class (used as filename)
     """
     strings = {}
-    with open(os.path.join(os.path.dirname(__file__), class_name + 'Strings.json'),'r') as f:
+    with open(os.path.join(os.path.dirname(__file__), class_name + 'Strings.json'),'r',encoding='utf-8') as f:
         strings = json.load(f)
 
 
@@ -109,7 +109,7 @@ def get_strings(class_name, default_language='en_US.UTF-8'):
         # auto update string file!
         logger.warn('Updating string file.')
         file_content = json.dumps(strings, indent=4)
-        with open(os.path.join(os.path.dirname(__file__), class_name + 'Strings.json'),'w') as f:
+        with open(os.path.join(os.path.dirname(__file__), class_name + 'Strings.json'),'w',encoding='utf-8') as f:
             f.write(file_content)
 
     return strings

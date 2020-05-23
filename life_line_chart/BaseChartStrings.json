@@ -162,12 +162,12 @@
                 "long_description": "Fotos von Personen auf den Linien anzeigen."
             },
             "individual_photo_relative_size": {
-                "short_description": "Gr\u00c3\u00b6\u00c3\u0178e der Fotos",
-                "long_description": "Die Bilder werden in eine Quadrat dieser Kantenl\u00c3\u00a4nge eingepasst. Die L\u00c3\u00a4nge wird relativ zur Linienbreite angegeben."
+                "short_description": "Gr\u00f6\u00dfe der Fotos",
+                "long_description": "Die Bilder werden in eine Quadrat dieser Kantenl\u00e4nge eingepasst. Die L\u00e4nge wird relativ zur Linienbreite angegeben."
             },
             "total_height": {
-                "short_description": "Gesamth\u00c3\u00b6he",
-                "long_description": "H\u00c3\u00b6he des gesamten Diagramms."
+                "short_description": "Gesamth\u00f6he",
+                "long_description": "H\u00f6he des gesamten Diagramms."
             },
             "relative_line_thickness": {
                 "short_description": "Relative Linienbreite",
@@ -175,7 +175,7 @@
             },
             "vertical_step_size": {
                 "short_description": "Vertikale Schrittweite",
-                "long_description": "Dies ist der Abstand zwischen zwei Lebenslinien. Dieser Wert wird h\u00c3\u00a4ufig zur Skalierung anderer Objekte verwendet."
+                "long_description": "Dies ist der Abstand zwischen zwei Lebenslinien. Dieser Wert wird h\u00e4ufig zur Skalierung anderer Objekte verwendet."
             },
             "birth_label_active": {
                 "short_description": "Geburts-Textfeld anzeigen",
@@ -184,27 +184,27 @@
             "birth_label_along_path": {
                 "short_description": "Geburts-Textfeld auf der Linie",
                 "long_description": "Das Geburts-Textfeld kann entlang der Linie dargestellt werden.",
-                "tab": "Infotexte"
+                "tab": "Label Configuration"
             },
             "birth_label_rotation": {
                 "short_description": "Geburts-Textfeld drehen",
                 "long_description": "Das Geburts-Textfeld wird um diesen Wikel gegen den Uhrzeigersinn gedreht.",
-                "tab": "Infotexte"
+                "tab": "Label Configuration"
             },
             "birth_label_letter_x_offset": {
                 "short_description": "Horizontale Verschiebung des Geburts-Textfeldes",
-                "long_description": "Das Geburts-Textfeld wird um diesen Wert horizontal verschoben. Die die Verschiebung wird relativ zur Schriftgr\u00c3\u00b6\u00c3\u0178e angegeben.",
-                "tab": "Infotexte"
+                "long_description": "Das Geburts-Textfeld wird um diesen Wert horizontal verschoben. Die die Verschiebung wird relativ zur Schriftgr\u00f6\u00dfe angegeben.",
+                "tab": "Label Configuration"
             },
             "birth_label_letter_y_offset": {
                 "short_description": "Vertikale Verschiebung des Geburts-Textfeldes",
-                "long_description": "Das Geburts-Textfeld wird um diesen Wert vertikal verschoben. Die die Verschiebung wird relativ zur Schriftgr\u00c3\u00b6\u00c3\u0178e angegeben.",
-                "tab": "Infotexte"
+                "long_description": "Das Geburts-Textfeld wird um diesen Wert vertikal verschoben. Die die Verschiebung wird relativ zur Schriftgr\u00f6\u00dfe angegeben.",
+                "tab": "Label Configuration"
             },
             "birth_label_wrapping_active": {
                 "short_description": "Zeilenumbruch im Geburts-Textfeld",
-                "long_description": "Wo es m\u00c3\u00b6glich ist, wird der Text im Geburts-Textfeld umgebrochen.",
-                "tab": "Infotexte"
+                "long_description": "Wo es m\u00f6glich ist, wird der Text im Geburts-Textfeld umgebrochen.",
+                "tab": "Label Configuration"
             },
             "birth_label_anchor": {
                 "short_description": "Textausrichtung des Geburts-Textfeld",
@@ -214,7 +214,7 @@
                     "middle": "Zentriert",
                     "end": "Rechts"
                 },
-                "tab": "Infotexte"
+                "tab": "Label Configuration"
             },
             "death_label_active": {
                 "short_description": "Sterbe-Textfeld anzeigen",
@@ -223,22 +223,22 @@
             "death_label_rotation": {
                 "short_description": "Sterbe-Textfeld drehen",
                 "long_description": "Das Sterbe-Textfeld wird um diesen Wikel gegen den Uhrzeigersinn gedreht.",
-                "tab": "Infotexte"
+                "tab": "Label Configuration"
             },
             "death_label_letter_x_offset": {
                 "short_description": "Horizontale Verschiebung des Sterbe-Textfeldes",
-                "long_description": "Das Sterbe-Textfeld wird um diesen Wert horizontal verschoben. Die die Verschiebung wird relativ zur Schriftgr\u00c3\u00b6\u00c3\u0178e angegeben.",
-                "tab": "Infotexte"
+                "long_description": "Das Sterbe-Textfeld wird um diesen Wert horizontal verschoben. Die die Verschiebung wird relativ zur Schriftgr\u00f6\u00dfe angegeben.",
+                "tab": "Label Configuration"
             },
             "death_label_letter_y_offset": {
                 "short_description": "Vertikale Verschiebung des Sterbe-Textfeldes",
-                "long_description": "Das Sterbe-Textfeld wird um diesen Wert vertikal verschoben. Die die Verschiebung wird relativ zur Schriftgr\u00c3\u00b6\u00c3\u0178e angegeben.",
-                "tab": "Infotexte"
+                "long_description": "Das Sterbe-Textfeld wird um diesen Wert vertikal verschoben. Die die Verschiebung wird relativ zur Schriftgr\u00f6\u00dfe angegeben.",
+                "tab": "Label Configuration"
             },
             "death_label_wrapping_active": {
                 "short_description": "Zeilenumbruch im Sterbe-Textfeld",
-                "long_description": "Wo es m\u00c3\u00b6glich ist, wird der Text im Sterbe-Textfeld umgebrochen.",
-                "tab": "Infotexte"
+                "long_description": "Wo es m\u00f6glich ist, wird der Text im Sterbe-Textfeld umgebrochen.",
+                "tab": "Label Configuration"
             },
             "death_label_anchor": {
                 "short_description": "Textausrichtung des Sterbe-Textfeld",
@@ -248,7 +248,7 @@
                     "middle": "Zentriert",
                     "end": "Rechts"
                 },
-                "tab": "Infotexte"
+                "tab": "Label Configuration"
             },
             "marriage_label_active": {
                 "short_description": "Ehe-Textfeld anzeigen",
@@ -261,12 +261,12 @@
             "font_name": {
                 "short_description": "Schriftart",
                 "long_description": "Der Name der Schriftfamilie, die f\u00fcr Textfelder verwendet wird.",
-                "tab": "Label-Konfiguration"
+                "tab": "Label Configuration"
             },
             "font_size_description": {
                 "short_description": "Relative Schriftgr\u00f6\u00dfe",
                 "long_description": "Die Schriftgr\u00f6\u00dfe ist relativ zu der Breite der Lebenslinien angegeben.",
-                "tab": "Label-Konfiguration"
+                "tab": "Label Configuration"
             },
             "family_shape": {
                 "short_description": "Familienform",
@@ -278,11 +278,11 @@
             },
             "margin_year_max": {
                 "short_description": "Mindestabstand des oberen Randes",
-                "long_description": "Die obere Grenze des Diagramms wird mindestens um diese Anzahl an Jahre vergr\u00c3\u00b6\u00c3\u0178ert."
+                "long_description": "Die obere Grenze des Diagramms wird mindestens um diese Anzahl an Jahre vergr\u00f6\u00dfert."
             },
             "margin_year_min": {
                 "short_description": "Mindestabstand des unteren Randes",
-                "long_description": "Die untere Grenze des Diagramms wird mindestens um diese Anzahl an Jahre vergr\u00c3\u00b6\u00c3\u0178ert."
+                "long_description": "Die untere Grenze des Diagramms wird mindestens um diese Anzahl an Jahre vergr\u00f6\u00dfert."
             }
         },
         "positioning": {},
