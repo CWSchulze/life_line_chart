@@ -1,3 +1,15 @@
+"""
+Translation
+===========
+
+This is a collection of methods to translate or simply update strings stored in a dict.
+
+To add a new language just add a top-level dict in the json files and import one of the Charts.
+The new language will be filled with all available strings, so the structure is aligned with the
+default language.
+
+If googletrans is available, the strings will also be translated.
+"""
 
 import os
 from copy import deepcopy
@@ -7,6 +19,18 @@ import json
 logger = logging.getLogger("life_line_chart")
 
 def translate_strings(data, source_language='en_EN.UTF-8', destination_language='de_DE.UTF-8', translator=None):
+    """
+    automatic translation of strings in a dict
+
+    Args:
+        data (dict or str): data to translate
+        source_language (str, optional): source language. Defaults to 'en_EN.UTF-8'.
+        destination_language (str, optional): destination language. Defaults to 'de_DE.UTF-8'.
+        translator (googletrans.Translator, optional): for caching of the instance. Defaults to None.
+
+    Returns:
+        dict or str: translated object
+    """
     if not translator:
         try:
             import googletrans
@@ -25,6 +49,15 @@ def translate_strings(data, source_language='en_EN.UTF-8', destination_language=
 def recursive_merge_dict_members(a, b, translate_function=None):
     """
     merge b into reference a, return merged dict
+
+    Args:
+        a (dict): dict a is target
+        b (dict): dict b is source
+        translate_function (lambda, optional): function that translates strings. If none is
+                                               provided, nothing will be translated. Defaults to None.
+
+    Returns:
+        dict: merged dict
     """
     changed = False
     c = {}

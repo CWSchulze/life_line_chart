@@ -220,11 +220,6 @@
                 "short_description": "Sterbe-Textfeld anzeigen",
                 "long_description": "Dieses Flag aktiviert die Darstellung eines kurzen Infotextes zum Tod."
             },
-            "death_label_along_path": {
-                "short_description": "Sterbe-Textfeld auf der Linie",
-                "long_description": "Das Sterbe-Textfeld kann entlang der Linie dargestellt werden.",
-                "tab": "Infotexte"
-            },
             "death_label_rotation": {
                 "short_description": "Sterbe-Textfeld drehen",
                 "long_description": "Das Sterbe-Textfeld wird um diesen Wikel gegen den Uhrzeigersinn gedreht.",
@@ -283,17 +278,18 @@
             },
             "margin_year_max": {
                 "short_description": "Mindestabstand des oberen Randes",
-                "long_description": "Die obere Grenze des Diagramms wird mindestens um diese Anzahl an Jahre vergrößert."
+                "long_description": "Die obere Grenze des Diagramms wird mindestens um diese Anzahl an Jahre vergr\u00c3\u00b6\u00c3\u0178ert."
             },
             "margin_year_min": {
                 "short_description": "Mindestabstand des unteren Randes",
-                "long_description": "Die untere Grenze des Diagramms wird mindestens um diese Anzahl an Jahre vergrößert."
+                "long_description": "Die untere Grenze des Diagramms wird mindestens um diese Anzahl an Jahre vergr\u00c3\u00b6\u00c3\u0178ert."
             }
         },
         "positioning": {},
         "chart_configuration_root_individual": {
             "generations": {
-                "short_description": "Maximale Anzahl an Generationen"
+                "short_description": "Maximale Anzahl an Generationen",
+                "long_description": "Wenn diese Anzahl von Generationen erreicht worden ist, wird der Algorithmus nicht tiefer gehen."
             }
         }
     }
