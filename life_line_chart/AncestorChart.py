@@ -75,7 +75,7 @@ class AncestorChart(BaseSVGChart):
                 return
 
             if color is None:
-                i = int(hashlib.sha1(" ".join(gr_individual.name).encode(
+                i = int(hashlib.sha1(individual.plain_name.encode(
                     'utf8')).hexdigest(), 16) % (10 ** 8)
                 c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
                 f = 255/max(c)
@@ -121,20 +121,20 @@ class AncestorChart(BaseSVGChart):
                 continue
 
             if not child.has_graphical_representation():
-                gr_individual = self._create_individual_graphical_representation(
+                gr_child = self._create_individual_graphical_representation(
                     child)
 
-                if gr_individual is None:
+                if gr_child is None:
                     return
 
-                i = int(hashlib.sha1(" ".join(gr_individual.name).encode(
+                i = int(hashlib.sha1(child.plain_name.encode(
                     'utf8')).hexdigest(), 16) % (10 ** 8)
                 c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
                 f = 255/max(c)
                 c = [int(x*f) for x in c]
                 f = min(1, 500/sum(c))
                 c = [int(x*f) for x in c]
-                gr_individual.color = c
+                gr_child.color = c
 
                 family.graphical_representations[0].add_visible_children(child)
                 child.graphical_representations[0].visible_parent_family = family.graphical_representations[0]

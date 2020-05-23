@@ -143,7 +143,7 @@ class BaseIndividual():
     name = property(_get_name)
 
     def _get_plain_name(self):
-        return ' '.join([n.strip() for n in self.name if n.strip() != ''])
+        return ' '.join([n.strip() for n in self._get_name() if n.strip() != ''])
     plain_name = property(_get_plain_name)
 
     def _get_children(self):
@@ -225,7 +225,7 @@ class BaseIndividual():
 
     def _get_info_text(self):
         content = [
-            " ".join([n.strip() for n in self.name if n != '']).strip(),
+            self.plain_name,
             self.birth_label,
             self.death_label,
             '',
@@ -252,7 +252,7 @@ class BaseIndividual():
 
     def _get_short_info_text(self):
         content = [
-            " ".join([n.strip() for n in self.name if n != '']).strip(),
+            " ".join([n.strip() for n in self._get_name() if n != '']).strip(),
             self.birth_label,
             self.death_label,
         ]

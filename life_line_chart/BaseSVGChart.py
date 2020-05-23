@@ -93,8 +93,8 @@ class BaseSVGChart(BaseChart):
                     failed.append(x_index)
                     # value = index_map[x_index]
                     logger.error(
-                        "failed: " + str((x_index, value[2].family_id, gr_individual.name, v[x_index])))
-                    # raise RuntimeError((x_index, key, gr_individual.name))
+                        "failed: " + str((x_index, value[2].family_id, gr_individual.individual.plain_name, v[x_index])))
+                    # raise RuntimeError((x_index, key, gr_individual.individual.plain_name))
         full_index_list = list(sorted(v.keys()))
         for i in range(max(full_index_list)):
             if i not in full_index_list:
