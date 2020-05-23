@@ -50,7 +50,11 @@ setup(
     ],
     platforms="OS Independent",
     # package_data={'life_line_chart': ['ringe.png']},
-    data_files=[('life_line_chart',['life_line_chart/ringe.png'])],
+    data_files=[('life_line_chart', [
+        'life_line_chart/ringe.png',
+        'life_line_chart/AncestorChartStrings.json',
+        'life_line_chart/BaseChartStrings.json'
+        ])],
     include_package_data=True,
     packages=['life_line_chart'],
     extras_require= {
