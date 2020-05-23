@@ -6,24 +6,45 @@ import json
 
 logger = logging.getLogger("life_line_chart")
 
+def translate_strings(data, source_language='en_EN.UTF-8', destination_language='de_DE.UTF-8', translator=None):
+    if not translator:
+        try:
+            import googletrans
+            translator = googletrans.Translator()
+        except ImportError:
+            logger.warning('Failed to load googletans module during automatic string translation')
+            return data
 
-def recursive_merge_dict_members(a, b, c=None):
+    if type(data) == str:
+        return translator.translate(data, src=source_language, dest=destination_language).text
+    elif type(data) == dict:
+        for k, v in data.items():
+            data[k] = translate_strings(v, source_language, destination_language)
+    return data
+
+def recursive_merge_dict_members(a, b, translate_function=None):
     """
     merge b into reference a, return merged dict
     """
     changed = False
-    if c == None:
-        c = {}
-    for k, v in a.items():
-        if k in b:
+    c = {}
+    b_key_list = list(b.keys())
+    for a_index, (k, v) in enumerate(a.items()):
+        try:
+            b_index = b_key_list.index(k)
+        except ValueError:
+            c[k] = deepcopy(v)
+            if translate_function:
+                c[k] = translate_function(c[k])
+            changed = True
+        else:
+            changed = changed or b_index != a_index
             if type(v) == dict:
-                changed, sub_dict = recursive_merge_dict_members(v, b[k]) or changed
+                sub_changed, sub_dict = recursive_merge_dict_members(v, b[k], translate_function)
+                changed =  sub_changed or changed
                 c[k] = sub_dict
             else:
                 c[k] = deepcopy(b[k])
-        else:
-            c[k] = deepcopy(v)
-            changed = True
     return changed, c
 
 def get_strings(class_name, default_language='en_US.UTF-8'):
@@ -41,7 +62,11 @@ def get_strings(class_name, default_language='en_US.UTF-8'):
     changed = {}
     for lang, data in strings.items():
         if lang != default_language:
-            changed[lang], strings[default_language] = recursive_merge_dict_members(strings[default_language], data)
+            changed[lang], strings[lang] = recursive_merge_dict_members(
+                strings[default_language],
+                data,
+                lambda data, source=default_language, destination=lang:
+                    translate_strings(data, source, destination))
 
     if any(changed.values()):
         # auto update string file!

@@ -45,13 +45,13 @@
                 "tab": "Label Configuration"
             },
             "birth_label_letter_x_offset": {
-                "short_description": "Birth label x offset",
-                "long_description": "The birth label is moved in x direction by this value, which is given relatively to the font size.",
+                "short_description": "Horizontal offset of birth label",
+                "long_description": "The birth label is moved horizontally by this value, which is given relatively to the font size.",
                 "tab": "Label Configuration"
             },
             "birth_label_letter_y_offset": {
-                "short_description": "Birth label y offset",
-                "long_description": "The birth label is moved in y direction by this value, which is given relatively to the font size.",
+                "short_description": "Vertical offset of birth label",
+                "long_description": "The birth label is moved vertically by this value, which is given relatively to the font size.",
                 "tab": "Label Configuration"
             },
             "birth_label_wrapping_active": {
@@ -79,13 +79,13 @@
                 "tab": "Label Configuration"
             },
             "death_label_letter_x_offset": {
-                "short_description": "Death label x offset",
-                "long_description": "The death label is moved in x direction by this value, which is given relatively to the font size.",
+                "short_description": "Horizontal offset of death label",
+                "long_description": "The death label is moved horizontally by this value, which is given relatively to the font size.",
                 "tab": "Label Configuration"
             },
             "death_label_letter_y_offset": {
-                "short_description": "Death label y offset",
-                "long_description": "The death label is moved in y direction by this value, which is given relatively to the font size.",
+                "short_description": "Vertical offset of death label",
+                "long_description": "The death label is moved vertically by this value, which is given relatively to the font size.",
                 "tab": "Label Configuration"
             },
             "death_label_wrapping_active": {
@@ -149,146 +149,151 @@
     "de_DE.UTF-8": {
         "formatting": {
             "warp_shape": {
-                "long_description": "The overall shape of the chart can be warped.",
+                "short_description": "Diagramm verzerren",
+                "long_description": "Die gesamte Form des Diagramms kann verzerrt werden.",
                 "choices": {
-                    "normal": "Normal grid shape",
-                    "sine": "Sine shape",
-                    "triangle": "Triangular shape"
+                    "normal": "Gitterstruktur",
+                    "sine": "Sinusform",
+                    "triangle": "Dreiecksform"
                 }
             },
             "individual_photo_active": {
-                "short_description": "Show photos",
-                "long_description": "Photos of the individual are shown."
+                "short_description": "Fotos anzeigen",
+                "long_description": "Fotos von Personen auf den Linien anzeigen."
             },
             "individual_photo_relative_size": {
-                "short_description": "Photo size",
-                "long_description": "Photos which are shown are fitted into a square of this extent. The size is given relative to the line thickness."
+                "short_description": "Gr\u00c3\u00b6\u00c3\u0178e der Fotos",
+                "long_description": "Die Bilder werden in eine Quadrat dieser Kantenl\u00c3\u00a4nge eingepasst. Die L\u00c3\u00a4nge wird relativ zur Linienbreite angegeben."
             },
             "total_height": {
-                "short_description": "Total height",
-                "long_description": "Total height of the whole chart."
+                "short_description": "Gesamth\u00c3\u00b6he",
+                "long_description": "H\u00c3\u00b6he des gesamten Diagramms."
             },
             "relative_line_thickness": {
-                "short_description": "Relative line thickness",
-                "long_description": "The line thickness of an individual is given relatively to the vertical step size."
+                "short_description": "Relative Linienbreite",
+                "long_description": "Die Breite eine Lebenslinie wird relativ zur vertikalen Schrittweite angegeben."
             },
             "vertical_step_size": {
-                "short_description": "Vertical step size",
-                "long_description": "This is the distance from one line to another. This value is also used for scaling of other items."
+                "short_description": "Vertikale Schrittweite",
+                "long_description": "Dies ist der Abstand zwischen zwei Lebenslinien. Dieser Wert wird h\u00c3\u00a4ufig zur Skalierung anderer Objekte verwendet."
             },
             "birth_label_active": {
-                "short_description": "Show birth label",
-                "long_description": "Activate the birth label."
+                "short_description": "Geburts-Textfeld anzeigen",
+                "long_description": "Dieses Flag aktiviert die Darstellung eines kurzen Infotextes zur Geburt."
             },
             "birth_label_along_path": {
-                "short_description": "Birth label along path",
-                "long_description": "The birth label is aligned to the individual line.",
-                "tab": "Label Configuration"
+                "short_description": "Geburts-Textfeld auf der Linie",
+                "long_description": "Das Geburts-Textfeld kann entlang der Linie dargestellt werden.",
+                "tab": "Infotexte"
             },
             "birth_label_rotation": {
-                "short_description": "Birth label rotation",
-                "long_description": "The birth label is written in a text frame rotated by this value.",
-                "tab": "Label Configuration"
+                "short_description": "Geburts-Textfeld drehen",
+                "long_description": "Das Geburts-Textfeld wird um diesen Wikel gegen den Uhrzeigersinn gedreht.",
+                "tab": "Infotexte"
             },
             "birth_label_letter_x_offset": {
-                "short_description": "Birth label x offset",
-                "long_description": "The birth label is moved in x direction by this value, which is given relatively to the font size.",
-                "tab": "Label Configuration"
+                "short_description": "Horizontale Verschiebung des Geburts-Textfeldes",
+                "long_description": "Das Geburts-Textfeld wird um diesen Wert horizontal verschoben. Die die Verschiebung wird relativ zur Schriftgr\u00c3\u00b6\u00c3\u0178e angegeben.",
+                "tab": "Infotexte"
             },
             "birth_label_letter_y_offset": {
-                "short_description": "Birth label y offset",
-                "long_description": "The birth label is moved in y direction by this value, which is given relatively to the font size.",
-                "tab": "Label Configuration"
+                "short_description": "Vertikale Verschiebung des Geburts-Textfeldes",
+                "long_description": "Das Geburts-Textfeld wird um diesen Wert vertikal verschoben. Die die Verschiebung wird relativ zur Schriftgr\u00c3\u00b6\u00c3\u0178e angegeben.",
+                "tab": "Infotexte"
             },
             "birth_label_wrapping_active": {
-                "short_description": "Wrap words in birth label",
-                "long_description": "The birth label content is wrapped where possible.",
-                "tab": "Label Configuration"
+                "short_description": "Zeilenumbruch im Geburts-Textfeld",
+                "long_description": "Wo es m\u00c3\u00b6glich ist, wird der Text im Geburts-Textfeld umgebrochen.",
+                "tab": "Infotexte"
             },
             "birth_label_anchor": {
-                "short_description": "Birth label anchor",
-                "long_description": "Text alignment of the birth label.",
+                "short_description": "Textausrichtung des Geburts-Textfeld",
+                "long_description": "Der Text im Geburts-Textfeld kann unterschiedliche ausgerichtet werden.",
                 "choices": {
-                    "start": "Left",
-                    "middle": "Center",
-                    "end": "Right"
+                    "start": "Links",
+                    "middle": "Zentriert",
+                    "end": "Rechts"
                 },
-                "tab": "Label Configuration"
+                "tab": "Infotexte"
             },
             "death_label_active": {
-                "short_description": "Show death label",
-                "long_description": "Activate the death label."
+                "short_description": "Sterbe-Textfeld anzeigen",
+                "long_description": "Dieses Flag aktiviert die Darstellung eines kurzen Infotextes zum Tod."
+            },
+            "death_label_along_path": {
+                "short_description": "Sterbe-Textfeld auf der Linie",
+                "long_description": "Das Sterbe-Textfeld kann entlang der Linie dargestellt werden.",
+                "tab": "Infotexte"
             },
             "death_label_rotation": {
-                "short_description": "Death label rotation",
-                "long_description": "The death label is written in a text frame rotated by this value.",
-                "tab": "Label Configuration"
+                "short_description": "Sterbe-Textfeld drehen",
+                "long_description": "Das Sterbe-Textfeld wird um diesen Wikel gegen den Uhrzeigersinn gedreht.",
+                "tab": "Infotexte"
             },
             "death_label_letter_x_offset": {
-                "short_description": "Death label x offset",
-                "long_description": "The death label is moved in x direction by this value, which is given relatively to the font size.",
-                "tab": "Label Configuration"
+                "short_description": "Horizontale Verschiebung des Sterbe-Textfeldes",
+                "long_description": "Das Sterbe-Textfeld wird um diesen Wert horizontal verschoben. Die die Verschiebung wird relativ zur Schriftgr\u00c3\u00b6\u00c3\u0178e angegeben.",
+                "tab": "Infotexte"
             },
             "death_label_letter_y_offset": {
-                "short_description": "Death label y offset",
-                "long_description": "The death label is moved in y direction by this value, which is given relatively to the font size.",
-                "tab": "Label Configuration"
+                "short_description": "Vertikale Verschiebung des Sterbe-Textfeldes",
+                "long_description": "Das Sterbe-Textfeld wird um diesen Wert vertikal verschoben. Die die Verschiebung wird relativ zur Schriftgr\u00c3\u00b6\u00c3\u0178e angegeben.",
+                "tab": "Infotexte"
             },
             "death_label_wrapping_active": {
-                "short_description": "Wrap words in death label",
-                "long_description": "The death label content is wrapped where possible.",
-                "tab": "Label Configuration"
+                "short_description": "Zeilenumbruch im Sterbe-Textfeld",
+                "long_description": "Wo es m\u00c3\u00b6glich ist, wird der Text im Sterbe-Textfeld umgebrochen.",
+                "tab": "Infotexte"
             },
             "death_label_anchor": {
-                "short_description": "Death label anchor",
-                "long_description": "Text alignment of the death label.",
+                "short_description": "Textausrichtung des Sterbe-Textfeld",
+                "long_description": "Der Text im Sterbe-Textfeld kann unterschiedliche ausgerichtet werden.",
                 "choices": {
-                    "start": "Left",
-                    "middle": "Center",
-                    "end": "Right"
+                    "start": "Links",
+                    "middle": "Zentriert",
+                    "end": "Rechts"
                 },
-                "tab": "Label Configuration"
+                "tab": "Infotexte"
             },
             "marriage_label_active": {
-                "short_description": "Show marriage label",
-                "long_description": "Activate the marriage label."
+                "short_description": "Ehe-Textfeld anzeigen",
+                "long_description": "Dieses Flag aktiviert die Darstellung eines kurzen Infotextes zur Ehe."
             },
             "fade_individual_color": {
-                "short_description": "Fade individual color",
-                "long_description": "The color of the individuals is faded to black with increasing age."
+                "short_description": "Farbgradient der Lebenslinie",
+                "long_description": "Die Farbe der Lebenslinien verblasst mit zunehmendem Alter."
             },
             "font_name": {
-                "short_description": "Font name",
-                "long_description": "Name of the font family used for labels.",
-                "tab": "Label Configuration"
+                "short_description": "Schriftart",
+                "long_description": "Der Name der Schriftfamilie, die f\u00fcr Textfelder verwendet wird.",
+                "tab": "Label-Konfiguration"
             },
             "font_size_description": {
-                "short_description": "Relative font size",
-                "long_description": "The font size is given relatively to the line thickness.",
-                "tab": "Label Configuration"
+                "short_description": "Relative Schriftgr\u00f6\u00dfe",
+                "long_description": "Die Schriftgr\u00f6\u00dfe ist relativ zu der Breite der Lebenslinien angegeben.",
+                "tab": "Label-Konfiguration"
             },
             "family_shape": {
-                "short_description": "Family shape",
-                "long_description": "The shape of the families can be varied.",
+                "short_description": "Familienform",
+                "long_description": "Die Form der Familien kann variiert werden.",
                 "choices": {
-                    "0": "Rectangular",
-                    "1": "Softer"
+                    "0": "Rechteckig",
+                    "1": "weichere"
                 }
             },
             "margin_year_max": {
-                "short_description": "Upper year minimum margin",
-                "long_description": "The upper bound of the chart is extended by at least this number of years."
+                "short_description": "Mindestabstand des oberen Randes",
+                "long_description": "Die obere Grenze des Diagramms wird mindestens um diese Anzahl an Jahre vergrößert."
             },
             "margin_year_min": {
-                "short_description": "Lower year minimum margin",
-                "long_description": "The lower bound of the chart is extended by at least this number of years."
+                "short_description": "Mindestabstand des unteren Randes",
+                "long_description": "Die untere Grenze des Diagramms wird mindestens um diese Anzahl an Jahre vergrößert."
             }
         },
         "positioning": {},
         "chart_configuration_root_individual": {
             "generations": {
-                "short_description": "Maximum number of generations",
-                "long_description": "When this number of generations has been reached, the algorithm doesn't go any deeper"
+                "short_description": "Maximale Anzahl an Generationen"
             }
         }
     }
