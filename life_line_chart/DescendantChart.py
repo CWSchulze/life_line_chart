@@ -111,7 +111,6 @@ class DescendantChart(BaseSVGChart):
             return
         x_position = x_offset
         gr_individual = individual.graphical_representations[0]
-        gr_individual.x_start = x_position
         self.min_x_index = min(self.min_x_index, x_position)
 
         visible_marriages = \

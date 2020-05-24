@@ -140,7 +140,6 @@ class AncestorChart(BaseSVGChart):
         logger.info(f"discovering {individual.plain_name}")
         x_position = x_offset
         gr_individual = individual.graphical_representations[0]
-        gr_individual.x_start = x_position
         self.min_x_index = min(self.min_x_index, x_position)
         child_of_families = individual.child_of_families
 
