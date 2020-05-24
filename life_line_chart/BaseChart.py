@@ -73,6 +73,9 @@ class BaseChart():
         self._instances[('i', None)] = None
         self.graphical_individual_representations = []
         self.graphical_family_representations = []
+        # strong graphical connections which must not be broken by optimization algorithms
+        self.graphical_strong_connections = {}
+        self.graphical_strong_connection_options = {}
         self.additional_graphical_items = {}
         logger.debug('finished creating instances')
 
@@ -258,8 +261,14 @@ class BaseChart():
                 if list(sorted(x_pos.values()))[0][1] != x_pos[family_id][1]:
                     return
                 # for cof in individual.child_of_families:
-                cof = individual.graphical_representations[0].visible_parent_family
-                if cof and cof.visual_placement_child and cof.visual_placement_child.individual_id == individual.individual_id:
+
+                _cof = individual.graphical_representations[0].strongly_connected_parent_family
+                cofs = individual.child_of_families
+                if len(cofs) == 0 or not cofs[0].has_graphical_representation():
+                    return
+                cof = cofs[0].graphical_representations[0]
+
+                if cof and cof.strongly_connected_child and cof.strongly_connected_child.individual_id == individual.individual_id:
                     if cof.husb:
                         # if cof.husb.graphical_representations[0].get_x_position() and len(cof.husb.graphical_representations[0].get_x_position()) == 1:
                             self._move_individual_and_ancestors(
@@ -613,6 +622,19 @@ class BaseChart():
         self.additional_graphical_items.clear()
         self.graphical_individual_representations.clear()
         self.graphical_family_representations.clear()
+        self.graphical_strong_connections.clear()
+        self.graphical_strong_connection_options.clear()
         self.position_to_person_map = {}
         for _, instance in self._instances.items():
             instance.graphical_representations.clear()
+
+    def add_strong_connection(self, family, individual):
+        self.graphical_strong_connections[individual.individual_id] = family.family_id
+
+    def add_strong_connection_option(self, family, individual):
+        if individual.individual_id not in self.graphical_strong_connection_options:
+            self.graphical_strong_connection_options[individual.individual_id] = []
+        self.graphical_strong_connection_options[individual.individual_id].append(family.family_id)
+
+    def is_strongly_connected():
+        pass

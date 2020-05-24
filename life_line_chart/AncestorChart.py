@@ -86,7 +86,7 @@ class AncestorChart(BaseSVGChart):
             family = self._create_family_graphical_representation(
                 child_of_family)
             family.add_visible_children(individual)
-            gr_individual.visible_parent_family = family
+            gr_individual.strongly_connected_parent_family = family
             if generations > 0 or generations < 0:
                 father, mother = child_of_family.get_husband_and_wife()
                 if father:
@@ -122,7 +122,7 @@ class AncestorChart(BaseSVGChart):
                 gr_child.color = self._instances.color_generator(child)
 
                 family.graphical_representations[0].add_visible_children(child)
-                gr_child.visible_parent_family = family.graphical_representations[0]
+                gr_child.strongly_connected_parent_family = family.graphical_representations[0]
 
 
     def place_selected_individuals(self, individual, child_family, spouse_family, child_of_family, x_offset=0, discovery_cache=[]):
@@ -148,17 +148,17 @@ class AncestorChart(BaseSVGChart):
             father, mother = local_child_of_family.get_husband_and_wife()
             if father and father.has_graphical_representation():
                 gr_father = father.graphical_representations[0]
+                self.add_strong_connection_option(local_child_of_family, individual)
                 fathers_child_of_families = father.child_of_families
                 if fathers_child_of_families:
                     fathers_born_in_family = fathers_child_of_families[0]
                 else:
                     fathers_born_in_family = None
                 if not gr_father.has_x_position(local_child_of_family):
-                    gr_father.visual_placement_child = (
-                        individual, spouse_family)
+                    gr_father.strongly_connected_marriage = spouse_family
                     if local_child_of_family.has_graphical_representation():
-                        local_child_of_family.graphical_representations[0].visual_placement_child = individual
-                    # gr_father.visual_placement_child = spouse_family
+                        local_child_of_family.graphical_representations[0].strongly_connected_child = individual
+                        self.add_strong_connection(local_child_of_family, individual)
                     self.place_selected_individuals(
                         father, spouse_family, local_child_of_family, fathers_born_in_family, x_position, discovery_cache)
                     width = gr_father.get_ancestor_width(
@@ -191,13 +191,10 @@ class AncestorChart(BaseSVGChart):
                     x_position += 1
 
             elif not gr_sibling.has_x_position(child_of_family):
-                if not gr_sibling.visual_placement_child:
-                    sibling.graphical_representations[
-                        0].visual_placement_child = gr_individual.visual_placement_child
-                    gr_sibling.set_x_position(
-                        x_position,
-                        child_of_family)
-                    x_position += 1
+                gr_sibling.set_x_position(
+                    x_position,
+                    child_of_family)
+                x_position += 1
 
         if child_of_family and child_of_family.has_graphical_representation() and not child_of_family.graphical_representations[0].children_width:
             child_of_family.graphical_representations[0].children_width = x_position - \
@@ -208,17 +205,16 @@ class AncestorChart(BaseSVGChart):
             father, mother = local_child_of_family.get_husband_and_wife()
             if mother and mother.has_graphical_representation():
                 gr_mother = mother.graphical_representations[0]
+                self.add_strong_connection_option(local_child_of_family, individual)
                 mothers_child_of_families = mother.child_of_families
                 if mothers_child_of_families:
                     mothers_born_in_family = mothers_child_of_families[0]
                 else:
                     mothers_born_in_family = None
                 if not gr_mother.has_x_position(local_child_of_family):
-                    gr_mother.visual_placement_child = (
-                        individual, spouse_family)
                     if local_child_of_family.has_graphical_representation():
-                        local_child_of_family.graphical_representations[0].visual_placement_child = individual
-                    # gr_mother.visual_placement_child = spouse_family
+                        local_child_of_family.graphical_representations[0].strongly_connected_child = individual
+                        self.add_strong_connection(local_child_of_family, individual)
                     self.place_selected_individuals(
                         mother, spouse_family, local_child_of_family, mothers_born_in_family, x_position, discovery_cache)
                     x_min, x_max = gr_mother.get_ancestor_range(
@@ -325,18 +321,18 @@ class AncestorChart(BaseSVGChart):
             if self.compression_steps <= 0:
                 continue
 
-            if not gr_individual.has_x_position(gr_individual.visible_parent_family):
+            if not gr_individual.has_x_position(gr_individual.strongly_connected_parent_family):
                 continue
 
             try:
                 while i < 50000:
                     self._move_individual_and_ancestors(
-                        individual, gr_individual.visible_parent_family, direction_factor*1)
+                        individual, gr_individual.strongly_connected_parent_family, direction_factor*1)
                     self._check_compressed_x_position(True)
                     i += 1
             except LifeLineChartCollisionDetected as e:
                 self._move_individual_and_ancestors(
-                    individual, gr_individual.visible_parent_family, -direction_factor*1)
+                    individual, gr_individual.strongly_connected_parent_family, -direction_factor*1)
             except LifeLineChartCannotMoveIndividual as e:
                 pass
             except KeyError as e:
@@ -410,7 +406,7 @@ class AncestorChart(BaseSVGChart):
             self.compression_steps = 1e30
             if 'compression_steps' in self._formatting and self._formatting['compression_steps'] > 0:
                 self.compression_steps = self._formatting['compression_steps']
-            self._compress_chart_ancestor_graph(gr_root_individual.visible_parent_family)
+            self._compress_chart_ancestor_graph(gr_root_individual.strongly_connected_parent_family)
 
             # compressed chart should be aligned left
             _, min_index_x, max_index_x, self.position_to_person_map = self._check_compressed_x_position(

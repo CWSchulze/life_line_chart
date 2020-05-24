@@ -19,7 +19,7 @@ class GraphicalFamily():
 
         # Ancestor chart: Tells which child was used to place this family (this
         # is a strong connection)
-        self.visual_placement_child = None
+        self.strongly_connected_child = None
 
         # Descendant chart: Used to define under which family this family has
         # been placed (e.g. if wife/husband are from different branches of the

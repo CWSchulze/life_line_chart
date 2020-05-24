@@ -69,7 +69,7 @@ class DescendantChart(BaseSVGChart):
             if marriage.has_graphical_representation():
                 continue
 
-            #gr_individual.visible_parent_family = gr_marriage
+            #gr_individual.strongly_connected_parent_family = gr_marriage
             if generations > 0 or generations < 0:
                 gr_marriage = self._create_family_graphical_representation(
                     marriage)
@@ -91,7 +91,7 @@ class DescendantChart(BaseSVGChart):
                         child, generations - 1, filter=filter)
                     if child.has_graphical_representation():
                         gr_marriage.add_visible_children(child)
-                        child.graphical_representations[0].visible_parent_family = gr_marriage
+                        child.graphical_representations[0].strongly_connected_parent_family = gr_marriage
                 cofs = individual.child_of_families
                 if len(cofs) > 0:
                     gr_marriage.visual_placement_parent_family = individual.child_of_families[0]
