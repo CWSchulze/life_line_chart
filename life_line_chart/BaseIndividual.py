@@ -211,15 +211,15 @@ class BaseIndividual():
 
     @property
     def death_date(self):
-        return self._instances.display_death_date()
+        return self._instances.display_death_date(self)
 
     @property
     def info_text(self):
-        return self._instances.display_info_text()
+        return self._instances.display_info_text(self)
 
     @property
     def short_info_text(self):
-        return self._instances.display_short_info_text()
+        return self._instances.display_short_info_text(self)
 
     def has_marriages(self):
         return len(self._marriage_family_ids) > 0
