@@ -288,7 +288,7 @@ class BaseSVGChart(BaseChart):
                     marriage_ordinals.append(
                         graphical_representation_marriage_family.marriage['ordinal_value'])
                     marriage_labels.append(
-                        str(graphical_representation_marriage_family.label))
+                        str(graphical_representation_marriage_family.marriage_label))
 
             # generate event node information
             knots = []

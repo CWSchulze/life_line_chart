@@ -160,16 +160,7 @@ class BaseIndividual():
 
     @property
     def birth_date(self):
-        """
-        get the birth (or christening or baptism) date
-
-        Returns:
-            str: birth date string
-        """
-        if self.events['birth_or_christening']:
-            return self.events['birth_or_christening']['date'].date().strftime('%d.%m.%Y')
-        else:
-            return None
+        return self._instances.display_birth_date(self)
 
     @property
     def birth_label(self):
@@ -181,13 +172,13 @@ class BaseIndividual():
         """
         string = ''
         if self.events['birth_or_christening']:
+            date_str = self.birth_date
             event = self.events['birth_or_christening']
             if event['comment']:
                 string = self._instances.date_label_translation[event['comment']].format(
-                    symbol='*', date=str(event['date'].date().year))
-                # string += ' ' + self.events['birth_or_christening']['comment']
+                    symbol='*', date=date_str)
             else:
-                string += '*\xa0' + event['date'].date().strftime('%d.%m.%Y')
+                string += '*\xa0' + date_str
         return string
 
     @property
@@ -200,13 +191,13 @@ class BaseIndividual():
         """
         string = ''
         if self.events['death_or_burial']:
+            date_str = self.death_date
             event = self.events['death_or_burial']
             if event['comment']:
                 string = self._instances.date_label_translation[event['comment']].format(
-                    symbol='\u2020', date=str(event['date'].date().year))
-                # string += ' ' + self.events['birth_or_christening']['comment']
+                    symbol='\u2020', date=date_str)
             else:
-                string += '\u2020\xa0' + event['date'].date().strftime('%d.%m.%Y')
+                string += '\u2020\xa0' + date_str
         return string
 
     @property

@@ -130,16 +130,21 @@ class BaseFamily():
         return self._instances[('i', self.wife_individual_id)]
     wife = property(_get_wife)
 
-    def _get_label(self):
+    @property
+    def marriage_date(self):
+        return self._instances.display_marriage_date(self)
+
+    @property
+    def marriage_label(self):
         # label = self.marriage['date'].date().strftime('%d.%m.%Y')
         event = self.marriage
+        date_str = self.marriage_date
         if event['comment']:
             string = self._instances.date_label_translation[event['comment']].format(
-                symbol='', date=str(event['date'].date().year)).strip()
-            # string += ' ' + self.events['birth_or_christening']['comment']
+                symbol='', date=date_str)
         else:
-            string = event['date'].date().strftime('%d.%m.%Y')
-        if self.location:
-            string += '\nin ' + self.location
+            string = date_str
+        marriage_location = self._instances.display_marriage_location(self)
+        if marriage_location:
+            string += '\nin ' + marriage_location
         return string
-    label = property(_get_label)

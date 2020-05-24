@@ -136,12 +136,28 @@ class InstanceContainer():
         for marriage in individual.marriages:
             spouse = marriage.get_spouse(individual.individual_id)
             content.append('Partner: {} ({}), Heirat: {}'.format(
-                spouse.plain_name, spouse.birth_label, marriage.label))
+                spouse.plain_name, spouse.birth_label, marriage.marriage_label))
             for index, child in enumerate(marriage.get_sorted_children()):
                 content.append(' {}. Kind: {} ({})'.format(
                     index + 1, child.plain_name, child.birth_label))
 
         return '\n'.join(content)
+
+    def display_birth_date(self, individual):
+        """
+        get the birth (or christening or baptism) date str
+
+        Returns:
+            str: birth date str
+        """
+
+        event = individual.events['birth_or_christening']
+        if event:
+            if event['comment']:
+                return str(event['date'].date().year)
+            else:
+                return event['date'].date().strftime('%d.%m.%Y')
+        return None
 
     def display_death_date(self, individual):
         """
@@ -150,7 +166,38 @@ class InstanceContainer():
         Returns:
             str: death date
         """
-        if individual.events['death_or_burial']:
-            return individual.events['death_or_burial']['date'].date().strftime('%d.%m.%Y')
+
+        event = individual.events['death_or_burial']
+        if event:
+            if event['comment']:
+                return str(event['date'].date().year)
+            else:
+                return event['date'].date().strftime('%d.%m.%Y')
+        return None
+
+    def display_marriage_date(self, family):
+        """
+        get the marriage date str
+
+        Returns:
+            str: marriage date str
+        """
+
+        event = family.marriage
+        if event['comment']:
+            return str(event['date'].date().year)
         else:
-            return None
+            return event['date'].date().strftime('%d.%m.%Y')
+
+    def display_marriage_location(self, family):
+        """
+        get the marriage location str
+
+        Returns:
+            str: marriage location str
+        """
+
+        if family.location:
+            return family.location
+        return None
+

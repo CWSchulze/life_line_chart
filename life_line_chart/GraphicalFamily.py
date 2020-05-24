@@ -45,22 +45,23 @@ class GraphicalFamily():
                 individual
             )
 
-    def __get_husb_name(self):
+    @property
+    def husb_name(self):
         return self.family.husb_name
-    husb_name = property(__get_husb_name)
 
-    def __get_wife_name(self):
+    @property
+    def wife_name(self):
         return self.family.wife_name
-    wife_name = property(__get_wife_name)
 
-    def __get_husb(self):
+    @property
+    def husb(self):
         return self.family.husb
-    husb = property(__get_husb)
 
-    def __get_wife(self):
+    @property
+    def wife(self):
         return self.family.wife
-    wife = property(__get_wife)
 
-    def __get_label(self):
-        return self.family.label
-    label = property(__get_label)
+    @property
+    def marriage_label(self):
+        return self.family.marriage_label
+
