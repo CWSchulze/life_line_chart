@@ -32,7 +32,7 @@ class GraphicalIndividual():
         marriages = self.individual.marriages
         return [m.graphical_representations[0] for m in marriages if m.has_graphical_representation()]
 
-    def get_width(self, family):
+    def get_ancestor_width(self, family):
         """
         width of the ancestor individuals which are strongly connected
 
@@ -42,11 +42,11 @@ class GraphicalIndividual():
         Returns:
             int: width
         """
-        x_min, x_max = self.get_range(family)
+        x_min, x_max = self.get_ancestor_range(family)
         width = x_max - x_min + 1
         return width
 
-    def get_range(self, family):
+    def get_ancestor_range(self, family):
         """
         get the x range from min to max
 
@@ -82,7 +82,7 @@ class GraphicalIndividual():
                 index_of_first_marriage = 1 if f_x_positions[list(f_x_positions.keys())[0]][3] else 0
                 if list(f_x_positions.keys())[index_of_first_marriage] == self.visible_parent_family.family_id:
                     # count ancestors only, if the visible parent family is the first marriage (strong graphical connection)
-                    f_x_min, f_x_max = father.graphical_representations[0].get_range(
+                    f_x_min, f_x_max = father.graphical_representations[0].get_ancestor_range(
                         self.visible_parent_family)
                     x_min.append(f_x_min)
                     x_max.append(f_x_max)
@@ -97,7 +97,7 @@ class GraphicalIndividual():
                 index_of_first_marriage = 1 if m_x_positions[list(m_x_positions.keys())[0]][3] else 0
                 if list(m_x_positions.keys())[index_of_first_marriage] == self.visible_parent_family.family_id:
                     # count ancestors only, if the visible parent family is the first marriage (strong graphical connection)
-                    m_x_min, m_x_max = mother.graphical_representations[0].get_range(
+                    m_x_min, m_x_max = mother.graphical_representations[0].get_ancestor_range(
                         self.visible_parent_family)
                     x_min.append(m_x_min)
                     x_max.append(m_x_max)
@@ -117,9 +117,9 @@ class GraphicalIndividual():
         return x_min, x_max
 
 
-    def get_width2(self, family):
+    def get_descendant_width(self, family):
         """
-        width of the ancestor individuals which are strongly connected
+        width of the descendant individuals which are strongly connected
 
         Args:
             family (BaseFamily): family which is examined
@@ -127,11 +127,11 @@ class GraphicalIndividual():
         Returns:
             int: width
         """
-        x_min, x_max = self.get_range2(family)
+        x_min, x_max = self.get_descendant_range(family)
         width = x_max - x_min + 1
         return width
 
-    def get_range2(self, family):
+    def get_descendant_range(self, family):
         """
         get the x range from min to max
 
@@ -173,7 +173,7 @@ class GraphicalIndividual():
                     for child in marriage.children:
                         if not child.has_graphical_representation():
                             continue
-                        c_x_min, c_x_max = child.graphical_representations[0].get_range2(
+                        c_x_min, c_x_max = child.graphical_representations[0].get_descendant_range(
                             marriage)
                         x_min.append(c_x_min)
                         x_max.append(c_x_max)
@@ -195,7 +195,6 @@ class GraphicalIndividual():
 
     def get_name(self):
         return self.individual.get_name()
-    #name = property(__get_name)
 
     def __get_birth_date(self):
         if self.individual.events['birth_or_christening']:
@@ -213,6 +212,16 @@ class GraphicalIndividual():
 
     def get_x_position(self):
         return self._x_position
+
+    def has_x_position(self, family):
+        if self._x_position is None:
+            return False
+        family_id = None
+        if family is not None:
+            family_id = family.family_id
+        if family_id in self._x_position:
+            return True
+        return False
 
     def set_x_position(self, x_position, family, parent_starting_point=False):
         if family:
@@ -275,17 +284,17 @@ class GraphicalIndividual():
         else:
             return self.__death_date_ov
 
-    def __get_birth_label(self):
+    @property
+    def birth_label(self):
         return self.individual.birth_label
-    birth_label = property(__get_birth_label)
 
-    def __get_death_label(self):
+    @property
+    def death_label(self):
         string = self.individual.death_label
         if len(self._x_position) > 2 or len(self._x_position) == 2 and list(self._x_position.values())[0][1] != list(self._x_position.values())[1][1]:
             string += ' ' + self.individual.plain_name
         return string
-    death_label = property(__get_death_label)
 
-    def __get_children(self):
+    @property
+    def children(self):
         return self.individual.children
-    children = property(__get_children)

@@ -136,7 +136,6 @@ class BaseFamily():
 
     @property
     def marriage_label(self):
-        # label = self.marriage['date'].date().strftime('%d.%m.%Y')
         event = self.marriage
         date_str = self.marriage_date
         if event['comment']:

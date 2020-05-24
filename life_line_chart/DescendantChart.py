@@ -129,31 +129,29 @@ class DescendantChart(BaseSVGChart):
                 continue
 
             if marriage_index == len(visible_marriages) - 1:
-                if gr_individual.get_x_position() is None or \
-                        child_of_family is not None and child_of_family.family_id not in gr_individual.get_x_position():
+                if not gr_individual.has_x_position(child_of_family):
                     gr_individual.set_x_position(
                         x_position, child_of_family)
 
-            if gr_individual.get_x_position() is None or \
-                    marriage.family_id not in gr_individual.get_x_position():
+            if not gr_individual.has_x_position(marriage):
                 gr_individual.set_x_position(
                     x_position, marriage)
                 x_position += 1
 
 
-            for child in marriage.children:
+            for child in marriage.get_sorted_children():
                 self.place_selected_individuals(
                     child, marriage, x_position,
                     discovery_cache=discovery_cache)
                 if child.has_graphical_representation():
-                    width = child.graphical_representations[0].get_width2(
+                    width = child.graphical_representations[0].get_descendant_width(
                         marriage)
                     x_position += width
 
             spouse = marriage.get_spouse(individual.individual_id)
             if spouse is not None and spouse.has_graphical_representation():
                 gr_spouse = spouse.graphical_representations[0]
-                if not gr_spouse.get_x_position() or marriage.family_id not in gr_spouse.get_x_position():
+                if not gr_spouse.has_x_position(marriage):
                     gr_spouse.set_x_position(
                         x_position, marriage)
                     x_position += 1
@@ -213,7 +211,7 @@ class DescendantChart(BaseSVGChart):
                 self.place_selected_individuals(
                     root_individual, self._instances[('f', cof_family_id)], x_pos)
 
-                x_pos += root_individual.graphical_representations[0].get_width2(self._instances[('f', cof_family_id)])
+                x_pos += root_individual.graphical_representations[0].get_descendant_width(self._instances[('f', cof_family_id)])
 
             for settings in self._chart_configuration['root_individuals']:
                 root_individual_id = settings['individual_id']

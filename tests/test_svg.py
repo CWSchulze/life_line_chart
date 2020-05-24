@@ -35,7 +35,7 @@ def test_generate_svg_file():
     chart.place_selected_individuals(
         chart._instances[('i', individual_id)], None, None, child_of_family, x_position)
     x_min, x_max = chart._instances[('i', individual_id)
-                             ].graphical_representations[0].get_range(None)
+                             ].graphical_representations[0].get_ancestor_range(None)
     x_position += x_max - x_min + 1
 
     chart.modify_layout(individual_id)
@@ -70,7 +70,7 @@ def test_generate_svg_file_with_two_roots():
     chart.place_selected_individuals(
         chart._instances[('i', individual_id)], None, None, child_of_family, x_position)
     x_min, x_max = chart._instances[('i', individual_id)
-                             ].graphical_representations[0].get_range(None)
+                             ].graphical_representations[0].get_ancestor_range(None)
     x_position += x_max - x_min + 1
     chart.modify_layout(individual_id)
 
@@ -93,7 +93,7 @@ def test_generate_svg_file_with_two_roots():
     chart.place_selected_individuals(
         chart._instances[('i', individual_id)], None, None, child_of_family, x_position)
     x_min, x_max = chart._instances[('i', individual_id)
-                             ].graphical_representations[0].get_range(None)
+                             ].graphical_representations[0].get_ancestor_range(None)
     x_position += x_max - x_min + 1
 
     chart.define_svg_items()
@@ -142,7 +142,7 @@ def test_generate_svg_file_ancestor_and_children():
     chart.place_selected_individuals(
         chart._instances[('i', individual_id)], None, None, child_of_family, x_position)
     x_min, x_max = chart._instances[('i', individual_id)
-                             ].graphical_representations[0].get_range(None)
+                             ].graphical_representations[0].get_ancestor_range(None)
     x_position += x_max - x_min + 1
 
     chart.define_svg_items()
@@ -209,7 +209,7 @@ def test_photos_in_chart():
     chart.place_selected_individuals(
         chart._instances[('i', individual_id)], None, None, child_of_family, x_position)
     x_min, x_max = chart._instances[('i', individual_id)
-                             ].graphical_representations[0].get_range(None)
+                             ].graphical_representations[0].get_ancestor_range(None)
     x_position += x_max - x_min + 1
     chart.modify_layout(individual_id)
 

@@ -122,7 +122,7 @@ class AncestorChart(BaseSVGChart):
                 gr_child.color = self._instances.color_generator(child)
 
                 family.graphical_representations[0].add_visible_children(child)
-                child.graphical_representations[0].visible_parent_family = family.graphical_representations[0]
+                gr_child.visible_parent_family = family.graphical_representations[0]
 
 
     def place_selected_individuals(self, individual, child_family, spouse_family, child_of_family, x_offset=0, discovery_cache=[]):
@@ -153,7 +153,7 @@ class AncestorChart(BaseSVGChart):
                     fathers_born_in_family = fathers_child_of_families[0]
                 else:
                     fathers_born_in_family = None
-                if not gr_father.get_x_position() or local_child_of_family.family_id not in gr_father.get_x_position():
+                if not gr_father.has_x_position(local_child_of_family):
                     gr_father.visual_placement_child = (
                         individual, spouse_family)
                     if local_child_of_family.has_graphical_representation():
@@ -161,11 +161,11 @@ class AncestorChart(BaseSVGChart):
                     # gr_father.visual_placement_child = spouse_family
                     self.place_selected_individuals(
                         father, spouse_family, local_child_of_family, fathers_born_in_family, x_position, discovery_cache)
-                    width = gr_father.get_width(
+                    width = gr_father.get_ancestor_width(
                         local_child_of_family)
                     if local_child_of_family.has_graphical_representation():
                         local_child_of_family.graphical_representations[0].husb_width = \
-                            lambda gr=gr_father, cof=local_child_of_family: gr.get_width(cof)
+                            lambda gr=gr_father, cof=local_child_of_family: gr.get_ancestor_width(cof)
                     x_position += width
 
         # add the main individual and its visible siblings
@@ -178,19 +178,19 @@ class AncestorChart(BaseSVGChart):
         for sibling in siblings:
             gr_sibling = sibling.graphical_representations[0]
             if sibling.individual_id == individual.individual_id:
-                if gr_sibling.get_x_position() is None or spouse_family is not None and spouse_family.family_id not in gr_sibling.get_x_position():
+                if not gr_sibling.has_x_position(spouse_family):
                     # add new position of this spouse family
                     gr_sibling.set_x_position(
                         x_position, spouse_family)
 
-                    if child_of_family and child_of_family.family_id not in gr_sibling.get_x_position():
+                    if not gr_sibling.has_x_position(child_of_family):
                         # not added yet, so this is the primary cof placement
                         gr_sibling.set_x_position(
                             x_position, child_of_family, True)
 
                     x_position += 1
 
-            elif not gr_sibling.get_x_position() or child_of_family.family_id not in gr_sibling.get_x_position():
+            elif not gr_sibling.has_x_position(child_of_family):
                 if not gr_sibling.visual_placement_child:
                     sibling.graphical_representations[
                         0].visual_placement_child = gr_individual.visual_placement_child
@@ -213,7 +213,7 @@ class AncestorChart(BaseSVGChart):
                     mothers_born_in_family = mothers_child_of_families[0]
                 else:
                     mothers_born_in_family = None
-                if not gr_mother.get_x_position() or local_child_of_family.family_id not in gr_mother.get_x_position():
+                if not gr_mother.has_x_position(local_child_of_family):
                     gr_mother.visual_placement_child = (
                         individual, spouse_family)
                     if local_child_of_family.has_graphical_representation():
@@ -221,12 +221,12 @@ class AncestorChart(BaseSVGChart):
                     # gr_mother.visual_placement_child = spouse_family
                     self.place_selected_individuals(
                         mother, spouse_family, local_child_of_family, mothers_born_in_family, x_position, discovery_cache)
-                    x_min, x_max = gr_mother.get_range(
+                    x_min, x_max = gr_mother.get_ancestor_range(
                         local_child_of_family)
                     width = x_max - x_min + 1
                     if local_child_of_family.has_graphical_representation():
                         local_child_of_family.graphical_representations[0].wife_width = \
-                            lambda gr=gr_mother, cof=local_child_of_family: gr.get_width(cof)
+                            lambda gr=gr_mother, cof=local_child_of_family: gr.get_ancestor_width(cof)
                     x_position += width
 
         self.max_x_index = max(self.max_x_index, x_position)
@@ -325,7 +325,7 @@ class AncestorChart(BaseSVGChart):
             if self.compression_steps <= 0:
                 continue
 
-            if not gr_individual.visible_parent_family or not gr_individual.visible_parent_family.family_id in gr_individual.get_x_position():
+            if not gr_individual.has_x_position(gr_individual.visible_parent_family):
                 continue
 
             try:
@@ -401,19 +401,24 @@ class AncestorChart(BaseSVGChart):
 
         # for gr_family in self.graphical_family_representations:
         if self._positioning['compress']:
+            root_individual = self._instances[(
+                'i', root_individual_id)]
+            gr_root_individual = root_individual.graphical_representations[0]
+
             failed, old_x_min_index, old_x_max_index = self.check_unique_x_position()
             old_width = old_x_max_index - old_x_min_index
             self.compression_steps = 1e30
             if 'compression_steps' in self._formatting and self._formatting['compression_steps'] > 0:
                 self.compression_steps = self._formatting['compression_steps']
-            self._compress_chart_ancestor_graph(self._instances[(
-                'i', root_individual_id)].graphical_representations[0].visible_parent_family)
+            self._compress_chart_ancestor_graph(gr_root_individual.visible_parent_family)
 
             # compressed chart should be aligned left
             _, min_index_x, max_index_x, self.position_to_person_map = self._check_compressed_x_position(
                 False)
-            self._move_individual_and_ancestors(self._instances[('i', root_individual_id)], sorted(list(self._instances[(
-                'i', root_individual_id)].graphical_representations[0].get_x_position().values()))[0][2], -(min_index_x-old_x_min_index)*1)
+            self._move_individual_and_ancestors(
+                root_individual,
+                sorted(list(gr_root_individual.get_x_position().values()))[0][2],
+                -(min_index_x-old_x_min_index)*1)
             keys = sorted(list(self.position_to_person_map.keys()))
             for key in keys:
                 self.position_to_person_map[key - (
@@ -464,7 +469,7 @@ class AncestorChart(BaseSVGChart):
                 self.place_selected_individuals(
                     root_individual, None, None, self._instances[('f', cof_family_id)], x_pos)
 
-                x_pos += root_individual.graphical_representations[0].get_width(None)
+                x_pos += root_individual.graphical_representations[0].get_ancestor_width(None)
 
             for settings in self._chart_configuration['root_individuals']:
                 root_individual_id = settings['individual_id']
