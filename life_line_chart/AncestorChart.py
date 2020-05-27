@@ -79,6 +79,9 @@ class AncestorChart(BaseSVGChart):
             else:
                 gr_individual.color = color
         else:
+            # must not leave here, because merging of different family branches would stop here
+            # if len(individual.child_of_families) > 0 and individual.child_of_families[0].has_graphical_representation():
+            #     return
             gr_individual = individual.graphical_representations[0]
 
         child_of_families = individual.child_of_families[:1]
