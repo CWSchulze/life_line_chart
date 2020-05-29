@@ -90,7 +90,7 @@ class AncestorChart(BaseSVGChart):
         for child_of_family in child_of_families:
             family = self._create_family_graphical_representation(
                 child_of_family)
-            family.add_visible_children(individual)
+            family.add_visible_children(gr_individual)
             gr_individual.strongly_connected_parent_family = family
             # self.add_strong_connection()
             if generations > 0 or generations < 0:
@@ -127,7 +127,7 @@ class AncestorChart(BaseSVGChart):
 
                 gr_child.color = self._instances.color_generator(child)
 
-                family.graphical_representations[0].add_visible_children(child)
+                family.graphical_representations[0].add_visible_children(gr_child)
                 gr_child.strongly_connected_parent_family = family.graphical_representations[0]
                 # self.add_strong_connection(family.graphical_representations[0], gr_child)
 
@@ -162,6 +162,7 @@ class AncestorChart(BaseSVGChart):
                         fathers_born_in_family = fathers_child_of_families[0]
                     else:
                         fathers_born_in_family = None
+                    gr_local_child_of_family = local_child_of_family.graphical_representations[0]
                     if local_child_of_family.has_graphical_representation():
                         self.add_strong_connection(local_child_of_family, individual)
                     self.place_selected_individuals(
@@ -217,6 +218,7 @@ class AncestorChart(BaseSVGChart):
                         mothers_born_in_family = mothers_child_of_families[0]
                     else:
                         mothers_born_in_family = None
+                    gr_local_child_of_family = local_child_of_family.graphical_representations[0]
                     if local_child_of_family.has_graphical_representation():
                         self.add_strong_connection(local_child_of_family, individual)
                     self.place_selected_individuals(
@@ -331,12 +333,12 @@ class AncestorChart(BaseSVGChart):
             try:
                 while i < 50000:
                     self._move_individual_and_ancestors(
-                        gr_individual, strongly_connected_parent_family, direction_factor*1)
+                        gr_individual, gr_individual.strongly_connected_parent_family, direction_factor*1)
                     self._check_compressed_x_position(True)
                     i += 1
             except LifeLineChartCollisionDetected as e:
                 self._move_individual_and_ancestors(
-                    gr_individual, strongly_connected_parent_family, -direction_factor*1)
+                    gr_individual, gr_individual.strongly_connected_parent_family, -direction_factor*1)
             except LifeLineChartCannotMoveIndividual as e:
                 pass
             except KeyError as e:

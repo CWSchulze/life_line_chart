@@ -249,6 +249,7 @@ class BaseChart():
             family (BaseFamily): family instance
             x_index_offset (int): vertical offset
         """
+        individual = gr_individual.individual
         if family is None:
             family_id = family
             # return
@@ -272,15 +273,15 @@ class BaseChart():
 
                 # if bool(individual.graphical_representations[0].strongly_connected_parent_family and individual.graphical_representations[0].strongly_connected_parent_family.family_id == cof.family_id) != (self.is_strongly_connected(cof, individual)):
                 #     logger.fatal('ARRRG' + str(individual.plain_name))
-                b = self.may_be_strongly_connected(gr_cof, individual)
-                a = individual.graphical_representations[0].strongly_connected_parent_family and \
-                    individual.graphical_representations[0].strongly_connected_parent_family.family_id == cof.family_id and \
-                    cof.has_graphical_representation_of_spouse()
-                if a != b:
-                    logger.fatal('UURRRG' + str(individual.plain_name))
+                # b = self.may_be_strongly_connected(gr_cof, individual)
+                # a = individual.graphical_representations[0].strongly_connected_parent_family and \
+                #     individual.graphical_representations[0].strongly_connected_parent_family.family_id == cof.family_id and \
+                #     cof.has_graphical_representation_of_spouse()
+                # if a != b:
+                #     logger.fatal('UURRRG' + str(individual.plain_name))
 
                 if self.is_strongly_connected(gr_cof, individual):
-                # if individual.graphical_representations[0].strongly_connected_parent_family and individual.graphical_representations[0].strongly_connected_parent_family.family_id == cof.family_id:
+                #if individual.graphical_representations[0].strongly_connected_parent_family and individual.graphical_representations[0].strongly_connected_parent_family.family_id == cof.family_id:
                     if cof.husb:
                         # if cof.husb.graphical_representations[0].get_x_position() and len(cof.husb.graphical_representations[0].get_x_position()) == 1:
                             self._move_individual_and_ancestors(

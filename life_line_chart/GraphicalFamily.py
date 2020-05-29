@@ -15,7 +15,7 @@ class GraphicalFamily():
         self.marriage = self.family.marriage
 
         # Tells which children are visible
-        self.visible_children = {}
+        self.visible_children = []
 
         # Descendant chart: Used to define under which family this family has
         # been placed (e.g. if wife/husband are from different branches of the
