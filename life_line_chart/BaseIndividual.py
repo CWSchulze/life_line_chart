@@ -102,6 +102,10 @@ class BaseIndividual():
     """
     Base class for individuals. This class is used as interface to the database.
     """
+    # ordinal value of the birth date
+    __birth_date_ov = None
+    # ordinal value of the death date
+    __death_date_ov = None
 
     def __init__(self, instances, individual_id):
         self._instances = instances
@@ -126,7 +130,7 @@ class BaseIndividual():
 
     def __lt__(self, other):
         """
-        Sorting by name
+        Sorting by birth date
 
         Args:
             other (BaseIndividual): the other instance
@@ -134,7 +138,7 @@ class BaseIndividual():
         Returns:
             bool: is less than
         """
-        return self.plain_name < other.plain_name
+        return self.birth_date_ov < other.birth_date_ov
 
     def get_name(self):
         if True:
@@ -161,6 +165,23 @@ class BaseIndividual():
     @property
     def birth_date(self):
         return self._instances.display_birth_date(self)
+
+    @property
+    def birth_date_ov(self):
+        """
+        get the ordinal value of the birth (or christening or baptism) date
+
+        Returns:
+            float: ordinal value of birth date
+        """
+        if self.__birth_date_ov is None:
+            boc = self.events.get('birth_or_christening')
+            if boc:
+                self.__birth_date_ov = boc['date'].date().toordinal()
+                return self.__birth_date_ov
+            return None
+        else:
+            return self.__birth_date_ov
 
     @property
     def birth_label(self):
@@ -203,6 +224,23 @@ class BaseIndividual():
     @property
     def death_date(self):
         return self._instances.display_death_date(self)
+
+    @property
+    def death_date_ov(self):
+        """
+        get the ordinal value of the death (or burial) date
+
+        Returns:
+            float: ordinal value of death date
+        """
+        if self.__death_date_ov is None:
+            dob = self.events.get('death_or_burial')
+            if dob:
+                self.__death_date_ov = dob['date'].date().toordinal()
+                return self.__death_date_ov
+            return None
+        else:
+            return self.__death_date_ov
 
     @property
     def info_text(self):
