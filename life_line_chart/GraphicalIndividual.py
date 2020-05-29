@@ -18,10 +18,6 @@ class GraphicalIndividual():
     # This individual is placed in this marriage, so it is strongly connected.
     # Optimization algorithms must not break this connection.
     # strongly_connected_marriage = None
-    # ordinal value of the birth date
-    __birth_date_ov = None
-    # ordinal value of the death date
-    __death_date_ov = None
 
     def __init__(self, instances, individual_id):
         self.items = []
@@ -258,37 +254,25 @@ class GraphicalIndividual():
     def get_death_event(self):
         return self.individual.events['death_or_burial']
 
-    def get_birth_date_ov(self):
+    @property
+    def birth_date_ov(self):
         """
         get the ordinal value of the birth (or christening or baptism) date
 
         Returns:
             float: ordinal value of birth date
         """
-        if self.__birth_date_ov is None:
-            boc = self.individual.events.get('birth_or_christening')
-            if boc:
-                self.__birth_date_ov = boc['date'].date().toordinal()
-                return self.__birth_date_ov
-            return None
-        else:
-            return self.__birth_date_ov
+        return self.individual.birth_date_ov
 
-    def get_death_date_ov(self):
+    @property
+    def death_date_ov(self):
         """
         get the ordinal value of the death (or burial) date
 
         Returns:
             float: ordinal value of death date
         """
-        if self.__death_date_ov is None:
-            dob = self.individual.events.get('death_or_burial')
-            if dob:
-                self.__death_date_ov = dob['date'].date().toordinal()
-                return self.__death_date_ov
-            return None
-        else:
-            return self.__death_date_ov
+        return self.individual.death_date_ov
 
     @property
     def birth_label(self):
