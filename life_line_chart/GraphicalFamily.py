@@ -34,13 +34,15 @@ class GraphicalFamily():
             return None
         return self.family.get_spouse(individual.individual_id).graphical_representations[0]
 
-    def add_visible_children(self, individual):
-        if individual.individual_id not in self.visible_children and individual.graphical_representations[0].birth_date_ov:
-            self.visible_children[individual.individual_id] = (
-                individual.graphical_representations[0].birth_date_ov,
-                len(self.visible_children),
-                individual
-            )
+    def add_visible_children(self, gr_individual):
+        if gr_individual not in self.visible_children and gr_individual.birth_date_ov:
+            self.visible_children.append(gr_individual)
+            self.visible_children.sort()
+            # (
+            #     gr_individual.birth_date_ov,
+            #     len(self.visible_children),
+            #     gr_individual
+            # )
 
     @property
     def husb_name(self):
