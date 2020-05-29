@@ -263,12 +263,12 @@ class BaseSVGChart(BaseChart):
                     else:
                         # if no spouse is visible, place over the children
                         child_x_indices = []
-                        for _, (_, _, visible_child) in graphical_representation_marriage_family.visible_children.items():
+                        for visible_child in graphical_representation_marriage_family.visible_children:
                             try:
-                                child_x_indices.append(visible_child.graphical_representations[0].get_x_position()[
+                                child_x_indices.append(visible_child.get_x_position()[
                                                        graphical_representation_marriage_family.family_id][1])
                             except:
-                                logger.error('something went wrong with ' + "".join(visible_child.get_name()) +
+                                logger.error('something went wrong with ' + "".join(visible_child.plain_name) +
                                              ". The position family 0 is not equal to the placement...")
                         if len(child_x_indices) > 0:
                             # calculate the middle over the children

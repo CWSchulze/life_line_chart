@@ -195,7 +195,7 @@ class BaseChart():
                     distance_of_this_individual, index)] = gr_individual
         return total_distance, list_of_linked_individuals
 
-    def _move_single_individual(self, individual, family, x_index_offset):
+    def _move_single_individual(self, gr_individual, family, x_index_offset):
         """
         move a single individual vertically
 
@@ -207,7 +207,7 @@ class BaseChart():
         Returns:
             dict: position dict of the graphical individual representation
         """
-        x_pos = individual.graphical_representations[0].get_x_position()
+        x_pos = gr_individual.get_x_position()
         positions = sorted(list(x_pos.values()))
         if family is not None:
             family_id = family.family_id
@@ -240,12 +240,12 @@ class BaseChart():
                 'This family does not exist')
         return x_pos
 
-    def _move_individual_and_ancestors(self, individual, family, x_index_offset):
+    def _move_individual_and_ancestors(self, gr_individual, family, x_index_offset):
         """
         move an individual and its ancestors vertically. Only ancestors are moved, which are strongly coupled with the individual.
 
         Args:
-            individual (BaseIndividual): individual instance
+            gr_individual (GraphicalIndividual): gr_individual instance
             family (BaseFamily): family instance
             x_index_offset (int): vertical offset
         """
@@ -254,17 +254,17 @@ class BaseChart():
             # return
         else:
             family_id = family.family_id
-        if len(individual.graphical_representations) > 0:
+        if True or len(gr_individual.graphical_representations) > 0:
             x_pos = self._move_single_individual(
-                individual, family, x_index_offset)
+                gr_individual, family, x_index_offset)
             if None in x_pos or True:
                 # only move ancestors if they exist
                 # len(x_pos) <= 1 or
                 if list(sorted(x_pos.values()))[0][1] != x_pos[family_id][1]:
                     return
-                # for cof in individual.child_of_families:
+                # for cof in gr_individual.child_of_families:
 
-                cofs = individual.child_of_families
+                cofs = gr_individual.individual.child_of_families
                 if len(cofs) == 0 or not cofs[0].has_graphical_representation():
                     return
                 cof = cofs[0]
@@ -284,21 +284,21 @@ class BaseChart():
                     if cof.husb:
                         # if cof.husb.graphical_representations[0].get_x_position() and len(cof.husb.graphical_representations[0].get_x_position()) == 1:
                             self._move_individual_and_ancestors(
-                                cof.husb, gr_cof, x_index_offset)
-                    if cof.wife:
+                                cof.husb.graphical_representations[0], gr_cof, x_index_offset)
+                    if cof.wife and cof.wife.has_graphical_representation():
                         # if cof.wife.graphical_representations[0].get_x_position() and len(cof.wife.graphical_representations[0].get_x_position()) == 1:
                             self._move_individual_and_ancestors(
-                                cof.wife, gr_cof, x_index_offset)
-                    # print (individual.get)
+                                cof.wife.graphical_representations[0], gr_cof, x_index_offset)
+                    # print (gr_individual.get)
                 if cof and len(gr_cof.visible_children) > 1:
-                    for child_individual_id, (_, _, child_individual) in gr_cof.visible_children.items():
-                        if child_individual_id == individual.individual_id:
+                    for gr_child_individual in gr_cof.visible_children:
+                        if gr_child_individual.individual.individual_id == gr_individual.individual.individual_id:
                             continue
                         pos = sorted(
-                            list(child_individual.graphical_representations[0].get_x_position().values()))[0]
+                            list(gr_child_individual.get_x_position().values()))[0]
                         if pos[2]:
                             x_pos = self._move_single_individual(
-                                child_individual, pos[2], x_index_offset)
+                                gr_child_individual, pos[2], x_index_offset)
 
     def _flip_family(self, family):
         """
@@ -333,11 +333,11 @@ class BaseChart():
             wife_x_delta = husb_width + children_width
             child_x_delta = husb_width - wife_width
 
-        for _, (_, _, child_individual) in family.graphical_representations[0].visible_children.items():
+        for gr_child_individual in family.graphical_representations[0].visible_children:
             pos = sorted(
-                list(child_individual.graphical_representations[0].get_x_position().values()))
+                list(gr_child_individual.get_x_position().values()))
             self._move_single_individual(
-                child_individual, pos[0][2], child_x_delta)
+                gr_child_individual, pos[0][2], child_x_delta)
 
         self._move_individual_and_ancestors(
             family.husb, family, husb_x_delta+1000000)

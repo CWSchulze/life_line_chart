@@ -241,19 +241,19 @@ class AncestorChart(BaseSVGChart):
             self.min_ordinal = birth_ordinal_value
             self.max_ordinal = death_ordinal_value
 
-    def _compress_single_individual_position(self, individual, cof, direction):
+    def _compress_single_individual_position(self, gr_individual, cof, direction):
         """
-        move single individual until it collides
+        move single gr_individual until it collides
         """
         try:
             i = 0
             while i < 5000:
                 i += 1
-                self._move_single_individual(individual, cof, direction)
+                self._move_single_individual(gr_individual, cof, direction)
                 self._check_compressed_x_position(True)
         except LifeLineChartCollisionDetected:
             pass
-        self._move_single_individual(individual, cof, - direction)
+        self._move_single_individual(gr_individual, cof, - direction)
 
     def _compress_chart_ancestor_graph(self, gr_family):
         """
@@ -264,7 +264,7 @@ class AncestorChart(BaseSVGChart):
         Args:
             gr_family (GraphicalFamily): graphical family representation instance
         """
-        individuals = []
+        gr_individuals = []
         if gr_family is None:
             return
 
@@ -274,22 +274,22 @@ class AncestorChart(BaseSVGChart):
         if gr_family.husb is not None and gr_family.husb.has_graphical_representation():
             x_pos_husb = gr_family.husb.graphical_representations[0].get_x_position()[
                 gr_family.family_id][1]
-            individuals.append((1, gr_family.husb))
+            gr_individuals.append((1, gr_family.husb.graphical_representations[0]))
         if gr_family.wife is not None and gr_family.wife.has_graphical_representation():
             x_pos_wife = gr_family.wife.graphical_representations[0].get_x_position()[
                 gr_family.family_id][1]
-            individuals.append((-1, gr_family.wife))
+            gr_individuals.append((-1, gr_family.wife.graphical_representations[0]))
         if x_pos_husb and x_pos_wife and x_pos_husb > x_pos_wife:
             family_was_flipped = True
 
-        for _, individual in sorted(individuals):
-            cofs = individual.child_of_families
+        for _, gr_individual in sorted(gr_individuals):
+            cofs = gr_individual.individual.child_of_families
             for cof in cofs:
                 if cof.has_graphical_representation():
                     if cof.husb is None or cof.wife is None \
                             or not cof.husb.has_graphical_representation() \
                             or not cof.wife.has_graphical_representation():
-                        this_individual_x_pos = individual.graphical_representations[0].get_x_position()[
+                        this_individual_x_pos = gr_individual.get_x_position()[
                             cof.family_id][1]
                         parent_x_pos = None
                         if cof.husb is not None and cof.husb.has_graphical_representation():
@@ -300,21 +300,21 @@ class AncestorChart(BaseSVGChart):
                                 cof.family_id][1]
                         if parent_x_pos is not None and this_individual_x_pos > parent_x_pos:
                             self._compress_single_individual_position(
-                                individual, cof, -1)
+                                gr_individual, cof, -1)
                             # self._move_single_individual(individual, cof, parent_x_pos - this_individual_x_pos + 1)
                         elif parent_x_pos is not None and this_individual_x_pos < parent_x_pos:
                             self._compress_single_individual_position(
-                                individual, cof, 1)
+                                gr_individual, cof, 1)
                             # self._move_single_individual(individual, cof, parent_x_pos - this_individual_x_pos - 1)
                     try:
                         self._compress_chart_ancestor_graph(
                             cof.graphical_representations[0])
                     except KeyError as e:
                         pass
-        for original_direction_factor, individual in sorted(individuals):
-            if individual is None:
+        for original_direction_factor, gr_individual in sorted(gr_individuals):
+            if gr_individual is None:
                 continue
-            gr_individual = individual.graphical_representations[0]
+            #gr_individual = individual.graphical_representations[0]
             i = 0
             if family_was_flipped:
                 direction_factor = - original_direction_factor
@@ -331,18 +331,18 @@ class AncestorChart(BaseSVGChart):
             try:
                 while i < 50000:
                     self._move_individual_and_ancestors(
-                        individual, gr_individual.strongly_connected_parent_family, direction_factor*1)
+                        gr_individual, strongly_connected_parent_family, direction_factor*1)
                     self._check_compressed_x_position(True)
                     i += 1
             except LifeLineChartCollisionDetected as e:
                 self._move_individual_and_ancestors(
-                    individual, gr_individual.strongly_connected_parent_family, -direction_factor*1)
+                    gr_individual, strongly_connected_parent_family, -direction_factor*1)
             except LifeLineChartCannotMoveIndividual as e:
                 pass
             except KeyError as e:
                 pass
             if i != 0:
-                logger.info('moved ' + ' '.join(individual.get_name()) +
+                logger.info('moved ' + ' '.join(gr_individual.get_name()) +
                             ' by ' + str(i * direction_factor * 1))
 
     def modify_layout(self, root_individual_id):
@@ -416,7 +416,7 @@ class AncestorChart(BaseSVGChart):
             _, min_index_x, max_index_x, self.position_to_person_map = self._check_compressed_x_position(
                 False)
             self._move_individual_and_ancestors(
-                root_individual,
+                root_individual.graphical_representations[0],
                 sorted(list(gr_root_individual.get_x_position().values()))[0][2],
                 -(min_index_x-old_x_min_index)*1)
             keys = sorted(list(self.position_to_person_map.keys()))
