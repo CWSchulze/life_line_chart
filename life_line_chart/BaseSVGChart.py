@@ -206,6 +206,7 @@ class BaseSVGChart(BaseChart):
         self.min_x_index = min_x_index  # -1000
         self.max_x_index = max_x_index + 1  # +200
 
+        debug_items = []
         for gr_individual in self.graphical_individual_representations:
             birth_date_ov = gr_individual.birth_date_ov
             if not birth_date_ov:
@@ -231,6 +232,7 @@ class BaseSVGChart(BaseChart):
             marriage_ring_indices = []
             marriage_y_positions = []
             marriage_ring_positions = []
+            marriage_id = []
             new_x_position_after_marriage = []
             new_x_indices_after_marriage = []
             marriage_labels = []
@@ -283,6 +285,7 @@ class BaseSVGChart(BaseChart):
                             marriage_ring_indices.append(
                                 x_pos[graphical_representation_marriage_family.family_id][1])
 
+                    marriage_id.append(graphical_representation_marriage_family.family_id)
                     marriage_y_positions.append(self._map_y_position(
                         graphical_representation_marriage_family.marriage['ordinal_value']))
                     marriage_ordinals.append(
@@ -570,6 +573,7 @@ class BaseSVGChart(BaseChart):
                     }
                 )
             gr_individual.items += images
+        gr_individual.items += debug_items
 
     def paint_and_save(self, individual_id, filename=None):
         """
