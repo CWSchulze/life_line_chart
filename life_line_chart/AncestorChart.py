@@ -157,7 +157,7 @@ class AncestorChart(BaseSVGChart):
                 gr_father = father.graphical_representations[0]
                 self.add_strong_connection_option(local_child_of_family, individual)
                 if not gr_father.has_x_position(local_child_of_family):
-                    fathers_child_of_families = father.child_of_families
+                    fathers_child_of_families = gr_father.individual.child_of_families
                     if fathers_child_of_families:
                         fathers_born_in_family = fathers_child_of_families[0]
                     else:
@@ -165,9 +165,9 @@ class AncestorChart(BaseSVGChart):
                     if local_child_of_family.has_graphical_representation():
                         self.add_strong_connection(local_child_of_family, individual)
                     self.place_selected_individuals(
-                        father, spouse_family, local_child_of_family, fathers_born_in_family, x_position, discovery_cache)
+                        gr_father.individual, spouse_family, local_child_of_family, fathers_born_in_family, x_position, discovery_cache)
                     width = gr_father.get_ancestor_width(
-                        local_child_of_family)
+                       gr_local_child_of_family)
                     if local_child_of_family.has_graphical_representation():
                         local_child_of_family.graphical_representations[0].husb_width = \
                             lambda gr=gr_father, cof=local_child_of_family: gr.get_ancestor_width(cof)
@@ -177,11 +177,11 @@ class AncestorChart(BaseSVGChart):
         children_start_x = x_position
 
         if child_of_family is not None and child_of_family.has_graphical_representation() and child_of_family.graphical_representations[0].visible_children:
-            siblings = [sibling for _, _, sibling in sorted(child_of_family.graphical_representations[0].visible_children.values())]
+            siblings = child_of_family.graphical_representations[0].visible_children
         else:
-            siblings = [individual]
-        for sibling in siblings:
-            gr_sibling = sibling.graphical_representations[0]
+            siblings = [gr_individual]
+        for gr_sibling in siblings:
+            sibling = gr_sibling.individual
             if sibling.individual_id == individual.individual_id:
                 if not gr_sibling.has_x_position(spouse_family):
                     # add new position of this spouse family
@@ -212,7 +212,7 @@ class AncestorChart(BaseSVGChart):
                 gr_mother = mother.graphical_representations[0]
                 self.add_strong_connection_option(local_child_of_family, individual)
                 if not gr_mother.has_x_position(local_child_of_family):
-                    mothers_child_of_families = mother.child_of_families
+                    mothers_child_of_families = gr_mother.individual.child_of_families
                     if mothers_child_of_families:
                         mothers_born_in_family = mothers_child_of_families[0]
                     else:
@@ -220,9 +220,9 @@ class AncestorChart(BaseSVGChart):
                     if local_child_of_family.has_graphical_representation():
                         self.add_strong_connection(local_child_of_family, individual)
                     self.place_selected_individuals(
-                        mother, spouse_family, local_child_of_family, mothers_born_in_family, x_position, discovery_cache)
+                        gr_mother.individual, spouse_family, local_child_of_family, mothers_born_in_family, x_position, discovery_cache)
                     x_min, x_max = gr_mother.get_ancestor_range(
-                        local_child_of_family)
+                        gr_local_child_of_family)
                     width = x_max - x_min + 1
                     if local_child_of_family.has_graphical_representation():
                         local_child_of_family.graphical_representations[0].wife_width = \

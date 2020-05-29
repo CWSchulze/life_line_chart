@@ -125,8 +125,8 @@ class GraphicalIndividual():
                     x_min.append(x_pos)
                     x_max.append(x_pos)
             # add siblings
-            x_v = [c[2].graphical_representations[0].get_x_position()[self.strongly_connected_parent_family.family_id][1] for c_id, c in self.strongly_connected_parent_family.visible_children.items()
-                        if self.strongly_connected_parent_family.family_id in c[2].graphical_representations[0].get_x_position()]
+            x_v = [gr_c.get_x_position()[self.strongly_connected_parent_family.family_id][1] for gr_c in self.strongly_connected_parent_family.visible_children
+                        if self.strongly_connected_parent_family.family_id in gr_c.get_x_position()]
             x_min += x_v
             x_max += x_v
         x_min = min(x_min)
