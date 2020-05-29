@@ -207,7 +207,7 @@ class BaseSVGChart(BaseChart):
         self.max_x_index = max_x_index + 1  # +200
 
         for gr_individual in self.graphical_individual_representations:
-            birth_date_ov = gr_individual.get_birth_date_ov()
+            birth_date_ov = gr_individual.birth_date_ov
             if not birth_date_ov:
                 continue
             death_event = gr_individual.get_death_event()
@@ -607,7 +607,7 @@ class BaseSVGChart(BaseChart):
         additional_items = []
         for key, value in self.additional_graphical_items.items():
             additional_items += value
-        sorted_individuals = [(gr.get_birth_date_ov(), index, gr)
+        sorted_individuals = [(gr.birth_date_ov, index, gr)
                               for index, gr in enumerate(self.graphical_individual_representations)]
         sorted_individuals.sort()
         sorted_individual_items = []
