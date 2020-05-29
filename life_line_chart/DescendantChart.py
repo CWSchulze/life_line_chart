@@ -159,8 +159,8 @@ class DescendantChart(BaseSVGChart):
         self.max_x_index = max(self.max_x_index, x_position)
 
         # recalculate
-        birth_ordinal_value = gr_individual.get_birth_date_ov()
-        death_ordinal_value = gr_individual.get_death_date_ov()
+        birth_ordinal_value = gr_individual.birth_date_ov
+        death_ordinal_value = gr_individual.death_date_ov
         if self.min_ordinal is not None and self.max_ordinal is not None:
             self.min_ordinal = min(self.min_ordinal, birth_ordinal_value)
             self.max_ordinal = max(self.max_ordinal, death_ordinal_value)
