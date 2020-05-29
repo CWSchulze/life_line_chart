@@ -25,10 +25,23 @@ class GraphicalIndividual():
         self.__instances = instances
         self.individual = self.__instances[('i', self.individual_id)]
         self.individual.graphical_representations.append(self)
+        self.debug_label = ""
         pass
 
     def __repr__(self):
         return 'gr_individual "' + self.individual.plain_name + '" ' + self.individual.birth_date
+
+    def __lt__(self, other):
+        """
+        Sorting by birth date
+
+        Args:
+            other (GraphicalIndividual): the other instance
+
+        Returns:
+            bool: is less than
+        """
+        return self.birth_date_ov < other.birth_date_ov
 
     def get_marriages(self):
         marriages = self.individual.marriages
