@@ -15,7 +15,7 @@ class GraphicalFamily():
         self.marriage = self.family.marriage
 
         # Tells which children are visible
-        self.visible_children = []
+        self.visible_children = {}
 
         # Descendant chart: Used to define under which family this family has
         # been placed (e.g. if wife/husband are from different branches of the
@@ -35,9 +35,9 @@ class GraphicalFamily():
         return self.family.get_spouse(individual.individual_id).graphical_representations[0]
 
     def add_visible_children(self, individual):
-        if individual.individual_id not in self.visible_children and individual.graphical_representations[0].get_birth_date_ov():
+        if individual.individual_id not in self.visible_children and individual.graphical_representations[0].birth_date_ov:
             self.visible_children[individual.individual_id] = (
-                individual.graphical_representations[0].get_birth_date_ov(),
+                individual.graphical_representations[0].birth_date_ov,
                 len(self.visible_children),
                 individual
             )
