@@ -53,7 +53,7 @@ class AncestorChart(BaseSVGChart):
         # configuration of this chart
         self._chart_configuration.update(AncestorChart.DEFAULT_CHART_CONFIGURATION)
 
-    def select_individuals(self, individual, generations=None, color=None, filter=None):
+    def select_individuals(self, individual, generations=None, color=None, filter=None, discovery_cache=[]):
         """
         Select individuals to show. This is done by creating instances of graphical representations.
 
@@ -78,6 +78,8 @@ class AncestorChart(BaseSVGChart):
                 gr_individual.color = self._instances.color_generator(individual)
             else:
                 gr_individual.color = color
+            discovery_cache.append(individual.individual_id)
+            gr_individual.debug_label = '\n' + str(len(discovery_cache))
         else:
             # must not leave here, because merging of different family branches would stop here
             # if len(individual.child_of_families) > 0 and individual.child_of_families[0].has_graphical_representation():
