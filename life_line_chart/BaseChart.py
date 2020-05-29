@@ -377,13 +377,13 @@ class BaseChart():
                     v[x_index] = []
                     position_to_person_map[x_index] = []
                 if i == 0:
-                    start_y = gr_individual.get_birth_date_ov()
+                    start_y = gr_individual.birth_date_ov
                 else:
                     start_y = list(x_pos.values())[i][0]
                 if i < len(x_pos) - 1:
                     end_y = list(x_pos.values())[i+1][0]
                 else:
-                    end_y = gr_individual.get_death_date_ov()
+                    end_y = gr_individual.death_date_ov
                 position_to_person_map[x_index].append({
                     'start': start_y,
                     'end': end_y,
@@ -400,10 +400,10 @@ class BaseChart():
         for x_index, graphical_individual_representation_list in v.items():
             for index, graphical_individual_representation_a in enumerate(graphical_individual_representation_list):
                 for graphical_individual_representation_b in graphical_individual_representation_list[index+1:]:
-                    birth_position_a = graphical_individual_representation_a.get_birth_date_ov() - 365*15
-                    birth_position_b = graphical_individual_representation_b.get_birth_date_ov() - 365*15
-                    death_position_a = graphical_individual_representation_a.get_death_date_ov() + 365*15
-                    death_position_b = graphical_individual_representation_b.get_death_date_ov() + 365*15
+                    birth_position_a = graphical_individual_representation_a.birth_date_ov - 365*15
+                    birth_position_b = graphical_individual_representation_b.birth_date_ov - 365*15
+                    death_position_a = graphical_individual_representation_a.death_date_ov + 365*15
+                    death_position_b = graphical_individual_representation_b.death_date_ov + 365*15
                     if ((birth_position_a - birth_position_b)
                                 * (birth_position_a - death_position_b) < 0 or
                                 (death_position_a - birth_position_b)
