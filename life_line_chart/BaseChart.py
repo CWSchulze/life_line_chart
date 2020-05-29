@@ -151,6 +151,7 @@ class BaseChart():
             del new_instance
             return None
         self.graphical_individual_representations.append(new_instance)
+        new_instance.g_id = (len(individual.graphical_representations) - 1, individual.individual_id)
         return new_instance
 
     def _create_family_graphical_representation(self, family):
@@ -170,6 +171,7 @@ class BaseChart():
         else:
             new_instance = family.graphical_representations[0]
             # print('the family was added twice:'+family.family_id)
+        new_instance.g_id = (len(family.graphical_representations) - 1, family.family_id)
         return new_instance
 
     def _calculate_sum_of_distances(self):

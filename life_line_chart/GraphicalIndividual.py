@@ -26,6 +26,7 @@ class GraphicalIndividual():
         self.individual = self.__instances[('i', self.individual_id)]
         self.individual.graphical_representations.append(self)
         self.debug_label = ""
+        self.g_id = None
         pass
 
     def __repr__(self):
