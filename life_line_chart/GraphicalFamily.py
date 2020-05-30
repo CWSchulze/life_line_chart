@@ -70,12 +70,12 @@ class GraphicalFamily():
     def connected_children(self):
         if self.g_id not in self.__instances.connection_container['f']:
             return None
-        strongly_connected_children = []
+        connected_children = []
         for g_id, connections in self.__instances.connection_container['f'][self.g_id].items():
             if 'weak_child' in connections:
-                strongly_connected_children.append(self.__instances[('i', g_id[1])].graphical_representations[g_id[0]])
-        if len(strongly_connected_children) > 0:
-            return strongly_connected_children
+                connected_children.append(self.__instances[('i', g_id[1])].graphical_representations[g_id[0]])
+        if len(connected_children) > 0:
+            return connected_children
         return []
 
     @property
