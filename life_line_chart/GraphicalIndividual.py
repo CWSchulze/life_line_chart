@@ -133,66 +133,6 @@ class GraphicalIndividual():
             x_min += x_v
             x_max += x_v
 
-        # # or "strongly linked cof has graphical representation" -> grouping of oldest ancestor siblings
-        # # without visible parents
-        # ancestors_are_visible = True#len([c for c in self.__instances.graph_link.get_strong_connections2_i(self).values() if c[0]in["4_child"]])>0
-        # # ancestors_are_visible = self.strongly_connected_parent_family is not None
-        # ancestors_are_strongly_connected_to_first_marriage2 = len([c for c in self.__instances.graph_link.get_strong_connections2_i(self).values() if c[0]in["4_child"]])>0
-        # strongly_connected_parent_families = self.__instances.graph_link.get_strong_connections2_i(self, ["1_child", "4_child"])
-        # for strongly_connected_parent_family in strongly_connected_parent_families:
-
-        #     # ancestors are not placed over first marriage, if the placement of the ancestors has already been done. E.g. siblings are not strongly connected
-        #     ancestors_are_strongly_connected_to_first_marriage = list(self._x_position.values())[0][1]==list(self._x_position.values())[index_of_first_marriage][1]
-        #     # ancestors are usually placed over first marriage, so count ancestors only if the searched family is the first one
-        #     first_marriage_is_what_we_search = list(self._x_position.keys())[index_of_first_marriage] == family_id
-        #     # if ancestors_are_visible and ancestors_are_strongly_connected_to_first_marriage2:
-        #     if ancestors_are_visible and ancestors_are_strongly_connected_to_first_marriage and first_marriage_is_what_we_search:
-        #         #strongly_connected_parent_family_ids = [k for k, c in self.__instances.graph_link.get_strong_connections2_i(self).items() if c[0]in["4_child"]]
-        #         #strongly_connected_parent_families = self.__instances.graph_link.get_strong_connections2_i(self, "4_child")
-        #         #strongly_connected_parent_family = self.__instances[('f',strongly_connected_parent_family_ids[0])].graphical_representations[0]
-        #         #strongly_connected_parent_family = self.strongly_connected_parent_family
-        #         # if family:
-        #         #     strongly_connected_parent_family_ids_ = [k for k, c in self.__instances.graph_link.get_strong_connections2_f(family).items() if c[0]in["4_child"]]
-        #         # strongly_connected_parent_family_ = self.__instances[('f',strongly_connected_parent_family_ids_[0])].graphical_representations[0]
-        #         # x = [k for k, c in self.__instances.graph_link.get_strong_connections2_f(family).items() if c[0]==3]
-        #         father, mother = strongly_connected_parent_family.family.get_husband_and_wife()
-        #         if father and father.has_graphical_representation():
-        #             # only handle if the father is visible
-        #             f_x_positions = father.graphical_representations[0].get_x_position()
-        #             index_of_first_marriage = 1 if f_x_positions[list(f_x_positions.keys())[0]][3] else 0
-        #             if list(f_x_positions.keys())[index_of_first_marriage] == strongly_connected_parent_family.family_id:
-        #             #if father:#.individual_id in strongly_connected_parent_family_ids_:
-        #                 # count ancestors only, if the visible parent family is the first marriage (strong graphical connection)
-        #                 f_x_min, f_x_max = father.graphical_representations[0].get_ancestor_range(
-        #                     strongly_connected_parent_family)
-        #                 x_min.append(f_x_min)
-        #                 x_max.append(f_x_max)
-        #             else:
-        #                 # ignore ancestors
-        #                 x_pos = father.graphical_representations[0].get_x_position()[strongly_connected_parent_family.family_id][1]
-        #                 x_min.append(x_pos)
-        #                 x_max.append(x_pos)
-        #         if mother and mother.has_graphical_representation():
-        #             # only handle if the father is visible
-        #             m_x_positions = mother.graphical_representations[0].get_x_position()
-        #             index_of_first_marriage = 1 if m_x_positions[list(m_x_positions.keys())[0]][3] else 0
-        #             if list(m_x_positions.keys())[index_of_first_marriage] == strongly_connected_parent_family.family_id:
-        #             #if mother.individual_id in strongly_connected_parent_family_ids_:#strongly_connected_parent_family:
-        #                 # count ancestors only, if the visible parent family is the first marriage (strong graphical connection)
-        #                 m_x_min, m_x_max = mother.graphical_representations[0].get_ancestor_range(
-        #                     strongly_connected_parent_family)
-        #                 x_min.append(m_x_min)
-        #                 x_max.append(m_x_max)
-        #             else:
-        #                 # ignore ancestors
-        #                 x_pos = mother.graphical_representations[0].get_x_position()[strongly_connected_parent_family.family_id][1]
-        #                 x_min.append(x_pos)
-        #                 x_max.append(x_pos)
-        #         # add siblings
-        #         x_v = [gr_c.get_x_position()[strongly_connected_parent_family.family_id][1] for gr_c in strongly_connected_parent_family.visible_children
-        #                     if strongly_connected_parent_family.family_id in gr_c.get_x_position()]
-        #         x_min += x_v
-        #         x_max += x_v
         x_min = min(x_min)
         x_max = max(x_max)
         self.__instances.ancestor_width_cache[(self.individual_id, family_id)] = x_min, x_max
