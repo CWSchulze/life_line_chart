@@ -97,10 +97,17 @@ class AncestorChart(BaseSVGChart):
                 father, mother = child_of_family.get_husband_and_wife()
                 if father:
                     self.select_individuals(
-                        father, generations - 1, color=gr_individual.color if self._positioning['fathers_have_the_same_color'] else None, filter=filter)
+                        father,
+                        generations - 1,
+                        color=gr_individual.color if self._positioning['fathers_have_the_same_color'] else None,
+                        filter=filter,
+                        discovery_cache=discovery_cache)
                 if mother:
                     self.select_individuals(
-                        mother, generations - 1, filter=filter)
+                        mother,
+                        generations - 1,
+                        filter=filter,
+                        discovery_cache=discovery_cache)
             # gr_family.visible_children.sort()
 
     def select_family_children(self, family, filter=None):
