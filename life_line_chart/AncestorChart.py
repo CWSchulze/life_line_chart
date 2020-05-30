@@ -223,9 +223,8 @@ class AncestorChart(BaseSVGChart):
                         self.add_strong_connection(local_child_of_family, individual)
                     self.place_selected_individuals(
                         gr_mother.individual, spouse_family, local_child_of_family, mothers_born_in_family, x_position, discovery_cache)
-                    x_min, x_max = gr_mother.get_ancestor_range(
-                        gr_local_child_of_family)
-                    width = x_max - x_min + 1
+                    width = gr_mother.get_ancestor_width(
+                       gr_local_child_of_family)
                     if local_child_of_family.has_graphical_representation():
                         local_child_of_family.graphical_representations[0].wife_width = \
                             lambda gr=gr_mother, cof=local_child_of_family: gr.get_ancestor_width(cof)
