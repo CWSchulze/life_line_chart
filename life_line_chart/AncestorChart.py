@@ -88,10 +88,10 @@ class AncestorChart(BaseSVGChart):
 
         child_of_families = individual.child_of_families[:1]
         for child_of_family in child_of_families:
-            family = self._create_family_graphical_representation(
+            gr_family = self._create_family_graphical_representation(
                 child_of_family)
-            family.add_visible_children(gr_individual)
-            gr_individual.strongly_connected_parent_family = family
+            gr_family.add_visible_children(gr_individual)
+            gr_individual.strongly_connected_parent_family = gr_family
             # self.add_strong_connection()
             if generations > 0 or generations < 0:
                 father, mother = child_of_family.get_husband_and_wife()
@@ -101,7 +101,7 @@ class AncestorChart(BaseSVGChart):
                 if mother:
                     self.select_individuals(
                         mother, generations - 1, filter=filter)
-            # family.visible_children.sort()
+            # gr_family.visible_children.sort()
 
     def select_family_children(self, family, filter=None):
         """
