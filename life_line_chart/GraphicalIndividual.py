@@ -24,10 +24,9 @@ class GraphicalIndividual():
         self.individual.graphical_representations.append(self)
         self.debug_label = ""
         self.g_id = None
-        self.connected_parent_families = []
         # This individual is placed in this parent family, so it is strongly connected.
         # Optimization algorithms must not break this connection.
-        strongly_connected_parent_family = None
+        self.strongly_connected_parent_family = None
         pass
 
     def __repr__(self):
