@@ -122,11 +122,10 @@ class BaseIndividual():
 
     def _initialize(self):
         self._marriage_family_ids = self._get_marriage_family_ids()
-        unsorted_marriages = [
-            self._instances[('f', m)] for m in self._marriage_family_ids]
-        sorted_pairs = zip([(m.marriage['ordinal_value'], i) if m.marriage else (
-            0, i) for i, m in enumerate(unsorted_marriages)], unsorted_marriages)
-        self.marriages = [m for ov, m in sorted(sorted_pairs)]
+        self.marriages = [
+            self._instances[('f', m)] for m in self._marriage_family_ids
+            if self._instances[('f', m)].marriage]
+        self.marriages.sort()
 
     def __lt__(self, other):
         """
