@@ -100,13 +100,14 @@ class AncestorChart(BaseSVGChart):
                 father, mother = child_of_family.get_husband_and_wife()
                 new_gr = new_f_gr and father and not father.has_graphical_representation()
                 if father:
-                    self.select_individuals(
-                        father, generations - 1 if go_deeper else 0,
+                    gr_father = self.select_individuals(
+                        father,
+                        generations - 1 if go_deeper else 0,
                         color=gr_individual.color if self._positioning['fathers_have_the_same_color'] else None,
                         filter=filter,
                         discovery_cache=discovery_cache)
 
-                    if father.has_graphical_representation():
+                    if gr_father:
                         self.add_strong_connection2(gr_child_of_family, father.graphical_representations[-1], "2_father")
             gr_individual.strongly_connected_parent_family = gr_child_of_family
             self.add_strong_connection2(gr_child_of_family, gr_individual,"1_child")
@@ -116,19 +117,20 @@ class AncestorChart(BaseSVGChart):
                 father, mother = child_of_family.get_husband_and_wife()
                 new_gr = new_f_gr and mother and not mother.has_graphical_representation()
                 if mother:
-                    self.select_individuals(
+                    gr_mother = self.select_individuals(
                         mother, generations - 1 if go_deeper else 0,
                         filter=filter,
                         discovery_cache=discovery_cache)
                     # if mother.has_graphical_representation():
                     # self.add_strong_connection2(gr_child_of_family, mother.graphical_representations[0],3)
-                    if mother.has_graphical_representation():
+                    if gr_mother:
                         self.add_strong_connection2(gr_child_of_family, mother.graphical_representations[-1],"2_mother")
                 if father is not None and father.has_graphical_representation() or \
                             mother is not None and mother.has_graphical_representation()  :
                             pass
                     #self.add_strong_connection2(gr_child_of_family, gr_individual)
                 # gr_child_of_family.visible_children.sort()
+        return gr_individual
 
     def select_family_children(self, family, filter=None):
         """
