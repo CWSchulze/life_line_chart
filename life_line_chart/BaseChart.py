@@ -670,17 +670,6 @@ class BaseChart():
         if family.family_id not in self.graphical_strong_connection_options[individual.individual_id]:
             self.graphical_strong_connection_options[individual.individual_id].append(family.family_id)
 
-    def is_strongly_connected2(self, gr_family, gr_individual, connection_names=None):
-        if gr_family is None:
-            return False
-        target_individual_ids = self.XX_db['f'].get(gr_family.g_id)
-        if target_individual_ids is None:
-            return {}
-        connection = target_individual_ids[gr_individual.g_id]
-        if connection_names:
-            return connection[0] in connection_names
-        return len(target_individual_ids) > 0
-
     def may_be_strongly_connected(self, family, individual):
         if family is None or individual is None:
             return False
@@ -690,13 +679,6 @@ class BaseChart():
             return True
         return False
 
-    def get_strong_connections(self, gr_individual):
-        if gr_individual is None:
-            return False
-        target_family_id = self.graphical_strong_connections.get(gr_individual.g_id)
-        if target_family_id is None:
-            return []
-        return target_family_id
 
     def get_strong_connections2_i(self, gr_individual, connection_names=None):
         if gr_individual is None:
