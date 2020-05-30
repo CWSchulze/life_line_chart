@@ -14,6 +14,9 @@ class GraphicalFamily():
         self.family.graphical_representations.append(self)
         self.marriage = self.family.marriage
 
+        self.gr_husb = None
+        self.gr_wife = None
+
         # Tells which children are visible
         self.visible_children = []
 

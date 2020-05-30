@@ -216,6 +216,18 @@ class GraphicalIndividual():
         return x_min, x_max
 
     @property
+    def connected_parent_families(self):
+        if self.g_id not in self.__instances.connection_container['i']:
+            return []
+        connected_parent_families = []
+        for g_id, connections in self.__instances.connection_container['i'][self.g_id].items():
+            if 'weak_child' in connections:
+                connected_parent_families.append(self.__instances[('f', g_id[1])].graphical_representations[g_id[0]])
+        if len(connected_parent_families) > 0:
+            return connected_parent_families
+        return []
+
+    @property
     def strongly_connected_parent_family(self):
         if self.g_id not in self.__instances.connection_container['i']:
             return None
