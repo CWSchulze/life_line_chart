@@ -32,6 +32,8 @@ class InstanceContainer():
         self._individual_constructor = individual_constructor
         self.instantiate_all = instantiate_all
         self.ancestor_width_cache = {}
+        self.connection_container = {}
+        self.connection_container.update({'i': {}, 'f': {}})
 
     def __iter__(self):  # iterate over all keys
         for type_id, instance in self._data.keys():
@@ -90,6 +92,9 @@ class InstanceContainer():
         """
         self._data.clear()
         self._data.update({('i', None): None, ('f', None): None})
+        self.connection_container.clear()
+        self.connection_container.update({'i': {}, 'f': {}})
+        self.ancestor_width_cache.clear()
 
     def color_generator(self, individual):
         """

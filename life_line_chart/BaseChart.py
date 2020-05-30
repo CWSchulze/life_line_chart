@@ -70,11 +70,21 @@ class BaseChart():
         if formatting:
             self._formatting.update(formatting)
         self._instances = instance_container
+        self._instances.graph_link = self
         self._instances[('i', None)] = None
         self.graphical_individual_representations = []
         self.graphical_family_representations = []
         # strong graphical connections which must not be broken by optimization algorithms
         self.graphical_strong_connections = {}
+        self.graphical_strong_connections2 = {}
+        self.graphical_strong_connections2_bl = {}
+
+        self.XX_db = {
+            'f':{},
+            'i':{}
+        }
+        self.XX_conn_list = []
+
         self.graphical_strong_connection_options = {}
         self.additional_graphical_items = {}
         logger.debug('finished creating instances')
@@ -271,18 +281,9 @@ class BaseChart():
                 cof = cofs[0]
                 gr_cof = cofs[0].graphical_representations[0]
 
-                # if bool(individual.graphical_representations[0].strongly_connected_parent_family and individual.graphical_representations[0].strongly_connected_parent_family.family_id == cof.family_id) != (self.is_strongly_connected(cof, individual)):
-                #     logger.fatal('ARRRG' + str(individual.plain_name))
-                # b = self.may_be_strongly_connected(gr_cof, individual)
-                # a = individual.graphical_representations[0].strongly_connected_parent_family and \
-                #     individual.graphical_representations[0].strongly_connected_parent_family.family_id == cof.family_id and \
-                #     cof.has_graphical_representation_of_spouse()
-                # if a != b:
-                #     logger.fatal('UURRRG' + str(individual.plain_name))
-
-                if self.is_strongly_connected(gr_cof, individual):
-                #if individual.graphical_representations[0].strongly_connected_parent_family and individual.graphical_representations[0].strongly_connected_parent_family.family_id == cof.family_id:
-                    if cof.husb:
+                strongly_connected_parent_family = gr_individual.strongly_connected_parent_family
+                if strongly_connected_parent_family and strongly_connected_parent_family.family_id == cof.family_id:
+                    if cof.husb and cof.husb.has_graphical_representation():
                         # if cof.husb.graphical_representations[0].get_x_position() and len(cof.husb.graphical_representations[0].get_x_position()) == 1:
                             self._move_individual_and_ancestors(
                                 cof.husb.graphical_representations[0], gr_cof, x_index_offset)
@@ -635,30 +636,50 @@ class BaseChart():
         self.additional_graphical_items.clear()
         self.graphical_individual_representations.clear()
         self.graphical_family_representations.clear()
-        self.graphical_strong_connections.clear()
         self.graphical_strong_connection_options.clear()
         self.position_to_person_map = {}
         for _, instance in self._instances.items():
             instance.graphical_representations.clear()
 
-    def add_strong_connection(self, family, individual):
-        if individual.individual_id not in self.graphical_strong_connections:
-            self.graphical_strong_connections[individual.individual_id] = []
-        self.graphical_strong_connections[individual.individual_id].append(family.family_id)
+    def add_strong_connection2(self, gr_family, gr_individual, priority):
+        self.XX_conn_list.append((
+            gr_family.g_id,
+            gr_individual.g_id,
+            (priority, gr_individual.birth_date_ov)
+            ))
+        if gr_family.g_id not in self.XX_db['f']:
+            self.XX_db['f'][gr_family.g_id] = {}
+        if gr_individual.g_id not in self.XX_db['f'][gr_family.g_id] or True:
+            self.XX_db['f'][gr_family.g_id][gr_individual.g_id] = self.XX_conn_list[-1][2]
+        else:
+            print("x")
+            pass
+
+        if gr_individual.g_id not in self.XX_db['i']:
+            self.XX_db['i'][gr_individual.g_id] = {}
+        if gr_family.g_id not in self.XX_db['i'][gr_individual.g_id] or True:
+            self.XX_db['i'][gr_individual.g_id][gr_family.g_id] = self.XX_conn_list[-1][2]
+            #self.XX_db['i'][gr_individual.g_id].sort(key=lambda tup: tup[2])
+        else:
+            print("x")
+            pass
 
     def add_strong_connection_option(self, family, individual):
         if individual.individual_id not in self.graphical_strong_connection_options:
             self.graphical_strong_connection_options[individual.individual_id] = []
-        self.graphical_strong_connection_options[individual.individual_id].append(family.family_id)
+        if family.family_id not in self.graphical_strong_connection_options[individual.individual_id]:
+            self.graphical_strong_connection_options[individual.individual_id].append(family.family_id)
 
-    def is_strongly_connected(self, family, individual):
-        if family is None or individual is None:
+    def is_strongly_connected2(self, gr_family, gr_individual, connection_names=None):
+        if gr_family is None:
             return False
-        target_family_id = self.graphical_strong_connections.get(individual.individual_id)
-
-        if target_family_id is not None and family.family_id in target_family_id:
-            return True
-        return False
+        target_individual_ids = self.XX_db['f'].get(gr_family.g_id)
+        if target_individual_ids is None:
+            return {}
+        connection = target_individual_ids[gr_individual.g_id]
+        if connection_names:
+            return connection[0] in connection_names
+        return len(target_individual_ids) > 0
 
     def may_be_strongly_connected(self, family, individual):
         if family is None or individual is None:
@@ -668,3 +689,32 @@ class BaseChart():
         if target_family_id is not None and family.family_id in target_family_id:
             return True
         return False
+
+    def get_strong_connections(self, gr_individual):
+        if gr_individual is None:
+            return False
+        target_family_id = self.graphical_strong_connections.get(gr_individual.g_id)
+        if target_family_id is None:
+            return []
+        return target_family_id
+
+    def get_strong_connections2_i(self, gr_individual, connection_names=None):
+        if gr_individual is None:
+            return False
+        target_family_ids = self.XX_db['i'].get(gr_individual.g_id)
+        if target_family_ids is None:
+            return {}
+        if connection_names:
+            return [self._instances[('f',f_id)].graphical_representations[g_id] for (g_id, f_id), (name, ov) in target_family_ids.items() if name in connection_names]
+        return target_family_ids
+
+    def get_strong_connections2_f(self, gr_family, connection_names=None):
+        if gr_family is None:
+            return False
+        target_individual_ids = self.XX_db['f'].get(gr_family.g_id)
+        if target_individual_ids is None:
+            return {}
+        if connection_names:
+            return [self._instances[('i',i_id)].graphical_representations[g_id] for (g_id, i_id), (name, ov) in target_individual_ids.items() if name in connection_names]
+        return target_individual_ids
+

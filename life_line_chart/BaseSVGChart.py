@@ -303,7 +303,33 @@ class BaseSVGChart(BaseChart):
             _death_position = self._map_position(*_death_original_location)
             knots.append((x_pos_list[0][1], birth_date_ov))
             images = []
-            for index, (marriage_ring_index, marriage_ordinal, new_x_index_after_marriage, label) in enumerate(zip(marriage_ring_indices, marriage_ordinals, new_x_indices_after_marriage, marriage_labels)):
+            for index, (marriage_ring_index, marriage_ordinal, new_x_index_after_marriage, label, family_id) in enumerate(zip(marriage_ring_indices, marriage_ordinals, new_x_indices_after_marriage, marriage_labels, marriage_id)):
+                for (prio_, ov), (g_id, i_id) in sorted(zip(self.XX_db['f'][(0,family_id)].values(), self.XX_db['f'][(0,family_id)].keys())):
+                    prio = int(prio_[0])
+                    def coordinate_transformation(x, y):
+                        new_x, new_y = self._map_position(x, y)
+                        return new_x + new_y*1j
+                    if not self._instances[('i', i_id)].has_graphical_representation():
+                        continue
+                    l_i = self._instances[('i', i_id)].graphical_representations[0]
+                    x_p_ = sorted([(ov, pos, index, family_id, flag)
+                                 for index, (family_id, (ov, pos, f, flag)) in enumerate(l_i.get_x_position().items())])
+                    x_p = x_p_[0][1]
+                    debug_items.append(
+                        {
+                    'type': 'path',
+                    'config': {'type': 'Line', 'arguments': (
+                            coordinate_transformation(
+                                marriage_ring_index, marriage_ordinal-5*365),
+                            coordinate_transformation(
+                                x_p, l_i.birth_date_ov)
+                        )},
+                    'color': (25*prio, 25*prio, 25*prio),
+                    'stroke_width': self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.1*prio
+                }
+
+                    )
+                    i_id
                 if not self._formatting['no_ring']:
                     ring_position = self._map_position(
                         marriage_ring_index, marriage_ordinal)
