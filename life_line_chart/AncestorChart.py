@@ -109,6 +109,7 @@ class AncestorChart(BaseSVGChart):
 
                     if gr_father:
                         self.add_strong_connection2(gr_child_of_family, father.graphical_representations[-1], "2_father")
+                        gr_child_of_family.gr_husb = gr_father
             gr_individual.strongly_connected_parent_family = gr_child_of_family
             self.add_strong_connection2(gr_child_of_family, gr_individual,"1_child")
             gr_individual.connected_parent_families.append(gr_child_of_family)
@@ -125,6 +126,7 @@ class AncestorChart(BaseSVGChart):
                     # self.add_strong_connection2(gr_child_of_family, mother.graphical_representations[0],3)
                     if gr_mother:
                         self.add_strong_connection2(gr_child_of_family, mother.graphical_representations[-1],"2_mother")
+                        gr_child_of_family.gr_wife = gr_mother
                 if father is not None and father.has_graphical_representation() or \
                             mother is not None and mother.has_graphical_representation()  :
                             pass
