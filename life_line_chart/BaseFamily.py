@@ -17,6 +17,18 @@ class BaseFamily():
     def __repr__(self):
         return 'family "' + self.husb_name + '"+"' + self.wife_name + '"'
 
+    def __lt__(self, other):
+        """
+        Sorting by marriage date
+
+        Args:
+            other (BaseFamily): the other instance
+
+        Returns:
+            bool: is less than
+        """
+        return self.marriage['ordinal_value'] < other.marriage['ordinal_value']
+
     def _initialize(self):
         self.husband_individual_id, self.wife_individual_id = self._get_husband_and_wife_id()
         self.children_individual_ids = self._get_children_ids()

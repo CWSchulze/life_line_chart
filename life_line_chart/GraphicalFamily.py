@@ -30,6 +30,18 @@ class GraphicalFamily():
     def __repr__(self):
         return 'gr_family "' + self.family.husb_name + '"+"' + self.family.wife_name + '"'
 
+    def __lt__(self, other):
+        """
+        Sorting by marriage date
+
+        Args:
+            other (GraphicalFamily): the other instance
+
+        Returns:
+            bool: is less than
+        """
+        return self.family.marriage['ordinal_value'] < other.family.marriage['ordinal_value']
+
     def get_spouse(self, individual):
         spouse = self.family.get_spouse(
             individual.individual_id)
