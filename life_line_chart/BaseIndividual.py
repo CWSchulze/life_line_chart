@@ -19,7 +19,8 @@ def estimate_death_date(individual):
             'tag_name': 'None',
             'date': date,
             'ordinal_value': date.toordinal(),
-            'comment': f'Estimated (max age {max_age})'
+            'comment': f'Estimated (max age {max_age})',
+            'precision': 'y'
         }
         if date > datetime.datetime.now():
             individual.events['death_or_burial']['date'] = datetime.datetime.now()
@@ -55,7 +56,8 @@ def estimate_birth_date(individual, instances):
                         'tag_name': 'MARR',
                         'comment': 'Estimated (min 1 after parents marriage)',
                         'date': date,
-                        'ordinal_value': date.toordinal()
+                        'ordinal_value': date.toordinal(),
+                        'precision': 'y'
                     }
         if individual.events['birth_or_christening']:
             date = individual.events['birth_or_christening']['date']
@@ -78,7 +80,8 @@ def estimate_birth_date(individual, instances):
                         'tag_name': 'MARR',
                         'comment': 'Estimated (min 25 at marriage)',
                         'date': date,
-                        'ordinal_value': date.toordinal()
+                        'ordinal_value': date.toordinal(),
+                        'precision': 'y'
                     }
         if individual.events['birth_or_christening'] and individual.events['birth_or_christening']['date'].year > 25:
             date = individual.events['birth_or_christening']['date']
@@ -94,7 +97,8 @@ def estimate_birth_date(individual, instances):
                 'tag_name': 'None',
                 'date': date,
                 'ordinal_value': date.toordinal(),
-                'comment': 'Estimated (max age 75)'
+                'comment': 'Estimated (max age 75)',
+                'precision': 'y'
             }
 
 

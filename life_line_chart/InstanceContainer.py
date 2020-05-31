@@ -158,8 +158,10 @@ class InstanceContainer():
 
         event = individual.events['birth_or_christening']
         if event:
-            if event['comment']:
+            if event['precision'] != 'dmy':
                 return str(event['date'].date().year)
+            elif event['precision'] != 'my':
+                return event['date'].date().strftime('%m.%Y')
             else:
                 return event['date'].date().strftime('%d.%m.%Y')
         return None

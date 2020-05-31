@@ -47,6 +47,7 @@ def get_date_dict_from_tag(parent_item, tag_name):
         if 'DATE' not in parent_item[tag_name]:
             return
         comment = None
+        precision = ''
         content = parent_item[tag_name]['DATE']['tag_data']
         date_info = _date_expr.match(content)
         if date_info is None:
@@ -75,24 +76,31 @@ def get_date_dict_from_tag(parent_item, tag_name):
             # move to the end of the interval
             if date_info.group(5):
                 day = int(date_info.group(5))
+                precision += 'd'
             if date_info.group(6):
                 month = _months.index(date_info.group(6)) + 1
+                precision += 'm'
             if date_info.group(7):
                 year = int(date_info.group(7))
+                precision += 'y'
         else:
             if date_info.group(2):
                 day = int(date_info.group(2))
+                precision += 'd'
             if date_info.group(3):
                 month = _months.index(date_info.group(3)) + 1
+                precision += 'm'
             if date_info.group(4):
                 year = int(date_info.group(4))
+                precision += 'y'
 
         date = datetime.datetime(year, month, day, 0, 0, 0, 0)
         return {
             'tag_name': tag_name,
             'date': date,
             'ordinal_value': date.toordinal(),
-            'comment': comment
+            'comment': comment,
+            'precision' : precision
         }
 
     except:
