@@ -259,49 +259,51 @@ class BaseChart():
             family (BaseFamily): family instance
             x_index_offset (int): vertical offset
         """
-        individual = gr_individual.individual
+
         if family is None:
             family_id = family
-            # return
         else:
             family_id = family.family_id
-        if True or len(gr_individual.graphical_representations) > 0:
+
+        # move this individual
+        x_pos = self._move_single_individual(
+            gr_individual, family, x_index_offset)
+
+        if gr_individual.first_marriage_strongly_connected_to_parent_family == True:
+            # if the head of the individual is detached, then dont move anyone else
+            return
+        vms = gr_individual.visible_marriages
+        if vms:
+            # if this is not the first marriage, dont move anyone else
+            if vms[0].family_id != family_id:
+                return
+
+        cofs = gr_individual.individual.child_of_families
+        if len(cofs) == 0 or not cofs[0].has_graphical_representation():
+            return
+        cof = cofs[0]
+        gr_cof = cofs[0].graphical_representations[0]
+
+        #for strongly_connected_parent_family in gr_individual.connected_parent_families:
+        strongly_connected_parent_family = gr_individual.strongly_connected_parent_family
+        if strongly_connected_parent_family:
+            if strongly_connected_parent_family.gr_husb:
+                # if cof.husb.graphical_representations[0].get_x_position() and len(cof.husb.graphical_representations[0].get_x_position()) == 1:
+                    self._move_individual_and_ancestors(
+                        strongly_connected_parent_family.gr_husb, strongly_connected_parent_family, x_index_offset)
+            if strongly_connected_parent_family.gr_wife:
+                # if cof.wife.graphical_representations[0].get_x_position() and len(cof.wife.graphical_representations[0].get_x_position()) == 1:
+                    self._move_individual_and_ancestors(
+                        strongly_connected_parent_family.gr_wife, strongly_connected_parent_family, x_index_offset)
+        # print (gr_individual.get)
+        for gr_child_individual in gr_cof.visible_children:
+            if gr_child_individual == gr_individual:
+                continue
+            # pos = sorted(
+            #     list(gr_child_individual.get_x_position().values()))[0]
+            # if pos[2]:
             x_pos = self._move_single_individual(
-                gr_individual, family, x_index_offset)
-            if None in x_pos or True:
-                strongly_connected_parent_family = gr_individual.strongly_connected_parent_family
-                # only move ancestors if they exist
-                # len(x_pos) <= 1 or
-                if list(sorted(x_pos.values()))[0][1] != x_pos[family_id][1]:
-                    return
-                # for cof in gr_individual.child_of_families:
-
-                cofs = gr_individual.individual.child_of_families
-                if len(cofs) == 0 or not cofs[0].has_graphical_representation():
-                    return
-                cof = cofs[0]
-                gr_cof = cofs[0].graphical_representations[0]
-
-                #for strongly_connected_parent_family in gr_individual.connected_parent_families:
-                if strongly_connected_parent_family:
-                    if strongly_connected_parent_family.gr_husb:
-                        # if cof.husb.graphical_representations[0].get_x_position() and len(cof.husb.graphical_representations[0].get_x_position()) == 1:
-                            self._move_individual_and_ancestors(
-                                strongly_connected_parent_family.gr_husb, strongly_connected_parent_family, x_index_offset)
-                    if strongly_connected_parent_family.gr_wife:
-                        # if cof.wife.graphical_representations[0].get_x_position() and len(cof.wife.graphical_representations[0].get_x_position()) == 1:
-                            self._move_individual_and_ancestors(
-                                strongly_connected_parent_family.gr_wife, strongly_connected_parent_family, x_index_offset)
-                # print (gr_individual.get)
-                if len(gr_cof.visible_children) > 1:
-                    for gr_child_individual in gr_cof.visible_children:
-                        if gr_child_individual.individual.individual_id == gr_individual.individual.individual_id:
-                            continue
-                        pos = sorted(
-                            list(gr_child_individual.get_x_position().values()))[0]
-                        if pos[2]:
-                            x_pos = self._move_single_individual(
-                                gr_child_individual, pos[2], x_index_offset)
+                gr_child_individual, cof, x_index_offset)
 
     def _flip_family(self, family):
         """
