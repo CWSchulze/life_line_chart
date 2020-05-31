@@ -58,7 +58,11 @@ class GedcomFamily(BaseFamily):
         Returns:
             str: husband name
         """
-        return self._database_indi[self.husband_individual_id]['NAME']['tag_data']
+        try:
+            name = self._database_indi[self.husband_individual_id]['NAME']['tag_data']
+        except KeyError:
+            name = "unknown"
+        return name
 
     def _get_wife_name(self):
         """
@@ -67,7 +71,11 @@ class GedcomFamily(BaseFamily):
         Returns:
             str: wife name
         """
-        return self._database_indi[self.wife_individual_id]['NAME']['tag_data']
+        try:
+            name = self._database_indi[self.wife_individual_id]['NAME']['tag_data']
+        except KeyError:
+            name = "unknown"
+        return name
 
     husb_name = property(_get_husb_name)
     wife_name = property(_get_wife_name)
