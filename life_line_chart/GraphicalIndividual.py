@@ -85,7 +85,10 @@ class GraphicalIndividual():
         # if [3] is true, then that index is the ancestor family
         index_of_first_marriage = 1 if self._x_position[list(self._x_position.keys())[0]][3] else 0
 
-        strongly_connected_parent_family = self.strongly_connected_parent_family
+        if self.connected_parent_families:
+            strongly_connected_parent_family = self.connected_parent_families[0]
+        else:
+            strongly_connected_parent_family = None
 
         ancestors_are_visible = strongly_connected_parent_family is not None
         # ancestors are not placed over first marriage, if the placement of the ancestors has already been done. E.g. siblings are not strongly connected
