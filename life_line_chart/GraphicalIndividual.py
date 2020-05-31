@@ -24,6 +24,8 @@ class GraphicalIndividual():
         self.individual.graphical_representations.append(self)
         self.debug_label = ""
         self.g_id = None
+
+        self.first_marriage_strongly_connected_to_parent_family = None
         # This individual is placed in this parent family, so it is strongly connected.
         # Optimization algorithms must not break this connection.
         self.strongly_connected_parent_family = None
