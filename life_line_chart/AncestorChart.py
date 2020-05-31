@@ -188,9 +188,8 @@ class AncestorChart(BaseSVGChart):
                     gr_father, spouse_family, local_child_of_family, fathers_born_in_family, x_position, discovery_cache)
                 width = gr_father.get_ancestor_width(
                     gr_local_child_of_family)
-                if local_child_of_family.has_graphical_representation():
-                    local_child_of_family.graphical_representations[0].husb_width = \
-                        lambda gr=gr_father, cof=local_child_of_family: gr.get_ancestor_width(cof)
+                gr_local_child_of_family.husb_width = \
+                    lambda gr=gr_father, cof=local_child_of_family: gr.get_ancestor_width(cof)
                 x_position += width
 
         # add the main individual and its visible siblings
@@ -246,9 +245,8 @@ class AncestorChart(BaseSVGChart):
                     gr_mother, spouse_family, local_child_of_family, mothers_born_in_family, x_position, discovery_cache)
                 width = gr_mother.get_ancestor_width(
                     gr_local_child_of_family)
-                if local_child_of_family.has_graphical_representation():
-                    local_child_of_family.graphical_representations[0].wife_width = \
-                        lambda gr=gr_mother, cof=local_child_of_family: gr.get_ancestor_width(cof)
+                gr_local_child_of_family.wife_width = \
+                    lambda gr=gr_mother, cof=local_child_of_family: gr.get_ancestor_width(cof)
                 x_position += width
 
         self.max_x_index = max(self.max_x_index, x_position)
