@@ -214,7 +214,23 @@ class GraphicalIndividual():
         return x_min, x_max
 
     @property
+    def visible_marriages(self):
+        """
+        sorted list of marriages which have a graphical representation
+
+        Returns:
+            list: visible marriages
+        """
+        return [m for m in self.individual.marriages if m.has_graphical_representation()]
+
+    @property
     def connected_parent_families(self):
+        """
+        child of families where this individual appears
+
+        Returns:
+            list: list of parent families
+        """
         if self.g_id not in self.__instances.connection_container['i']:
             return []
         connected_parent_families = []
@@ -227,6 +243,15 @@ class GraphicalIndividual():
 
     @property
     def strongly_connected_parent_family(self):
+        """
+        parent families which are strongly connected
+
+        Raises:
+            RuntimeError: placing error
+
+        Returns:
+            GraphicalFamily: strongly connected parent family
+        """
         if self.g_id not in self.__instances.connection_container['i']:
             return None
         strongly_connected_parent_families = []
