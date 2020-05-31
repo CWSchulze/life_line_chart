@@ -221,12 +221,20 @@ class GraphicalIndividual():
     @property
     def visible_marriages(self):
         """
-        sorted list of marriages which have a graphical representation
+        list of marriages which have a graphical representation
 
         Returns:
-            list: visible marriages
+            list: list of visible marriages
         """
-        return [m for m in self.individual.marriages if m.has_graphical_representation()]
+        if self.g_id not in self.__instances.connection_container['i']:
+            return []
+        connected_parent_families = []
+        for g_id, connections in self.__instances.connection_container['i'][self.g_id].items():
+            if 'gr_husb' in connections or 'gr_wife' in connections:
+                connected_parent_families.append(self.__instances[('f', g_id[1])].graphical_representations[g_id[0]])
+        if len(connected_parent_families) > 0:
+            return connected_parent_families
+        return []
 
     @property
     def connected_parent_families(self):
