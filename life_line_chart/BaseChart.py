@@ -689,14 +689,3 @@ class BaseChart():
         if connection_names:
             return [self._instances[('f',f_id)].graphical_representations[g_id] for (g_id, f_id), (name, ov) in target_family_ids.items() if name in connection_names]
         return target_family_ids
-
-    def get_strong_connections2_f(self, gr_family, connection_names=None):
-        if gr_family is None:
-            return False
-        target_individual_ids = self.XX_db['f'].get(gr_family.g_id)
-        if target_individual_ids is None:
-            return {}
-        if connection_names:
-            return [self._instances[('i',i_id)].graphical_representations[g_id] for (g_id, i_id), (name, ov) in target_individual_ids.items() if name in connection_names]
-        return target_individual_ids
-
