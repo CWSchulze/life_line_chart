@@ -363,35 +363,29 @@ class AncestorChart(BaseSVGChart):
             if self.compression_steps <= 0:
                 continue
 
-            X = self._instances.graph_link.get_strong_connections2_i(gr_individual, ["5_father", "5_mother"])
-            #X = [k for k, c in self._instances.graph_link.get_strong_connections2_i(gr_individual).items() if c[0]in["5_father", "5_mother"]]
-            if len(X) == 0:
-                strongly_connected_parent_family = None
-            else:
-                strongly_connected_parent_family = X[0]
-            # strongly_connected_parent_family = gr_individual.strongly_connected_parent_family
+            vms = gr_individual.visible_marriages
+            if vms:
+                strongly_connected_parent_family = vms[0]
 
-                #strongly_connected_parent_family = self._instances[('f',strongly_connected_parent_family_id)].graphical_representations[0]
+                if not gr_individual.has_x_position(strongly_connected_parent_family):
+                    continue
 
-            if not gr_individual.has_x_position(strongly_connected_parent_family):
-                continue
-
-            try:
-                while i < 50000:
+                try:
+                    while i < 50000:
+                        self._move_individual_and_ancestors(
+                            gr_individual, strongly_connected_parent_family, direction_factor*1)
+                        self._check_compressed_x_position(True)
+                        i += 1
+                except LifeLineChartCollisionDetected as e:
                     self._move_individual_and_ancestors(
-                        gr_individual, strongly_connected_parent_family, direction_factor*1)
-                    self._check_compressed_x_position(True)
-                    i += 1
-            except LifeLineChartCollisionDetected as e:
-                self._move_individual_and_ancestors(
-                    gr_individual, strongly_connected_parent_family, -direction_factor*1)
-            except LifeLineChartCannotMoveIndividual as e:
-                pass
-            except KeyError as e:
-                pass
-            if i != 0:
-                logger.info('moved ' + ' '.join(gr_individual.get_name()) +
-                            ' by ' + str(i * direction_factor * 1))
+                        gr_individual, strongly_connected_parent_family, -direction_factor*1)
+                except LifeLineChartCannotMoveIndividual as e:
+                    pass
+                except KeyError as e:
+                    pass
+                if i != 0:
+                    logger.info('moved ' + ' '.join(gr_individual.get_name()) +
+                                ' by ' + str(i * direction_factor * 1))
 
     def modify_layout(self, root_individual_id):
         """

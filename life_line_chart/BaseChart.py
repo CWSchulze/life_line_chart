@@ -277,7 +277,7 @@ class BaseChart():
         vms = gr_individual.visible_marriages
         if vms:
             # if this is not the first marriage, dont move anyone else
-            if vms[0].family_id != family_id:
+            if vms[0] != family:
                 return
 
         cofs = gr_individual.individual.child_of_families
