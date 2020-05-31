@@ -63,16 +63,21 @@ class DescendantChart(BaseSVGChart):
             else:
                 gr_individual.color = color
         else:
-            gr_individual = individual.graphical_representations[0]
+            logger.warning('why this?')
+            gr_individual = individual.graphical_representations[-1]
 
         for marriage in individual.marriages:
             if marriage.has_graphical_representation():
                 continue
 
-            #gr_individual.strongly_connected_parent_family = gr_marriage
             if generations > 0 or generations < 0:
                 gr_marriage = self._create_family_graphical_representation(
                     marriage)
+
+                if gr_marriage.husb == individual:
+                    gr_marriage.gr_husb = gr_individual
+                else:
+                    gr_marriage.gr_wife = gr_individual
 
                 spouse = marriage.get_spouse(individual.individual_id)
                 if spouse is not None and not spouse.has_graphical_representation():
@@ -86,15 +91,21 @@ class DescendantChart(BaseSVGChart):
                             else:
                                 gr_spouse.color = color
 
+                    if gr_marriage.husb == spouse:
+                        gr_marriage.gr_husb = gr_spouse
+                    else:
+                        gr_marriage.gr_wife = gr_spouse
+
                 for child in marriage.children:
-                    self.select_descendants(
+                    gr_child = self.select_descendants(
                         child, generations - 1, filter=filter)
-                    if child.has_graphical_representation():
-                        gr_marriage.add_visible_children(child)
-                        child.graphical_representations[0].strongly_connected_parent_family = gr_marriage
+                    if gr_child:
+                        gr_marriage.add_visible_children(gr_child)
+                        gr_child.strongly_connected_parent_family = gr_marriage
                 cofs = individual.child_of_families
                 if len(cofs) > 0:
                     gr_marriage.visual_placement_parent_family = individual.child_of_families[0]
+        return gr_individual
 
     def place_selected_individuals(self, individual, child_of_family, x_offset=0, discovery_cache=[]):
         """
