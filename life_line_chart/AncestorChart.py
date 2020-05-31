@@ -107,10 +107,8 @@ class AncestorChart(BaseSVGChart):
                         filter=filter,
                         discovery_cache=discovery_cache)
 
-                    if gr_father:
-                        self.add_strong_connection2(gr_child_of_family, father.graphical_representations[-1], "2_father")
+                    if new_gr and gr_father:
                         gr_child_of_family.gr_husb = gr_father
-            # gr_individual.strongly_connected_parent_family = gr_child_of_family
 
             if generations > 0 or generations < 0:
                 father, mother = child_of_family.get_husband_and_wife()
@@ -120,16 +118,8 @@ class AncestorChart(BaseSVGChart):
                         mother, generations - 1 if go_deeper else 0,
                         filter=filter,
                         discovery_cache=discovery_cache)
-                    # if mother.has_graphical_representation():
-                    # self.add_strong_connection2(gr_child_of_family, mother.graphical_representations[0],3)
-                    if gr_mother:
-                        self.add_strong_connection2(gr_child_of_family, mother.graphical_representations[-1],"2_mother")
+                    if new_gr and gr_mother:
                         gr_child_of_family.gr_wife = gr_mother
-                if father is not None and father.has_graphical_representation() or \
-                            mother is not None and mother.has_graphical_representation()  :
-                            pass
-                    #self.add_strong_connection2(gr_child_of_family, gr_individual)
-                # gr_child_of_family.visible_children.sort()
         return gr_individual
 
     def select_family_children(self, family, filter=None):
@@ -177,7 +167,6 @@ class AncestorChart(BaseSVGChart):
         x_position = x_offset
         self.min_x_index = min(self.min_x_index, x_position)
         #child_of_families = individual.child_of_families
-        #child_of_families = self.get_strong_connections2_i(gr_individual, "1_child")
         child_of_families = gr_individual.connected_parent_families
 
         # recursively add the father branch
@@ -192,7 +181,7 @@ class AncestorChart(BaseSVGChart):
                     fathers_born_in_family = fathers_child_of_families[0]
                 else:
                     fathers_born_in_family = None
-                gr_local_child_of_family = local_child_of_family.graphical_representations[0]
+
                 if local_child_of_family.has_graphical_representation():
                     gr_individual.strongly_connected_parent_family = gr_local_child_of_family
                 self.place_selected_individuals(
@@ -250,7 +239,7 @@ class AncestorChart(BaseSVGChart):
                     mothers_born_in_family = mothers_child_of_families[0]
                 else:
                     mothers_born_in_family = None
-                gr_local_child_of_family = local_child_of_family.graphical_representations[0]
+
                 if local_child_of_family.has_graphical_representation():
                     gr_individual.strongly_connected_parent_family = gr_local_child_of_family
                 self.place_selected_individuals(
