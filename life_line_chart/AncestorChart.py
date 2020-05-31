@@ -194,8 +194,6 @@ class AncestorChart(BaseSVGChart):
                     fathers_born_in_family = None
                 gr_local_child_of_family = local_child_of_family.graphical_representations[0]
                 if local_child_of_family.has_graphical_representation():
-                    self.add_strong_connection2(gr_local_child_of_family, gr_individual, "4_child")
-                    self.add_strong_connection2(gr_local_child_of_family, gr_father, "5_father")
                     gr_individual.strongly_connected_parent_family = gr_local_child_of_family
                 self.place_selected_individuals(
                     gr_father, spouse_family, local_child_of_family, fathers_born_in_family, x_position, discovery_cache)
@@ -246,7 +244,6 @@ class AncestorChart(BaseSVGChart):
                 continue
             local_child_of_family = gr_local_child_of_family.family
             gr_mother = gr_local_child_of_family.gr_wife
-            self.add_strong_connection_option(local_child_of_family, individual)
             if not gr_mother.has_x_position(local_child_of_family):
                 mothers_child_of_families = gr_mother.individual.child_of_families
                 if mothers_child_of_families:
@@ -255,8 +252,6 @@ class AncestorChart(BaseSVGChart):
                     mothers_born_in_family = None
                 gr_local_child_of_family = local_child_of_family.graphical_representations[0]
                 if local_child_of_family.has_graphical_representation():
-                    self.add_strong_connection2(gr_local_child_of_family, gr_individual, "4_child")
-                    self.add_strong_connection2(gr_local_child_of_family, gr_mother, "5_mother")
                     gr_individual.strongly_connected_parent_family = gr_local_child_of_family
                 self.place_selected_individuals(
                     gr_mother, spouse_family, local_child_of_family, mothers_born_in_family, x_position, discovery_cache)
