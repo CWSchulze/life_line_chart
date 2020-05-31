@@ -269,6 +269,7 @@ class BaseChart():
             x_pos = self._move_single_individual(
                 gr_individual, family, x_index_offset)
             if None in x_pos or True:
+                strongly_connected_parent_family = gr_individual.strongly_connected_parent_family
                 # only move ancestors if they exist
                 # len(x_pos) <= 1 or
                 if list(sorted(x_pos.values()))[0][1] != x_pos[family_id][1]:
@@ -281,18 +282,18 @@ class BaseChart():
                 cof = cofs[0]
                 gr_cof = cofs[0].graphical_representations[0]
 
-                strongly_connected_parent_family = gr_individual.strongly_connected_parent_family
-                if strongly_connected_parent_family and strongly_connected_parent_family.family_id == cof.family_id:
-                    if cof.husb and cof.husb.has_graphical_representation():
+                #for strongly_connected_parent_family in gr_individual.connected_parent_families:
+                if strongly_connected_parent_family:
+                    if strongly_connected_parent_family.gr_husb:
                         # if cof.husb.graphical_representations[0].get_x_position() and len(cof.husb.graphical_representations[0].get_x_position()) == 1:
                             self._move_individual_and_ancestors(
-                                cof.husb.graphical_representations[0], gr_cof, x_index_offset)
-                    if cof.wife and cof.wife.has_graphical_representation():
+                                strongly_connected_parent_family.gr_husb, strongly_connected_parent_family, x_index_offset)
+                    if strongly_connected_parent_family.gr_wife:
                         # if cof.wife.graphical_representations[0].get_x_position() and len(cof.wife.graphical_representations[0].get_x_position()) == 1:
                             self._move_individual_and_ancestors(
-                                cof.wife.graphical_representations[0], gr_cof, x_index_offset)
-                    # print (gr_individual.get)
-                if cof and len(gr_cof.visible_children) > 1:
+                                strongly_connected_parent_family.gr_wife, strongly_connected_parent_family, x_index_offset)
+                # print (gr_individual.get)
+                if len(gr_cof.visible_children) > 1:
                     for gr_child_individual in gr_cof.visible_children:
                         if gr_child_individual.individual.individual_id == gr_individual.individual.individual_id:
                             continue
