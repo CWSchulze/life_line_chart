@@ -49,7 +49,8 @@ class BaseChart():
         'family_shape': 0,
         'individual_photo_active': False,
         'individual_photo_relative_size': 2.5,
-        'debug_connections':True,
+        'debug_visualize_connections':True,
+        'debug_visualize_ambiguous_placement':True,
     }
     DEFAULT_POSITIONING = {
     }
@@ -463,15 +464,16 @@ class BaseChart():
         full_index_list = list(sorted(v.keys()))
         for i in range(max(full_index_list)):
             if i not in full_index_list:
-                gr_individual.items.append({
-                    'type': 'rect',
-                    'config': {
-                        'insert': (self._map_x_position(i), 0),
-                        'size': (self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'], self._formatting['total_height']),
-                        'fill': 'black',
-                        'fill-opacity': "0.5"
-                    }
-                })
+                if self._formatting['debug_visualize_ambiguous_placement']:
+                    gr_individual.items.append({
+                        'type': 'rect',
+                        'config': {
+                            'insert': (self._map_x_position(i), 0),
+                            'size': (self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'], self._formatting['total_height']),
+                            'fill': 'black',
+                            'fill-opacity': "0.5"
+                        }
+                    })
                 failed.append(('missing', i))
         return failed, full_index_list[0], full_index_list[-1]
 

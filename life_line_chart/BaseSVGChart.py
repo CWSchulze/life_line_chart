@@ -327,7 +327,7 @@ class BaseSVGChart(BaseChart):
                                 new_marriage_ordinal = min(l_i.birth_date_ov-5*365, marriage_ordinal)
                             else:
                                 new_marriage_ordinal = max(l_i.birth_date_ov, marriage_ordinal+5*365)
-                        if self._formatting['debug_connections']:
+                        if self._formatting['debug_visualize_connections']:
                             debug_items.append(
                                 {
                                 'type': 'path',
