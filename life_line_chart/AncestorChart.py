@@ -110,7 +110,7 @@ class AncestorChart(BaseSVGChart):
                     if gr_father:
                         self.add_strong_connection2(gr_child_of_family, father.graphical_representations[-1], "2_father")
                         gr_child_of_family.gr_husb = gr_father
-            gr_individual.strongly_connected_parent_family = gr_child_of_family
+            # gr_individual.strongly_connected_parent_family = gr_child_of_family
 
             if generations > 0 or generations < 0:
                 father, mother = child_of_family.get_husband_and_wife()
@@ -196,7 +196,9 @@ class AncestorChart(BaseSVGChart):
                 if local_child_of_family.has_graphical_representation():
                     self.add_strong_connection2(gr_local_child_of_family, gr_individual, "4_child")
                     self.add_strong_connection2(gr_local_child_of_family, gr_father, "5_father")
-                    gr_individual.strongly_connected_parent_family = gr_local_child_of_family
+                    vm = gr_individual.visible_marriages
+                    if len(vm) == 0 or vm[0].family_id == spouse_family.family_id:
+                        gr_individual.strongly_connected_parent_family = gr_local_child_of_family
                 self.place_selected_individuals(
                     gr_father, spouse_family, local_child_of_family, fathers_born_in_family, x_position, discovery_cache)
                 width = gr_father.get_ancestor_width(
@@ -255,7 +257,9 @@ class AncestorChart(BaseSVGChart):
                 if local_child_of_family.has_graphical_representation():
                     self.add_strong_connection2(gr_local_child_of_family, gr_individual, "4_child")
                     self.add_strong_connection2(gr_local_child_of_family, gr_mother, "5_mother")
-                    gr_individual.strongly_connected_parent_family = gr_local_child_of_family
+                    vm = gr_individual.visible_marriages
+                    if len(vm) == 0 or vm[0].family_id == spouse_family.family_id:
+                        gr_individual.strongly_connected_parent_family = gr_local_child_of_family
                 self.place_selected_individuals(
                     gr_mother, spouse_family, local_child_of_family, mothers_born_in_family, x_position, discovery_cache)
                 width = gr_mother.get_ancestor_width(
@@ -456,7 +460,8 @@ class AncestorChart(BaseSVGChart):
             self.compression_steps = 1e30
             if 'compression_steps' in self._formatting and self._formatting['compression_steps'] > 0:
                 self.compression_steps = self._formatting['compression_steps']
-            self._compress_chart_ancestor_graph(gr_root_individual.strongly_connected_parent_family)
+            for family in gr_root_individual.connected_parent_families:
+                self._compress_chart_ancestor_graph(family)
 
             # compressed chart should be aligned left
             _, min_index_x, max_index_x, self.position_to_person_map = self._check_compressed_x_position(
