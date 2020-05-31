@@ -158,12 +158,12 @@ class InstanceContainer():
 
         event = individual.events['birth_or_christening']
         if event:
-            if event['precision'] != 'dmy':
-                return str(event['date'].date().year)
-            elif event['precision'] != 'my':
+            if event['precision'] == 'dmy':
+                return event['date'].date().strftime('%d.%m.%Y')
+            elif event['precision'] == 'my':
                 return event['date'].date().strftime('%m.%Y')
             else:
-                return event['date'].date().strftime('%d.%m.%Y')
+                return str(event['date'].date().year)
         return None
 
     def display_death_date(self, individual):
@@ -176,10 +176,12 @@ class InstanceContainer():
 
         event = individual.events['death_or_burial']
         if event:
-            if event['comment']:
-                return str(event['date'].date().year)
-            else:
+            if event['precision'] == 'dmy':
                 return event['date'].date().strftime('%d.%m.%Y')
+            elif event['precision'] == 'my':
+                return event['date'].date().strftime('%m.%Y')
+            else:
+                return str(event['date'].date().year)
         return None
 
     def display_marriage_date(self, family):
@@ -191,10 +193,12 @@ class InstanceContainer():
         """
 
         event = family.marriage
-        if event['comment']:
-            return str(event['date'].date().year)
-        else:
+        if event['precision'] == 'dmy':
             return event['date'].date().strftime('%d.%m.%Y')
+        elif event['precision'] == 'my':
+            return event['date'].date().strftime('%m.%Y')
+        else:
+            return str(event['date'].date().year)
 
     def display_marriage_location(self, family):
         """
