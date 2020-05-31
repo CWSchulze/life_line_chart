@@ -307,11 +307,20 @@ class BaseSVGChart(BaseChart):
                 for connections, (g_id, i_id) in sorted(zip(self._instances.connection_container['f'][(0,family_id)].values(), self._instances.connection_container['f'][(0,family_id)].keys())):
                     for connection in connections:
                         if connection == 'weak_child':
-                            prio = 1
+                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.1
+                            color = (175, 225, 175)
                         elif connection == 'strong_child':
-                            prio = 5
+                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.3
+                            color = (25, 25, 25)
+                        elif connection == 'gr_wife':
+                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.2
+                            color = (225, 25, 25)
+                        elif connection == 'gr_husb':
+                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.2
+                            color = (25, 25, 225)
                         else:
-                            prio = 10
+                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*1
+                            color = (25, 25, 25)
                         def coordinate_transformation(x, y):
                             new_x, new_y = self._map_position(x, y)
                             return new_x + new_y*1j
@@ -337,8 +346,8 @@ class BaseSVGChart(BaseChart):
                                         coordinate_transformation(
                                             x_p, l_i.birth_date_ov)
                                     )},
-                                'color': (25*prio, 25*prio, 25*prio),
-                                'stroke_width': self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.1*prio
+                                'color': color,
+                                'stroke_width': thickness
                                 }
                             )
 
