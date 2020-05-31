@@ -196,9 +196,7 @@ class AncestorChart(BaseSVGChart):
                 if local_child_of_family.has_graphical_representation():
                     self.add_strong_connection2(gr_local_child_of_family, gr_individual, "4_child")
                     self.add_strong_connection2(gr_local_child_of_family, gr_father, "5_father")
-                    vm = gr_individual.visible_marriages
-                    if len(vm) == 0 or vm[0].family_id == spouse_family.family_id:
-                        gr_individual.strongly_connected_parent_family = gr_local_child_of_family
+                    gr_individual.strongly_connected_parent_family = gr_local_child_of_family
                 self.place_selected_individuals(
                     gr_father, spouse_family, local_child_of_family, fathers_born_in_family, x_position, discovery_cache)
                 width = gr_father.get_ancestor_width(
@@ -259,9 +257,7 @@ class AncestorChart(BaseSVGChart):
                 if local_child_of_family.has_graphical_representation():
                     self.add_strong_connection2(gr_local_child_of_family, gr_individual, "4_child")
                     self.add_strong_connection2(gr_local_child_of_family, gr_mother, "5_mother")
-                    vm = gr_individual.visible_marriages
-                    if len(vm) == 0 or vm[0].family_id == spouse_family.family_id:
-                        gr_individual.strongly_connected_parent_family = gr_local_child_of_family
+                    gr_individual.strongly_connected_parent_family = gr_local_child_of_family
                 self.place_selected_individuals(
                     gr_mother, spouse_family, local_child_of_family, mothers_born_in_family, x_position, discovery_cache)
                 width = gr_mother.get_ancestor_width(
