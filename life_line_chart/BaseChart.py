@@ -48,7 +48,8 @@ class BaseChart():
         'warp_shape': 'normal',
         'family_shape': 0,
         'individual_photo_active': False,
-        'individual_photo_relative_size': 2.5
+        'individual_photo_relative_size': 2.5,
+        'debug_connections':True,
     }
     DEFAULT_POSITIONING = {
     }

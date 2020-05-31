@@ -327,20 +327,21 @@ class BaseSVGChart(BaseChart):
                                 new_marriage_ordinal = min(l_i.birth_date_ov-5*365, marriage_ordinal)
                             else:
                                 new_marriage_ordinal = max(l_i.birth_date_ov, marriage_ordinal+5*365)
-                        debug_items.append(
-                            {
-                            'type': 'path',
-                            'config': {'type': 'Line', 'arguments': (
-                                    coordinate_transformation(
-                                        marriage_ring_index, new_marriage_ordinal),
-                                    coordinate_transformation(
-                                        x_p, l_i.birth_date_ov)
-                                )},
-                            'color': (25*prio, 25*prio, 25*prio),
-                            'stroke_width': self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.1*prio
-                            }
-                        )
-                        i_id
+                        if self._formatting['debug_connections']:
+                            debug_items.append(
+                                {
+                                'type': 'path',
+                                'config': {'type': 'Line', 'arguments': (
+                                        coordinate_transformation(
+                                            marriage_ring_index, new_marriage_ordinal),
+                                        coordinate_transformation(
+                                            x_p, l_i.birth_date_ov)
+                                    )},
+                                'color': (25*prio, 25*prio, 25*prio),
+                                'stroke_width': self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.1*prio
+                                }
+                            )
+
                 if not self._formatting['no_ring']:
                     ring_position = self._map_position(
                         marriage_ring_index, marriage_ordinal)
