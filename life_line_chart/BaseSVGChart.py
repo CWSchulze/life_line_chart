@@ -308,10 +308,10 @@ class BaseSVGChart(BaseChart):
                     for connection in connections:
                         if connection == 'weak_child':
                             prio = 1
-                        if connection == 'strong_child':
-                            prio = 2
-                        else:
+                        elif connection == 'strong_child':
                             prio = 5
+                        else:
+                            prio = 10
                         def coordinate_transformation(x, y):
                             new_x, new_y = self._map_position(x, y)
                             return new_x + new_y*1j
@@ -321,10 +321,12 @@ class BaseSVGChart(BaseChart):
                         x_p_ = sorted([(ov, pos, index, family_id, flag)
                                     for index, (family_id, (ov, pos, f, flag)) in enumerate(l_i.get_x_position().items())])
                         x_p = x_p_[0][1]
-                        if l_i.birth_date_ov > marriage_ordinal:
-                            new_marriage_ordinal = min(l_i.birth_date_ov-5*365, marriage_ordinal)
-                        else:
-                            new_marriage_ordinal = max(l_i.birth_date_ov, marriage_ordinal+5*365)
+                        new_marriage_ordinal = marriage_ordinal
+                        if x_p == marriage_ring_index:
+                            if l_i.birth_date_ov > marriage_ordinal:
+                                new_marriage_ordinal = min(l_i.birth_date_ov-5*365, marriage_ordinal)
+                            else:
+                                new_marriage_ordinal = max(l_i.birth_date_ov, marriage_ordinal+5*365)
                         debug_items.append(
                             {
                             'type': 'path',
