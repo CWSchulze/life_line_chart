@@ -308,6 +308,8 @@ class BaseSVGChart(BaseChart):
                     marriage_labels.append(
                         str(graphical_representation_marriage_family.marriage_label))
 
+
+
             # generate event node information
             knots = []
             _birth_original_location = (
@@ -319,53 +321,6 @@ class BaseSVGChart(BaseChart):
             knots.append((x_pos_list[0][1], birth_date_ov))
             images = []
             for index, (marriage_ring_index, marriage_ordinal, new_x_index_after_marriage, label, family_id) in enumerate(zip(marriage_ring_indices, marriage_ordinals, new_x_indices_after_marriage, marriage_labels, marriage_id)):
-                for connections, (g_id, i_id) in sorted(zip(self._instances.connection_container['f'][(0,family_id)].values(), self._instances.connection_container['f'][(0,family_id)].keys())):
-                    for connection in connections:
-                        if connection == 'weak_child':
-                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.1
-                            color = (175, 225, 175)
-                        elif connection == 'strong_child':
-                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.3
-                            color = (25, 25, 25)
-                        elif connection == 'gr_wife':
-                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.2
-                            color = (225, 25, 25)
-                        elif connection == 'gr_husb':
-                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.2
-                            color = (25, 25, 225)
-                        else:
-                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*1
-                            color = (25, 25, 25)
-                        def coordinate_transformation(x, y):
-                            new_x, new_y = self._map_position(x, y)
-                            return new_x + new_y*1j
-                        if not self._instances[('i', i_id)].has_graphical_representation():
-                            continue
-                        l_i = self._instances[('i', i_id)].graphical_representations[0]
-                        x_p_ = sorted([(ov, pos, index, family_id, flag)
-                                    for index, (family_id, (ov, pos, f, flag)) in enumerate(l_i.get_x_position().items())])
-                        x_p = x_p_[0][1]
-                        new_marriage_ordinal = marriage_ordinal
-                        if x_p == marriage_ring_index:
-                            if l_i.birth_date_ov > marriage_ordinal:
-                                new_marriage_ordinal = min(l_i.birth_date_ov-5*365, marriage_ordinal)
-                            else:
-                                new_marriage_ordinal = max(l_i.birth_date_ov, marriage_ordinal+5*365)
-                        if self._formatting['debug_visualize_connections']:
-                            debug_items.append(
-                                {
-                                'type': 'path',
-                                'config': {'type': 'Line', 'arguments': (
-                                        coordinate_transformation(
-                                            marriage_ring_index, new_marriage_ordinal),
-                                        coordinate_transformation(
-                                            x_p, l_i.birth_date_ov)
-                                    )},
-                                'color': color,
-                                'stroke_width': thickness
-                                }
-                            )
-
                 if not self._formatting['no_ring']:
                     ring_position = self._map_position(
                         marriage_ring_index, marriage_ordinal)
