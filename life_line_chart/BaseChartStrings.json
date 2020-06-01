@@ -136,6 +136,14 @@
             "margin_year_min": {
                 "short_description": "Lower year minimum margin",
                 "long_description": "The lower bound of the chart is extended by at least this number of years."
+            },
+            "debug_visualize_connections": {
+                "short_description": "Visualize connections",
+                "long_description": "Visualize the connections between families and individuals. This is for debugging purposes."
+            },
+            "debug_visualize_ambiguous_placement": {
+                "short_description": "Visualize ambiguous placement",
+                "long_description": "Visualize automatically detected errors in the placement algorithm."
             }
         },
         "positioning": {},
@@ -283,6 +291,14 @@
             "margin_year_min": {
                 "short_description": "Mindestabstand des unteren Randes",
                 "long_description": "Die untere Grenze des Diagramms wird mindestens um diese Anzahl an Jahre vergr\u00f6\u00dfert."
+            },
+            "debug_visualize_connections": {
+                "short_description": "Verbindungen anzeigen",
+                "long_description": "Visualisieren Sie die Verbindungen zwischen Familien und Einzelpersonen. Dies ist f\u00fcr Debugging-Zwecke."
+            },
+            "debug_visualize_ambiguous_placement": {
+                "short_description": "Mehrdeutig Platzierung anzeigen",
+                "long_description": "Visualisieren Sie automatisch erkannte Fehler des Platzierungs-Algorithmus."
             }
         },
         "positioning": {},
