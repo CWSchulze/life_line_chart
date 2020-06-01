@@ -46,6 +46,14 @@ class GraphicalFamily():
             return None
         return self.family.get_spouse(individual.individual_id).graphical_representations[0]
 
+    def get_gr_spouse(self, gr_individual):
+        if self.gr_husb == gr_individual:
+            return self.gr_wife
+        elif self.gr_wife == gr_individual:
+            return self.gr_husb
+        else:
+            raise RuntimeError("This individual is not part of the family!")
+
     def add_visible_children(self, gr_child):
         if gr_child not in self.visible_children and gr_child.birth_date_ov:
             self.visible_children.append(gr_child)
