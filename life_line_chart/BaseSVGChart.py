@@ -229,8 +229,6 @@ class BaseSVGChart(BaseChart):
 
             # collect information about marriages
             marriage_ordinals = []
-            marriage_ring_indices = []
-            marriage_y_positions = []
             marriage_ring_positions = []
             marriage_id = []
             new_x_position_after_marriage = []
@@ -270,11 +268,9 @@ class BaseSVGChart(BaseChart):
                         spouse_x_index = spouse_representation.get_x_position(
                             )[graphical_representation_marriage_family.family_id][1]
                         # spouse_x_position = self._map_x_position(spouse_x_index)
-                        marriage_ring_positions.append(self._map_position(
+                        marriage_ring_positions.append((
                             (spouse_x_index + marriage_x_index)/2.,
                             graphical_representation_marriage_family.marriage['ordinal_value']))
-                        marriage_ring_indices.append(
-                            (spouse_x_index + marriage_x_index)/2.)
                     else:
                         # if no spouse is visible, place over the children
                         child_x_indices = []
@@ -287,22 +283,16 @@ class BaseSVGChart(BaseChart):
                                              ". The position family 0 is not equal to the placement...")
                         if len(child_x_indices) > 0:
                             # calculate the middle over the children
-                            marriage_ring_positions.append(self._map_position(
+                            marriage_ring_positions.append((
                                 sum(child_x_indices)/len(child_x_indices),
                                 graphical_representation_marriage_family.marriage['ordinal_value']))
-                            marriage_ring_indices.append(
-                                sum(child_x_indices)/len(child_x_indices))
                         else:
                             # place at the individual line... no spouse, no children, what is this information good for?
-                            marriage_ring_positions.append(self._map_position(
+                            marriage_ring_positions.append((
                                 x_pos[graphical_representation_marriage_family.family_id][1],
                                 graphical_representation_marriage_family.marriage['ordinal_value']))
-                            marriage_ring_indices.append(
-                                x_pos[graphical_representation_marriage_family.family_id][1])
 
                     marriage_id.append(graphical_representation_marriage_family.family_id)
-                    marriage_y_positions.append(self._map_y_position(
-                        graphical_representation_marriage_family.marriage['ordinal_value']))
                     marriage_ordinals.append(
                         graphical_representation_marriage_family.marriage['ordinal_value'])
                     marriage_labels.append(
@@ -367,7 +357,7 @@ class BaseSVGChart(BaseChart):
             _death_position = self._map_position(*_death_original_location)
             knots.append((x_pos_list[0][1], birth_date_ov))
             images = []
-            for index, (marriage_ring_index, marriage_ordinal, new_x_index_after_marriage, label, family_id) in enumerate(zip(marriage_ring_indices, marriage_ordinals, new_x_indices_after_marriage, marriage_labels, marriage_id)):
+            for index, ((marriage_ring_index, marriage_ordinal), new_x_index_after_marriage, label, family_id) in enumerate(zip(marriage_ring_positions, new_x_indices_after_marriage, marriage_labels, marriage_id)):
                 if not self._formatting['no_ring']:
                     ring_position = self._map_position(
                         marriage_ring_index, marriage_ordinal)
