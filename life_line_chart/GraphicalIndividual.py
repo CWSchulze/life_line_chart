@@ -284,13 +284,15 @@ class GraphicalIndividual():
                 self.__instances.connection_container['i'][self.g_id] = {}
             if gr_family.g_id not in self.__instances.connection_container['i'][self.g_id]:
                 self.__instances.connection_container['i'][self.g_id][gr_family.g_id] = []
-            self.__instances.connection_container['i'][self.g_id][gr_family.g_id].append("strong_child")
+            if "strong_child" not in self.__instances.connection_container['i'][self.g_id][gr_family.g_id]:
+                self.__instances.connection_container['i'][self.g_id][gr_family.g_id].append("strong_child")
 
             if gr_family.g_id not in self.__instances.connection_container['f']:
                 self.__instances.connection_container['f'][gr_family.g_id] = {}
             if self.g_id not in self.__instances.connection_container['f'][gr_family.g_id]:
                 self.__instances.connection_container['f'][gr_family.g_id][self.g_id] = []
-            self.__instances.connection_container['f'][gr_family.g_id][self.g_id].append("strong_child")
+            if "strong_child" not in self.__instances.connection_container['f'][gr_family.g_id][self.g_id]:
+                self.__instances.connection_container['f'][gr_family.g_id][self.g_id].append("strong_child")
 
     def get_name(self):
         return self.individual.get_name()
