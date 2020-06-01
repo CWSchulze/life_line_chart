@@ -309,6 +309,53 @@ class BaseSVGChart(BaseChart):
                         str(graphical_representation_marriage_family.marriage_label))
 
 
+            if self._formatting['debug_visualize_connections']:
+                individual_connections = self._instances.connection_container['i'][gr_individual.g_id]
+                for f_g_id, connections in individual_connections.items():
+                    marriage_ring_index, marriage_ordinal = calculate_ring_position(self._instances[('f',f_g_id[1])].graphical_representations[0])
+                    for connection in connections:
+                        if connection == 'weak_child':
+                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.1
+                            color = (175, 225, 175)
+                        elif connection == 'strong_child':
+                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.3
+                            color = (25, 25, 25)
+                        elif connection == 'gr_wife':
+                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.2
+                            color = (225, 25, 25)
+                        elif connection == 'gr_husb':
+                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.2
+                            color = (25, 25, 225)
+                        else:
+                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*1
+                            color = (25, 25, 25)
+                        def coordinate_transformation(x, y):
+                            new_x, new_y = self._map_position(x, y)
+                            return new_x + new_y*1j
+                        l_i = gr_individual#self._instances[('i', i_id)].graphical_representations[0]
+                        x_p_ = sorted([(ov, pos, index, family_id, flag)
+                                    for index, (family_id, (ov, pos, f, flag)) in enumerate(l_i.get_x_position().items())])
+                        x_p = x_p_[0][1]
+                        new_marriage_ordinal = marriage_ordinal
+                        if x_p == marriage_ring_index:
+                            if l_i.birth_date_ov > marriage_ordinal:
+                                new_marriage_ordinal = min(l_i.birth_date_ov-5*365, marriage_ordinal)
+                            else:
+                                new_marriage_ordinal = max(l_i.birth_date_ov, marriage_ordinal+5*365)
+                        debug_items.append(
+                                {
+                                'type': 'path',
+                                'config': {'type': 'Line', 'arguments': (
+                                        coordinate_transformation(
+                                            marriage_ring_index, new_marriage_ordinal),
+                                        coordinate_transformation(
+                                            x_p, l_i.birth_date_ov)
+                                    )},
+                                'color': color,
+                                'stroke_width': thickness
+                                }
+                            )
+
 
             # generate event node information
             knots = []
