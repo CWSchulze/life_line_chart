@@ -236,6 +236,21 @@ class BaseSVGChart(BaseChart):
             new_x_position_after_marriage = []
             new_x_indices_after_marriage = []
             marriage_labels = []
+            def calculate_ring_position(gr_family):
+                h_pos = gr_family.gr_husb.get_x_position(gr_family) if gr_family.gr_husb else None
+                w_pos = gr_family.gr_wife.get_x_position(gr_family) if gr_family.gr_wife else None
+                if h_pos is None or w_pos is None:
+                    vcs = gr_family.visible_children
+                    if vcs:
+                        vcs_pos = [vc.get_x_position(gr_family)[1] for vc in vcs]
+                        return (
+                                sum(vcs_pos)/len(vcs_pos),
+                                gr_family.marriage['ordinal_value'])
+                else:
+                    return (
+                            (h_pos[1] + w_pos[1])/2,
+                            gr_family.marriage['ordinal_value'])
+                return None
             if gr_individual.get_marriages():
                 for graphical_representation_marriage_family in gr_individual.get_marriages():
                     if graphical_representation_marriage_family.marriage is None:
