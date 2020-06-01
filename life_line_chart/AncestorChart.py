@@ -107,7 +107,7 @@ class AncestorChart(BaseSVGChart):
                         filter=filter,
                         discovery_cache=discovery_cache)
 
-                    if new_gr and gr_father:
+                    if gr_father and gr_child_of_family.gr_husb is None:
                         gr_child_of_family.gr_husb = gr_father
 
             if generations > 0 or generations < 0:
@@ -118,7 +118,7 @@ class AncestorChart(BaseSVGChart):
                         mother, generations - 1 if go_deeper else 0,
                         filter=filter,
                         discovery_cache=discovery_cache)
-                    if new_gr and gr_mother:
+                    if gr_mother and gr_child_of_family.gr_wife is None:
                         gr_child_of_family.gr_wife = gr_mother
         return gr_individual
 
