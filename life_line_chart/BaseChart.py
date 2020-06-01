@@ -297,7 +297,7 @@ class BaseChart():
             x_pos = self._move_single_individual(
                 gr_child_individual, cof, x_index_offset)
 
-    def _flip_family(self, family):
+    def _flip_family(self, gr_family):
         """
         Flip family. The three sections change order
         - father and ancestors
@@ -305,20 +305,20 @@ class BaseChart():
         - mother and ancestors
 
         Args:
-            family (BaseFamily): family instance
+            gr_family (GraphicalFamily): family instance
         """
-        if family.husb is None or family.wife is None or not family.husb.has_graphical_representation() or not family.wife.has_graphical_representation():
+        if gr_family.gr_husb is None or gr_family.gr_wife is None:
             return
-        husb_x_pos = family.husb.graphical_representations[0].get_x_position()[
-            family.family_id][1]
-        husb_width = family.graphical_representations[0].husb_width()
-        wife_x_pos = family.wife.graphical_representations[0].get_x_position()[
-            family.family_id][1]
-        wife_width = family.graphical_representations[0].wife_width()
-        children_width = family.graphical_representations[0].children_width
+        husb_x_pos = gr_family.gr_husb.get_x_position()[
+            gr_family.family_id][1]
+        husb_width = gr_family.husb_width()
+        wife_x_pos = gr_family.gr_wife.get_x_position()[
+            gr_family.family_id][1]
+        wife_width = gr_family.wife_width()
+        children_width = gr_family.children_width
         if not children_width:
             children_width = self._formatting['vertical_step_size']
-        if children_width != len(family.graphical_representations[0].visible_children):
+        if children_width != len(gr_family.visible_children):
             print("G")
 
         if husb_x_pos < wife_x_pos:
@@ -330,16 +330,16 @@ class BaseChart():
             wife_x_delta = husb_width + children_width
             child_x_delta = husb_width - wife_width
 
-        for gr_child_individual in family.graphical_representations[0].visible_children:
+        for gr_child_individual in gr_family.visible_children:
             pos = sorted(
                 list(gr_child_individual.get_x_position().values()))
             self._move_single_individual(
                 gr_child_individual, pos[0][2], child_x_delta)
 
         self._move_individual_and_ancestors(
-            family.husb, family, husb_x_delta+1000000)
-        self._move_individual_and_ancestors(family.wife, family, wife_x_delta)
-        self._move_individual_and_ancestors(family.husb, family, -1000000)
+            gr_family.gr_husb, gr_family, husb_x_delta+1000000)
+        self._move_individual_and_ancestors(gr_family.gr_wife, gr_family, wife_x_delta)
+        self._move_individual_and_ancestors(gr_family.gr_husb, gr_family, -1000000)
         self._instances.ancestor_width_cache.clear()
         pass
 
