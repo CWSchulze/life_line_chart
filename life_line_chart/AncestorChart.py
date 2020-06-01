@@ -211,7 +211,7 @@ class AncestorChart(BaseSVGChart):
                         # not added yet, so this is the primary cof placement
                         gr_sibling.set_x_position(
                             x_position, child_of_family, True)
-                        gr_sibling.first_marriage_strongly_connected_to_parent_family = False
+                        gr_sibling.first_marriage_strongly_connected_to_parent_family = True
 
                     x_position += 1
 
@@ -220,7 +220,7 @@ class AncestorChart(BaseSVGChart):
                     x_position,
                     child_of_family)
                 x_position += 1
-                gr_sibling.first_marriage_strongly_connected_to_parent_family = True
+                gr_sibling.first_marriage_strongly_connected_to_parent_family = False
 
         if child_of_family and child_of_family.has_graphical_representation() and not child_of_family.graphical_representations[0].children_width:
             child_of_family.graphical_representations[0].children_width = x_position - \

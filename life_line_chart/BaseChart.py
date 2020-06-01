@@ -261,7 +261,7 @@ class BaseChart():
         x_pos = self._move_single_individual(
             gr_individual, family, x_index_offset)
 
-        if gr_individual.first_marriage_strongly_connected_to_parent_family == True:
+        if gr_individual.first_marriage_strongly_connected_to_parent_family == False:
             # if the head of the individual is detached, then dont move anyone else
             return
         vms = gr_individual.visible_marriages
