@@ -620,7 +620,7 @@ class BaseSVGChart(BaseChart):
                     }
                 )
             gr_individual.items += images
-        gr_individual.items += debug_items
+            gr_individual.items += debug_items
 
     def paint_and_save(self, individual_id, filename=None):
         """
