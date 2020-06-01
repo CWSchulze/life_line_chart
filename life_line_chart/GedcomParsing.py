@@ -30,6 +30,20 @@ _precision = [
 ]
 _date_expr = re.compile('(?:(' + '|'.join(_precision) + ') )?(?:(\\d+) )?(?:(' + '|'.join(_months) + ') )?(\\d{4})')
 _interval_expr = re.compile('(BET) (?:(\\d+) (' + '|'.join(_months) + ') )?(\\d{4}) AND (?:(\\d+) (' + '|'.join(_months) + ') )?(\\d{4})')
+_max_days = {
+    1:31,
+    2:29,
+    3:31,
+    4:30,
+    5:31,
+    6:30,
+    7:31,
+    8:31,
+    9:30,
+    10:31,
+    11:30,
+    12:31
+}
 
 def get_date_dict_from_tag(parent_item, tag_name):
     """
@@ -94,7 +108,15 @@ def get_date_dict_from_tag(parent_item, tag_name):
                 year = int(date_info.group(4))
                 precision += 'y'
 
-        date = datetime.datetime(year, month, day, 0, 0, 0, 0)
+        try:
+            date = datetime.datetime(year, month, min(_max_days[month], day), 0, 0, 0, 0)
+        except ValueError as e:
+            if month==2:
+                date = datetime.datetime(year, month, min(_max_days[month]-1, day), 0, 0, 0, 0)
+            else:
+                raise
+
+
         return {
             'tag_name': tag_name,
             'date': date,
