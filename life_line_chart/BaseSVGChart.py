@@ -206,8 +206,8 @@ class BaseSVGChart(BaseChart):
         self.min_x_index = min_x_index  # -1000
         self.max_x_index = max_x_index + 1  # +200
 
-        debug_items = []
         for gr_individual in self.graphical_individual_representations:
+            debug_items = []
             birth_date_ov = gr_individual.birth_date_ov
             if not birth_date_ov:
                 continue
