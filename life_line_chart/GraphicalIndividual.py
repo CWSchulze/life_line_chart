@@ -311,8 +311,11 @@ class GraphicalIndividual():
             return None
     death_date = property(__get_death_date)
 
-    def get_x_position(self):
-        return self._x_position
+    def get_x_position(self, family = None):
+        if family is None:
+            return self._x_position
+        else:
+            return self._x_position.get(family.family_id)
 
     def has_x_position(self, family):
         if self._x_position is None:
