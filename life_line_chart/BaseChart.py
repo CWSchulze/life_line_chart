@@ -280,11 +280,11 @@ class BaseChart():
         strongly_connected_parent_family = gr_individual.strongly_connected_parent_family
         if strongly_connected_parent_family:
             if strongly_connected_parent_family.gr_husb:
-                # if cof.husb.graphical_representations[0].get_x_position() and len(cof.husb.graphical_representations[0].get_x_position()) == 1:
+                # if cof.gr_husb.get_x_position() and len(cof.gr_husb.get_x_position()) == 1:
                     self._move_individual_and_ancestors(
                         strongly_connected_parent_family.gr_husb, strongly_connected_parent_family, x_index_offset)
             if strongly_connected_parent_family.gr_wife:
-                # if cof.wife.graphical_representations[0].get_x_position() and len(cof.wife.graphical_representations[0].get_x_position()) == 1:
+                # if cof.gr_wife.get_x_position() and len(cof.gr_wife.get_x_position()) == 1:
                     self._move_individual_and_ancestors(
                         strongly_connected_parent_family.gr_wife, strongly_connected_parent_family, x_index_offset)
         # print (gr_individual.get)
