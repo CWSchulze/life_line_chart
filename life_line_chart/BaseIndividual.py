@@ -44,7 +44,7 @@ def estimate_birth_date(individual, instances):
         # parents marriage
         for family_id in individual.child_of_family_id:
             parents_marriage = instances[('f', family_id)]
-            if parents_marriage.marriage:
+            if parents_marriage and parents_marriage.marriage:
                 if not individual.events['birth_or_christening'] or individual.events['birth_or_christening']['ordinal_value'] < parents_marriage.marriage['ordinal_value']:
                     if individual.events['birth_or_christening'] and individual.events['birth_or_christening']['ordinal_value'] < parents_marriage.marriage['ordinal_value']:
                         date = deepcopy(parents_marriage.marriage['date'])
@@ -128,7 +128,7 @@ class BaseIndividual():
         self._marriage_family_ids = self._get_marriage_family_ids()
         self.marriages = [
             self._instances[('f', m)] for m in self._marriage_family_ids
-            if self._instances[('f', m)].marriage]
+            if self._instances[('f', m)]]
         self.marriages.sort()
 
     def __lt__(self, other):
@@ -258,7 +258,9 @@ class BaseIndividual():
 
     @property
     def child_of_families(self):
-        return [self._instances[('f', family_id)] for family_id in self.child_of_family_id]
+        families = [self._instances[('f', family_id)] for family_id in self.child_of_family_id
+            if self._instances[('f', family_id)]]
+        return families
 
     def has_graphical_representation(self):
         return len(self.graphical_representations) > 0

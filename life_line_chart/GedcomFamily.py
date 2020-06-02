@@ -1,5 +1,6 @@
 from .BaseFamily import BaseFamily
 from .GedcomParsing import get_date_dict_from_tag, _get_relevant_events, estimate_marriage_date
+from .Exceptions import LifeLineChartNotEnoughInformationToDisplay
 
 
 class GedcomFamily(BaseFamily):
@@ -21,6 +22,8 @@ class GedcomFamily(BaseFamily):
             if 'PLAC' in self._database_fam[self.family_id]['MARR']:
                 self.location = self._database_fam[self.family_id]['MARR']['PLAC']['tag_data']
         estimate_marriage_date(self)
+        if self.marriage is None:
+            raise LifeLineChartNotEnoughInformationToDisplay()
 
     def _get_husband_and_wife_id(self):
         """
