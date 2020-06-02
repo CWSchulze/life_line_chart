@@ -494,7 +494,7 @@ class AncestorChart(BaseSVGChart):
                 self.place_selected_individuals(
                     root_individual.graphical_representations[0], None, None, self._instances[('f', cof_family_id)], x_pos)
 
-                x_pos += root_individual.graphical_representations[0].get_ancestor_width(None)
+                x_pos = max(0, self.max_x_index)
 
             for settings in self._chart_configuration['root_individuals']:
                 root_individual_id = settings['individual_id']
