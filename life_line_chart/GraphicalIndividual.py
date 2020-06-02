@@ -280,19 +280,8 @@ class GraphicalIndividual():
     @strongly_connected_parent_family.setter
     def strongly_connected_parent_family(self, gr_family):
         if gr_family != None:
-            if self.g_id not in self.__instances.connection_container['i']:
-                self.__instances.connection_container['i'][self.g_id] = {}
-            if gr_family.g_id not in self.__instances.connection_container['i'][self.g_id]:
-                self.__instances.connection_container['i'][self.g_id][gr_family.g_id] = []
-            if "strong_child" not in self.__instances.connection_container['i'][self.g_id][gr_family.g_id]:
-                self.__instances.connection_container['i'][self.g_id][gr_family.g_id].append("strong_child")
-
-            if gr_family.g_id not in self.__instances.connection_container['f']:
-                self.__instances.connection_container['f'][gr_family.g_id] = {}
-            if self.g_id not in self.__instances.connection_container['f'][gr_family.g_id]:
-                self.__instances.connection_container['f'][gr_family.g_id][self.g_id] = []
-            if "strong_child" not in self.__instances.connection_container['f'][gr_family.g_id][self.g_id]:
-                self.__instances.connection_container['f'][gr_family.g_id][self.g_id].append("strong_child")
+            self.__instances.connection_container['i'][self.g_id][gr_family.g_id].append('strong_child')
+            self.__instances.connection_container['f'][gr_family.g_id][self.g_id].append('strong_child')
 
     def get_name(self):
         return self.individual.get_name()

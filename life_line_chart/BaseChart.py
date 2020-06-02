@@ -291,9 +291,6 @@ class BaseChart():
         for gr_child_individual in gr_cof.visible_children:
             if gr_child_individual == gr_individual:
                 continue
-            # pos = sorted(
-            #     list(gr_child_individual.get_x_position().values()))[0]
-            # if pos[2]:
             x_pos = self._move_single_individual(
                 gr_child_individual, cof, x_index_offset)
 
@@ -337,7 +334,6 @@ class BaseChart():
         self._move_individual_and_ancestors(gr_family.gr_wife, gr_family, wife_x_delta)
         self._move_individual_and_ancestors(gr_family.gr_husb, gr_family, -1000000)
         self._instances.ancestor_width_cache.clear()
-        pass
 
     def _check_compressed_x_position(self, early_raise):
         """
@@ -628,8 +624,7 @@ class BaseChart():
         self.additional_graphical_items.clear()
         self.graphical_individual_representations.clear()
         self.graphical_family_representations.clear()
-        self._instances.connection_container.clear()
-        self._instances.connection_container.update({'i': {}, 'f': {}})
+        self._instances.clear_connections()
         self.position_to_person_map = {}
         for _, instance in self._instances.items():
             instance.graphical_representations.clear()

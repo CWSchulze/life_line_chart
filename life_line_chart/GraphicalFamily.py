@@ -100,20 +100,8 @@ class GraphicalFamily():
     @strongly_connected_child.setter
     def strongly_connected_child(self, gr_child):
         if gr_child != None:
-            if self.g_id not in self.__instances.connection_container['f']:
-                self.__instances.connection_container['f'][self.g_id] = {}
-            if gr_child.g_id not in self.__instances.connection_container['f'][self.g_id]:
-                self.__instances.connection_container['f'][self.g_id][gr_child.g_id] = []
-            if "strong_child" not in self.__instances.connection_container['f'][self.g_id][gr_child.g_id]:
-                self.__instances.connection_container['f'][self.g_id][gr_child.g_id].append("strong_child")
-
-            if gr_child.g_id not in self.__instances.connection_container['i']:
-                self.__instances.connection_container['i'][gr_child.g_id] = {}
-            if self.g_id not in self.__instances.connection_container['i'][gr_child.g_id]:
-                self.__instances.connection_container['i'][gr_child.g_id][self.g_id] = []
-            if "strong_child" not in self.__instances.connection_container['i'][gr_child.g_id][self.g_id]:
-                self.__instances.connection_container['i'][gr_child.g_id][self.g_id].append("strong_child")
-
+            self.__instances.connection_container['f'][self.g_id][gr_child.g_id].append('strong_child')
+            self.__instances.connection_container['i'][gr_child.g_id][self.g_id].append('strong_child')
 
     @property
     def gr_husb(self):
@@ -132,19 +120,8 @@ class GraphicalFamily():
     @gr_husb.setter
     def gr_husb(self, gr_husb):
         if gr_husb != None:
-            if self.g_id not in self.__instances.connection_container['f']:
-                self.__instances.connection_container['f'][self.g_id] = {}
-            if gr_husb.g_id not in self.__instances.connection_container['f'][self.g_id]:
-                self.__instances.connection_container['f'][self.g_id][gr_husb.g_id] = []
-            if "gr_husb" not in self.__instances.connection_container['f'][self.g_id][gr_husb.g_id]:
-                self.__instances.connection_container['f'][self.g_id][gr_husb.g_id].append("gr_husb")
-
-            if gr_husb.g_id not in self.__instances.connection_container['i']:
-                self.__instances.connection_container['i'][gr_husb.g_id] = {}
-            if self.g_id not in self.__instances.connection_container['i'][gr_husb.g_id]:
-                self.__instances.connection_container['i'][gr_husb.g_id][self.g_id] = []
-            if "gr_husb" not in self.__instances.connection_container['i'][gr_husb.g_id][self.g_id]:
-                self.__instances.connection_container['i'][gr_husb.g_id][self.g_id].append("gr_husb")
+            self.__instances.connection_container['f'][self.g_id][gr_husb.g_id].append('gr_husb')
+            self.__instances.connection_container['i'][gr_husb.g_id][self.g_id].append('gr_husb')
 
     @property
     def gr_wife(self):
@@ -163,20 +140,8 @@ class GraphicalFamily():
     @gr_wife.setter
     def gr_wife(self, gr_wife):
         if gr_wife != None:
-            if self.g_id not in self.__instances.connection_container['f']:
-                self.__instances.connection_container['f'][self.g_id] = {}
-            if gr_wife.g_id not in self.__instances.connection_container['f'][self.g_id]:
-                self.__instances.connection_container['f'][self.g_id][gr_wife.g_id] = []
-            if "gr_wife" not in self.__instances.connection_container['f'][self.g_id][gr_wife.g_id]:
-                self.__instances.connection_container['f'][self.g_id][gr_wife.g_id].append("gr_wife")
-
-            if gr_wife.g_id not in self.__instances.connection_container['i']:
-                self.__instances.connection_container['i'][gr_wife.g_id] = {}
-            if self.g_id not in self.__instances.connection_container['i'][gr_wife.g_id]:
-                self.__instances.connection_container['i'][gr_wife.g_id][self.g_id] = []
-            if "gr_wife" not in self.__instances.connection_container['i'][gr_wife.g_id][self.g_id]:
-                self.__instances.connection_container['i'][gr_wife.g_id][self.g_id].append("gr_wife")
-
+            self.__instances.connection_container['f'][self.g_id][gr_wife.g_id].append('gr_wife')
+            self.__instances.connection_container['i'][gr_wife.g_id][self.g_id].append('gr_wife')
 
     @property
     def husb_name(self):
