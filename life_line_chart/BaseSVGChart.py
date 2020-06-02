@@ -300,6 +300,7 @@ class BaseSVGChart(BaseChart):
 
 
             if self._formatting['debug_visualize_connections']:
+                # show items to help debugging the algorithms
                 individual_connections = self._instances.connection_container['i'][gr_individual.g_id]
                 for f_g_id, connections in individual_connections.items():
                     marriage_ring_index, marriage_ordinal = calculate_ring_position(self._instances[('f',f_g_id[1])].graphical_representations[0])
@@ -345,7 +346,6 @@ class BaseSVGChart(BaseChart):
                                 'stroke_width': thickness
                                 }
                             )
-
 
             # generate event node information
             knots = []
@@ -562,8 +562,7 @@ class BaseSVGChart(BaseChart):
                     'color': gr_individual.color,
                     'color_pos': color_pos,
                     'stroke_width': self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']
-                }
-                )
+                })
             if self._formatting['birth_label_active']:
                 if self._formatting['birth_label_along_path']:
                     gr_individual.items.append(
