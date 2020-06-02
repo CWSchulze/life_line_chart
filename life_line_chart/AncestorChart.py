@@ -447,7 +447,7 @@ class AncestorChart(BaseSVGChart):
             logger.info(
                 f"flipping reduced the cross connections by {width - old_width} (i.e. from {old_width} to {width})")
 
-        # for gr_family in self.graphical_family_representations:
+        # for gr_family in self.gr_families:
         if self._positioning['compress']:
             root_individual = self._instances[(
                 'i', root_individual_id)]
@@ -552,10 +552,10 @@ class AncestorChart(BaseSVGChart):
                     pass
 
             #backup color
-            for gir in self.graphical_individual_representations:
+            for gir in self.gr_individuals:
                 gir.color_backup = gir.color
 
-            for gir in self.graphical_individual_representations:
+            for gir in self.gr_individuals:
                 gir.color = gir.color_backup
                 if color_lambda:
                     color = color_lambda(gir.individual_id)
@@ -569,7 +569,7 @@ class AncestorChart(BaseSVGChart):
         elif update_view:
             self.clear_svg_items()
 
-            for gir in self.graphical_individual_representations:
+            for gir in self.gr_individuals:
                 gir.color = gir.color_backup
                 if color_lambda:
                     color = color_lambda(gir.individual_id)

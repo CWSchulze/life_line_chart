@@ -75,7 +75,7 @@ class BaseSVGChart(BaseChart):
         """
         failed = []
         v = {}
-        for gr_individual in self.graphical_individual_representations:
+        for gr_individual in self.gr_individuals:
             x_pos = gr_individual.get_x_position()
             for value in x_pos.values():
                 x_index = value[1]
@@ -133,7 +133,7 @@ class BaseSVGChart(BaseChart):
             self._formatting['relative_line_thickness'] * \
             self._formatting['vertical_step_size']
 
-        if len(self.graphical_individual_representations) == 0:
+        if len(self.gr_individuals) == 0:
             # settings for empty graphs
             self.min_x_index = 0
             self.max_x_index = 1
@@ -192,7 +192,7 @@ class BaseSVGChart(BaseChart):
 
         min_x_index = 9e99
         max_x_index = -9e99
-        for gr_individual in self.graphical_individual_representations:
+        for gr_individual in self.gr_individuals:
             x_positions = gr_individual.get_x_position()
             if x_positions is None:
                 logger.error(gr_individual.individual.plain_name + ' has a graphical representation, but was not placed!')
@@ -200,13 +200,13 @@ class BaseSVGChart(BaseChart):
             for _, x_position in x_positions.items():
                 min_x_index = min(min_x_index, x_position[1])
                 max_x_index = max(max_x_index, x_position[1])
-        if len(self.graphical_individual_representations) == 0:
+        if len(self.gr_individuals) == 0:
             min_x_index = 0
             max_x_index = 0
         self.min_x_index = min_x_index  # -1000
         self.max_x_index = max_x_index + 1  # +200
 
-        for gr_individual in self.graphical_individual_representations:
+        for gr_individual in self.gr_individuals:
             debug_items = []
             birth_date_ov = gr_individual.birth_date_ov
             if not birth_date_ov:
@@ -250,34 +250,34 @@ class BaseSVGChart(BaseChart):
                             gr_family.marriage['ordinal_value'])
                 return None
             if gr_individual.get_marriages():
-                for graphical_representation_marriage_family in gr_individual.get_marriages():
-                    if graphical_representation_marriage_family.marriage is None:
+                for gr_marriage_family in gr_individual.get_marriages():
+                    if gr_marriage_family.marriage is None:
                         continue
-                    if graphical_representation_marriage_family.family_id not in x_pos:
-                        logger.error(graphical_representation_marriage_family.family_id + ' has a graphical representation, but was not placed!')
+                    if gr_marriage_family.family_id not in x_pos:
+                        logger.error(gr_marriage_family.family_id + ' has a graphical representation, but was not placed!')
                         continue
-                    spouse_representation = graphical_representation_marriage_family.get_spouse(
+                    spouse_representation = gr_marriage_family.get_spouse(
                         gr_individual.individual)
-                    marriage_x_index = x_pos[graphical_representation_marriage_family.family_id][1]
+                    marriage_x_index = x_pos[gr_marriage_family.family_id][1]
                     new_x_position_after_marriage.append(
                         self._map_x_position(marriage_x_index))
                     new_x_indices_after_marriage.append(marriage_x_index)
 
-                    if spouse_representation and spouse_representation.get_x_position() and graphical_representation_marriage_family.marriage:
+                    if spouse_representation and spouse_representation.get_x_position() and gr_marriage_family.marriage:
                         # if there is a spouse, choose the middle between them
                         spouse_x_index = spouse_representation.get_x_position(
-                            )[graphical_representation_marriage_family.family_id][1]
+                            )[gr_marriage_family.family_id][1]
                         # spouse_x_position = self._map_x_position(spouse_x_index)
                         marriage_ring_positions.append((
                             (spouse_x_index + marriage_x_index)/2.,
-                            graphical_representation_marriage_family.marriage['ordinal_value']))
+                            gr_marriage_family.marriage['ordinal_value']))
                     else:
                         # if no spouse is visible, place over the children
                         child_x_indices = []
-                        for visible_child in graphical_representation_marriage_family.visible_children:
+                        for visible_child in gr_marriage_family.visible_children:
                             try:
                                 child_x_indices.append(visible_child.get_x_position()[
-                                                       graphical_representation_marriage_family.family_id][1])
+                                                       gr_marriage_family.family_id][1])
                             except:
                                 logger.error('something went wrong with ' + "".join(visible_child.plain_name) +
                                              ". The position family 0 is not equal to the placement...")
@@ -285,18 +285,18 @@ class BaseSVGChart(BaseChart):
                             # calculate the middle over the children
                             marriage_ring_positions.append((
                                 sum(child_x_indices)/len(child_x_indices),
-                                graphical_representation_marriage_family.marriage['ordinal_value']))
+                                gr_marriage_family.marriage['ordinal_value']))
                         else:
                             # place at the individual line... no spouse, no children, what is this information good for?
                             marriage_ring_positions.append((
-                                x_pos[graphical_representation_marriage_family.family_id][1],
-                                graphical_representation_marriage_family.marriage['ordinal_value']))
+                                x_pos[gr_marriage_family.family_id][1],
+                                gr_marriage_family.marriage['ordinal_value']))
 
-                    marriage_id.append(graphical_representation_marriage_family.family_id)
+                    marriage_id.append(gr_marriage_family.family_id)
                     marriage_ordinals.append(
-                        graphical_representation_marriage_family.marriage['ordinal_value'])
+                        gr_marriage_family.marriage['ordinal_value'])
                     marriage_labels.append(
-                        str(graphical_representation_marriage_family.marriage_label))
+                        str(gr_marriage_family.marriage_label))
 
 
             if self._formatting['debug_visualize_connections']:
@@ -665,7 +665,7 @@ class BaseSVGChart(BaseChart):
         for key, value in self.additional_graphical_items.items():
             additional_items += value
         sorted_individuals = [(gr.birth_date_ov, index, gr)
-                              for index, gr in enumerate(self.graphical_individual_representations)]
+                              for index, gr in enumerate(self.gr_individuals)]
         sorted_individuals.sort()
         sorted_individual_items = []
         for _, _, gr_individual in sorted_individuals:

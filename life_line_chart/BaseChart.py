@@ -74,8 +74,8 @@ class BaseChart():
         self._instances = instance_container
         self._instances.graph_link = self
         self._instances[('i', None)] = None
-        self.graphical_individual_representations = []
-        self.graphical_family_representations = []
+        self.gr_individuals = []
+        self.gr_families = []
         # strong graphical connections which must not be broken by optimization algorithms
 
         self.additional_graphical_items = {}
@@ -152,7 +152,7 @@ class BaseChart():
         if new_instance.birth_date is None or new_instance.death_date is None:
             del new_instance
             return None
-        self.graphical_individual_representations.append(new_instance)
+        self.gr_individuals.append(new_instance)
         new_instance.g_id = (len(individual.graphical_representations) - 1, individual.individual_id)
         return new_instance
 
@@ -169,7 +169,7 @@ class BaseChart():
         if not family.graphical_representations:
             new_instance = self._graphical_family_class(
                 self._instances, family.family_id)
-            self.graphical_family_representations.append(new_instance)
+            self.gr_families.append(new_instance)
         else:
             new_instance = family.graphical_representations[0]
             # print('the family was added twice:'+family.family_id)
@@ -185,7 +185,7 @@ class BaseChart():
         """
         total_distance = 0
         list_of_linked_individuals = {}
-        for index, gr_individual in enumerate(self.graphical_individual_representations):
+        for index, gr_individual in enumerate(self.gr_individuals):
             x_positions = gr_individual.get_x_position()
             distance_of_this_individual = 0
             if x_positions:
@@ -354,7 +354,7 @@ class BaseChart():
         min_x = 999999
         max_x = 0
         # assign the individuals to all x_indices in which they appear
-        for gr_individual in self.graphical_individual_representations:
+        for gr_individual in self.gr_individuals:
             x_pos = gr_individual.get_x_position()
             for i, value in enumerate(x_pos.values()):
                 x_index = value[1]
@@ -388,13 +388,13 @@ class BaseChart():
             raise LifeLineChartCollisionDetected()
 
         # block every x_index from birth to death in which an individual appears
-        for x_index, graphical_individual_representation_list in v.items():
-            for index, graphical_individual_representation_a in enumerate(graphical_individual_representation_list):
-                for graphical_individual_representation_b in graphical_individual_representation_list[index+1:]:
-                    birth_position_a = graphical_individual_representation_a.birth_date_ov - 365*15
-                    birth_position_b = graphical_individual_representation_b.birth_date_ov - 365*15
-                    death_position_a = graphical_individual_representation_a.death_date_ov + 365*15
-                    death_position_b = graphical_individual_representation_b.death_date_ov + 365*15
+        for x_index, gr_individuals in v.items():
+            for index, gr_individual_a in enumerate(gr_individuals):
+                for gr_individual_b in gr_individuals[index+1:]:
+                    birth_position_a = gr_individual_a.birth_date_ov - 365*15
+                    birth_position_b = gr_individual_b.birth_date_ov - 365*15
+                    death_position_a = gr_individual_a.death_date_ov + 365*15
+                    death_position_b = gr_individual_b.death_date_ov + 365*15
                     if ((birth_position_a - birth_position_b)
                                 * (birth_position_a - death_position_b) < 0 or
                                 (death_position_a - birth_position_b)
@@ -405,9 +405,9 @@ class BaseChart():
                                 * (death_position_b - death_position_a) < 0):
                         if early_raise:
                             raise LifeLineChartCollisionDetected(
-                                graphical_individual_representation_a, graphical_individual_representation_b)
+                                gr_individual_a, gr_individual_b)
                         collisions.append(
-                            (graphical_individual_representation_a, graphical_individual_representation_b))
+                            (gr_individual_a, gr_individual_b))
         # if len(collisions) > 0:
         #     raise RuntimeError()
         return collisions, min_x, max_x, position_to_person_map
@@ -424,7 +424,7 @@ class BaseChart():
         """
         failed = []
         v = {}
-        for gr_individual in self.graphical_individual_representations:
+        for gr_individual in self.gr_individuals:
             x_pos = gr_individual.get_x_position()
             for value in x_pos.values():
                 x_index = value[1]
@@ -612,7 +612,7 @@ class BaseChart():
         clear all graphical items to render the chart with different settings
         """
         self.additional_graphical_items.clear()
-        for gr_individual in self.graphical_individual_representations:
+        for gr_individual in self.gr_individuals:
             gr_individual.items.clear()
 
     def clear_graphical_representations(self):
@@ -622,8 +622,8 @@ class BaseChart():
         self.max_ordinal = None
         self.min_ordinal = None
         self.additional_graphical_items.clear()
-        self.graphical_individual_representations.clear()
-        self.graphical_family_representations.clear()
+        self.gr_individuals.clear()
+        self.gr_families.clear()
         self._instances.clear_connections()
         self.position_to_person_map = {}
         for _, instance in self._instances.items():
