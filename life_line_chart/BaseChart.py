@@ -315,11 +315,7 @@ class BaseChart():
         wife_x_pos = gr_family.gr_wife.get_x_position()[
             gr_family.family_id][1]
         wife_width = gr_family.wife_width()
-        children_width = gr_family.children_width
-        if not children_width:
-            children_width = self._formatting['vertical_step_size']
-        if children_width != len(gr_family.visible_children):
-            print("G")
+        children_width = len(gr_family.visible_children)
 
         if husb_x_pos < wife_x_pos:
             husb_x_delta = wife_width + children_width

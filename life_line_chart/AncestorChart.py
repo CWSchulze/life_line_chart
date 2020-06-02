@@ -201,7 +201,21 @@ class AncestorChart(BaseSVGChart):
             # then we should return here
             return
 
+        # +----------------------------------------------
+        # | add father branch, siblings and mother branch
+        # +----------------------------------------------
+
         def add_parent(parent_variable_name, x_position):
+            """
+            add mother or father to the chart
+
+            Args:
+                parent_variable_name (str): 'husb' or 'wife'
+                x_position (int): x position index
+
+            Returns:
+                int: new x position index
+            """
             for gr_local_child_of_family in child_of_families:
                 local_child_of_family = gr_local_child_of_family.family
                 gr_parent = getattr(
@@ -232,7 +246,6 @@ class AncestorChart(BaseSVGChart):
         x_position = add_parent('husb', x_position)
 
         # add the main individual and its visible siblings
-        children_start_x = x_position
         for gr_sibling in siblings:
             sibling = gr_sibling.individual
             if sibling.individual_id == individual.individual_id:
@@ -255,10 +268,6 @@ class AncestorChart(BaseSVGChart):
                     child_of_family)
                 x_position += 1
                 gr_sibling.first_marriage_strongly_connected_to_parent_family = False
-
-        if child_of_family and child_of_family.has_graphical_representation() and not child_of_family.graphical_representations[0].children_width:
-            child_of_family.graphical_representations[0].children_width = x_position - \
-                children_start_x
 
         # add the mother branch
         x_position = add_parent('wife', x_position)

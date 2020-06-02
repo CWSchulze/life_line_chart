@@ -20,7 +20,6 @@ class GraphicalFamily():
         # been placed (e.g. if wife/husband are from different branches of the
         # family)
         self.visual_placement_parent_family = None
-        self.children_width = None
         self.g_id = None
 
     def __repr__(self):
