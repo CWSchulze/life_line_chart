@@ -1,3 +1,4 @@
+from .Exceptions import LifeLineChartUnknownPlacementError, LifeLineChartUnknownSelectionAndConnectionError
 
 class GraphicalFamily():
     """
@@ -50,7 +51,7 @@ class GraphicalFamily():
         elif self.gr_wife == gr_individual:
             return self.gr_husb
         else:
-            raise RuntimeError("This individual is not part of the family!")
+            raise LifeLineChartUnknownSelectionAndConnectionError("This individual is not part of the family!")
 
     def add_visible_children(self, gr_child):
         if gr_child not in self.visible_children and gr_child.birth_date_ov:
@@ -81,7 +82,7 @@ class GraphicalFamily():
             if 'strong_child' in connections:
                 strongly_connected_children.append(self.__instances[('i', g_id[1])].graphical_representations[g_id[0]])
         if len(strongly_connected_children) > 1:
-            raise RuntimeError("Something went wrong in the placement algorithm")
+            raise LifeLineChartUnknownPlacementError("Something went wrong in the placement algorithm")
         elif len(strongly_connected_children) > 0:
             return strongly_connected_children[0]
         return None
@@ -101,7 +102,7 @@ class GraphicalFamily():
             if 'gr_husb' in connections:
                 gr_husbs.append(self.__instances[('i', g_id[1])].graphical_representations[g_id[0]])
         if len(gr_husbs) > 1:
-            raise RuntimeError("Something went wrong in the placement algorithm")
+            raise LifeLineChartUnknownPlacementError("Something went wrong in the placement algorithm")
         elif len(gr_husbs) > 0:
             return gr_husbs[0]
         return None
@@ -121,7 +122,7 @@ class GraphicalFamily():
             if 'gr_wife' in connections:
                 gr_wifes.append(self.__instances[('i', g_id[1])].graphical_representations[g_id[0]])
         if len(gr_wifes) > 1:
-            raise RuntimeError("Something went wrong in the placement algorithm")
+            raise LifeLineChartUnknownPlacementError("Something went wrong in the placement algorithm")
         elif len(gr_wifes) > 0:
             return gr_wifes[0]
         return None

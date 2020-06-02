@@ -1,5 +1,5 @@
 from .GedcomIndividual import GedcomIndividual
-
+from .Exceptions import LifeLineChartUnknownPlacementError
 
 class GraphicalIndividual():
     """
@@ -260,7 +260,7 @@ class GraphicalIndividual():
         parent families which are strongly connected
 
         Raises:
-            RuntimeError: placing error
+            LifeLineChartUnknownPlacementError: placing error
 
         Returns:
             GraphicalFamily: strongly connected parent family
@@ -272,7 +272,7 @@ class GraphicalIndividual():
             if 'strong_child' in connections:
                 strongly_connected_parent_families.append(self.__instances[('f', g_id[1])].graphical_representations[g_id[0]])
         if len(strongly_connected_parent_families) > 1:
-            raise RuntimeError("Something went wrong in the placement algorithm")
+            raise LifeLineChartUnknownPlacementError("Something went wrong in the placement algorithm")
         elif len(strongly_connected_parent_families) > 0:
             return strongly_connected_parent_families[0]
         return None
