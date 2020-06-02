@@ -150,6 +150,7 @@ class AncestorChart(BaseSVGChart):
                 gr_child.strongly_connected_parent_family = family.graphical_representations[0]
 
 
+
     def place_selected_individuals(self, gr_individual, child_family, spouse_family, child_of_family, x_offset=0, discovery_cache=[], root_node_discovery_cache=[]):
         """
         Place the graphical representations in direction of x
@@ -192,36 +193,43 @@ class AncestorChart(BaseSVGChart):
                     if gr_child not in root_node_discovery_cache:
                         if gr_child.get_x_position() is None:
                             self.place_selected_individuals(
-                                gr_child, None, c_m, spouse_family, x_position, discovery_cache, root_node_discovery_cache)
+                                gr_child, None, c_m, spouse_family,
+                                x_position, discovery_cache, root_node_discovery_cache)
 
         if (gr_individual,spouse_family) in discovery_cache:
             # when this node was handled by the place_selected_individuals call in a root node
             # then we should return here
             return
 
+        def add_parent(parent_variable_name, x_position):
+            for gr_local_child_of_family in child_of_families:
+                local_child_of_family = gr_local_child_of_family.family
+                gr_parent = getattr(
+                    gr_local_child_of_family, 'gr_' + parent_variable_name)
+                if not gr_parent:
+                    continue
+                if not gr_parent.has_x_position(local_child_of_family):
+                    parent_child_of_families = gr_parent.individual.child_of_families
+                    if parent_child_of_families:
+                        parent_born_in_family = parent_child_of_families[0]
+                    else:
+                        parent_born_in_family = None
 
-        # recursively add the father branch
-        for gr_local_child_of_family in child_of_families:
-            local_child_of_family = gr_local_child_of_family.family
-            if not gr_local_child_of_family.gr_husb:
-                continue
-            gr_father = gr_local_child_of_family.gr_husb
-            if not gr_father.has_x_position(local_child_of_family):
-                fathers_child_of_families = gr_father.individual.child_of_families
-                if fathers_child_of_families:
-                    fathers_born_in_family = fathers_child_of_families[0]
-                else:
-                    fathers_born_in_family = None
+                    if local_child_of_family.has_graphical_representation():
+                        gr_individual.strongly_connected_parent_family = gr_local_child_of_family
+                    self.place_selected_individuals(
+                        gr_parent, spouse_family, local_child_of_family, parent_born_in_family,
+                        x_position, discovery_cache, root_node_discovery_cache)
+                    width = gr_parent.get_ancestor_width(
+                        gr_local_child_of_family)
+                    setattr(gr_local_child_of_family, parent_variable_name + '_width',
+                        lambda gr=gr_parent, cof=gr_local_child_of_family: gr.get_ancestor_width(cof)
+                        )
+                    x_position += width
+            return x_position
 
-                if local_child_of_family.has_graphical_representation():
-                    gr_individual.strongly_connected_parent_family = gr_local_child_of_family
-                self.place_selected_individuals(
-                    gr_father, spouse_family, local_child_of_family, fathers_born_in_family, x_position, discovery_cache, root_node_discovery_cache)
-                width = gr_father.get_ancestor_width(
-                    gr_local_child_of_family)
-                gr_local_child_of_family.husb_width = \
-                    lambda gr=gr_father, cof=gr_local_child_of_family: gr.get_ancestor_width(cof)
-                x_position += width
+        # add the father branch
+        x_position = add_parent('husb', x_position)
 
         # add the main individual and its visible siblings
         children_start_x = x_position
@@ -252,28 +260,8 @@ class AncestorChart(BaseSVGChart):
             child_of_family.graphical_representations[0].children_width = x_position - \
                 children_start_x
 
-        # recursively add the mother branch
-        for gr_local_child_of_family in child_of_families:
-            if not gr_local_child_of_family.gr_wife:
-                continue
-            local_child_of_family = gr_local_child_of_family.family
-            gr_mother = gr_local_child_of_family.gr_wife
-            if not gr_mother.has_x_position(local_child_of_family):
-                mothers_child_of_families = gr_mother.individual.child_of_families
-                if mothers_child_of_families:
-                    mothers_born_in_family = mothers_child_of_families[0]
-                else:
-                    mothers_born_in_family = None
-
-                if local_child_of_family.has_graphical_representation():
-                    gr_individual.strongly_connected_parent_family = gr_local_child_of_family
-                self.place_selected_individuals(
-                    gr_mother, spouse_family, local_child_of_family, mothers_born_in_family, x_position, discovery_cache, root_node_discovery_cache)
-                width = gr_mother.get_ancestor_width(
-                    gr_local_child_of_family)
-                gr_local_child_of_family.wife_width = \
-                    lambda gr=gr_mother, cof=gr_local_child_of_family: gr.get_ancestor_width(cof)
-                x_position += width
+        # add the mother branch
+        x_position = add_parent('wife', x_position)
 
         self.max_x_index = max(self.max_x_index, x_position)
 
