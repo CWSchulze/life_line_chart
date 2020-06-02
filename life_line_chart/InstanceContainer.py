@@ -1,5 +1,8 @@
 import logging
 import hashlib
+from collections import defaultdict
+connection_container_type = lambda y=lambda x=list:defaultdict(x):defaultdict(y)
+
 from .Exceptions import LifeLineChartNotEnoughInformationToDisplay
 
 logging.basicConfig()  # level=20)
@@ -33,7 +36,7 @@ class InstanceContainer():
         self.instantiate_all = instantiate_all
         self.ancestor_width_cache = {}
         self.connection_container = {}
-        self.connection_container.update({'i': {}, 'f': {}})
+        self.connection_container.update({'i': connection_container_type(), 'f': connection_container_type()})
 
     def __iter__(self):  # iterate over all keys
         for type_id, instance in self._data.keys():
@@ -92,9 +95,12 @@ class InstanceContainer():
         """
         self._data.clear()
         self._data.update({('i', None): None, ('f', None): None})
-        self.connection_container.clear()
-        self.connection_container.update({'i': {}, 'f': {}})
         self.ancestor_width_cache.clear()
+        self.clear_connections()
+
+    def clear_connections(self):
+        self.connection_container.clear()
+        self.connection_container.update({'i': connection_container_type(), 'f': connection_container_type()})
 
     def color_generator(self, individual):
         """
