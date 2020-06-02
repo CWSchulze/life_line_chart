@@ -57,19 +57,8 @@ class GraphicalFamily():
             self.visible_children.append(gr_child)
             self.visible_children.sort()
         if gr_child != None:
-            if self.g_id not in self.__instances.connection_container['f']:
-                self.__instances.connection_container['f'][self.g_id] = {}
-            if gr_child.g_id not in self.__instances.connection_container['f'][self.g_id]:
-                self.__instances.connection_container['f'][self.g_id][gr_child.g_id] = []
-            if "weak_child" not in self.__instances.connection_container['f'][self.g_id][gr_child.g_id]:
-                self.__instances.connection_container['f'][self.g_id][gr_child.g_id].append("weak_child")
-
-            if gr_child.g_id not in self.__instances.connection_container['i']:
-                self.__instances.connection_container['i'][gr_child.g_id] = {}
-            if self.g_id not in self.__instances.connection_container['i'][gr_child.g_id]:
-                self.__instances.connection_container['i'][gr_child.g_id][self.g_id] = []
-            if "weak_child" not in self.__instances.connection_container['i'][gr_child.g_id][self.g_id]:
-                self.__instances.connection_container['i'][gr_child.g_id][self.g_id].append("weak_child")
+            self.__instances.connection_container['f'][self.g_id][gr_child.g_id].append('weak_child')
+            self.__instances.connection_container['i'][gr_child.g_id][self.g_id].append('weak_child')
 
     @property
     def connected_children(self):
