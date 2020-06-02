@@ -458,6 +458,19 @@ class AncestorChart(BaseSVGChart):
                 False)
 
     def update_chart(self, filter_lambda=None, color_lambda=None, images_lambda=None, rebuild_all=False, update_view=False):
+        """
+        Update the chart, caching of positioning data is regarded
+
+        Args:
+            filter_lambda (lambda, optional): filtering of individuals. Defaults to None.
+            color_lambda (lambda, optional): coloring of individuals. Defaults to None.
+            images_lambda (lambda, optional): images of individuals. Defaults to None.
+            rebuild_all (bool, optional): clear cache, rebuild everything. Defaults to False.
+            update_view (bool, optional): update formatting only. Defaults to False.
+
+        Returns:
+            bool: view has changed
+        """
         rebuild_all = rebuild_all or self._positioning != self._backup_positioning or \
             self._chart_configuration != self._backup_chart_configuration
         update_view = update_view or rebuild_all or self._formatting != self._backup_formatting
