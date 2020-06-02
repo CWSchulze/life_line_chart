@@ -101,7 +101,7 @@ class DescendantChart(BaseSVGChart):
                         child, generations - 1, filter=filter)
                     if gr_child:
                         gr_marriage.add_visible_children(gr_child)
-                        gr_child.strongly_connected_parent_family = gr_marriage
+                        #gr_child.strongly_connected_parent_family = gr_marriage
                 cofs = individual.child_of_families
                 if len(cofs) > 0:
                     gr_marriage.visual_placement_parent_family = individual.child_of_families[0]
@@ -138,16 +138,26 @@ class DescendantChart(BaseSVGChart):
         for marriage_index, marriage in enumerate(reversed(visible_marriages)):
             if not marriage.has_graphical_representation():
                 continue
+            spouse = marriage.get_spouse(individual.individual_id)
 
+            # starting x index of gr_individual is first marriage (i.e. last in reversed list)
             if marriage_index == len(visible_marriages) - 1:
                 if not gr_individual.has_x_position(child_of_family):
                     gr_individual.set_x_position(
                         x_position, child_of_family)
 
-            if not gr_individual.has_x_position(marriage):
-                gr_individual.set_x_position(
-                    x_position, marriage)
-                x_position += 1
+            if marriage_index == len(visible_marriages) - 1:
+                if not gr_individual.has_x_position(marriage):
+                    gr_individual.set_x_position(
+                        x_position, marriage)
+                    x_position += 1
+            else:
+                if spouse is not None and spouse.has_graphical_representation():
+                    gr_spouse = spouse.graphical_representations[0]
+                    if not gr_spouse.has_x_position(marriage):
+                        gr_spouse.set_x_position(
+                            x_position, marriage)
+                        x_position += 1
 
 
             for child in marriage.get_sorted_children():
@@ -159,13 +169,18 @@ class DescendantChart(BaseSVGChart):
                         marriage)
                     x_position += width
 
-            spouse = marriage.get_spouse(individual.individual_id)
-            if spouse is not None and spouse.has_graphical_representation():
-                gr_spouse = spouse.graphical_representations[0]
-                if not gr_spouse.has_x_position(marriage):
-                    gr_spouse.set_x_position(
+            if marriage_index < len(visible_marriages) - 1:
+                if not gr_individual.has_x_position(marriage):
+                    gr_individual.set_x_position(
                         x_position, marriage)
                     x_position += 1
+            else:
+                if spouse is not None and spouse.has_graphical_representation():
+                    gr_spouse = spouse.graphical_representations[0]
+                    if not gr_spouse.has_x_position(marriage):
+                        gr_spouse.set_x_position(
+                            x_position, marriage)
+                        x_position += 1
 
         self.max_x_index = max(self.max_x_index, x_position)
 
