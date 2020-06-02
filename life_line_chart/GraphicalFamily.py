@@ -3,7 +3,6 @@ class GraphicalFamily():
     """
     Class which represents one appearance of a family
     """
-    _x_position = None
     # color = 'rgb(200,200,255)'
 
     def __init__(self, instances, family_id):
