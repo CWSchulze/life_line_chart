@@ -4,7 +4,6 @@ class GraphicalFamily():
     """
     Class which represents one appearance of a family
     """
-    # color = 'rgb(200,200,255)'
 
     def __init__(self, instances, family_id):
         self.graphical_representations = []
@@ -39,6 +38,15 @@ class GraphicalFamily():
         return self.family.marriage['ordinal_value'] < other.family.marriage['ordinal_value']
 
     def get_spouse(self, individual):
+        """
+        get the spouse of the individual
+
+        Args:
+            individual (BaseIndividual): individual
+
+        Returns:
+            BaseIndividual: spouse
+        """
         spouse = self.family.get_spouse(
             individual.individual_id)
         if not spouse or not spouse.graphical_representations:
@@ -46,6 +54,15 @@ class GraphicalFamily():
         return self.family.get_spouse(individual.individual_id).graphical_representations[0]
 
     def get_gr_spouse(self, gr_individual):
+        """
+        get the gr_spouse of gr_individual
+
+        Args:
+            gr_individual (GraphicalIndividual): individual
+
+        Returns:
+            GraphicalIndividual: spouse
+        """
         if self.gr_husb == gr_individual:
             return self.gr_wife
         elif self.gr_wife == gr_individual:
@@ -54,6 +71,12 @@ class GraphicalFamily():
             raise LifeLineChartUnknownSelectionAndConnectionError("This individual is not part of the family!")
 
     def add_visible_children(self, gr_child):
+        """
+        add a visible child to this family
+
+        Args:
+            gr_child (GraphicalIndividual): child
+        """
         if gr_child not in self.visible_children and gr_child.birth_date_ov:
             self.visible_children.append(gr_child)
             self.visible_children.sort()
@@ -63,6 +86,12 @@ class GraphicalFamily():
 
     @property
     def connected_children(self):
+        """
+        get the list of connected visible children
+
+        Returns:
+            list: list of visible connected children
+        """
         if self.g_id not in self.__instances.connection_container['f']:
             return None
         connected_children = []
@@ -70,11 +99,21 @@ class GraphicalFamily():
             if 'weak_child' in connections:
                 connected_children.append(self.__instances[('i', g_id[1])].graphical_representations[g_id[0]])
         if len(connected_children) > 0:
+            connected_children.sort()
             return connected_children
         return []
 
     @property
     def strongly_connected_child(self):
+        """
+        get the list of the strongly connected child
+
+        Raises:
+            LifeLineChartUnknownPlacementError: [description]
+
+        Returns:
+            [type]: [description]
+        """
         if self.g_id not in self.__instances.connection_container['f']:
             return None
         strongly_connected_children = []

@@ -10,6 +10,7 @@ from .InstanceContainer import InstanceContainer
 logging.basicConfig()  # level=20)
 logger = logging.getLogger("life_line_chart")
 
+
 def get_gedcom_instance_container(filename='gramps_testdata.ged'):
     """
     instance container for families and individuals from gedcom file
