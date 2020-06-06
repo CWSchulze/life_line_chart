@@ -512,12 +512,12 @@ class AncestorChart(BaseSVGChart):
                 generations = settings['generations']
                 root_individual = self._instances[(
                     'i', root_individual_id)]
-                self.select_individuals(root_individual, generations, filter=local_filter_lambda)
+                self.select_individuals(root_individual, generations, filter=local_filter_lambda, discovery_cache=[])
 
             for family_id in self._chart_configuration['family_children']:
                 family = self._instances[(
                     'f', family_id)]
-                self.select_family_children(family, filter=local_filter_lambda)
+                self.select_family_children(family, filter=local_filter_lambda, discovery_cache=[])
 
             x_pos = 0
             for settings in self._chart_configuration['root_individuals']:
@@ -535,11 +535,11 @@ class AncestorChart(BaseSVGChart):
                 if vms:
                     for vm in vms:
                         self.place_selected_individuals(
-                            root_individual.graphical_representations[0], None, vm.family, self._instances[('f', cof_family_id)], x_pos)
+                            root_individual.graphical_representations[0], None, vm.family, self._instances[('f', cof_family_id)], x_pos, [], [])
                         spouse_family = vm.family.graphical_representations[0]
                 else:
                     self.place_selected_individuals(
-                        root_individual.graphical_representations[0], None, None, self._instances[('f', cof_family_id)], x_pos)
+                        root_individual.graphical_representations[0], None, None, self._instances[('f', cof_family_id)], x_pos, [], [])
 
                 x_pos = max(0, self.max_x_index)
 
