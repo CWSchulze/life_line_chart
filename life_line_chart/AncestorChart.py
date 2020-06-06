@@ -560,7 +560,7 @@ class AncestorChart(BaseSVGChart):
             for family_id in self._chart_configuration['family_children']:
                 family = self._instances[(
                     'f', family_id)]
-                self.select_family_children(family, filter=local_filter_lambda, discovery_cache=[])
+                self.select_family_children(family, filter=local_filter_lambda)
 
             x_pos = 0
             for settings in self._chart_configuration['root_individuals']:
