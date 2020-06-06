@@ -427,34 +427,50 @@ class AncestorChart(BaseSVGChart):
         """
         self.check_unique_x_position()
 
+        candidates = []
         if self._positioning['flip_to_optimize']:
             width, loli = self._calculate_sum_of_distances()
             old_width = width
-            candidantes = set(list(loli.values()))
-            for key in sorted(loli.keys()):
+            for key in loli.keys():
                 def collect_candidates(children):
                     for child in children:
                         if len(child.graphical_representations) > 0:
-                            candidantes.add(child.graphical_representations[0])
+                            if child.graphical_representations[0] not in candidates:
+                                candidates.append(child.graphical_representations[0])
                             collect_candidates(child.children)
 
                 individual = loli[key]
+                if individual not in candidates:
+                    candidates.append(individual)
                 collect_candidates(individual.children)
                 for cof in individual.individual.child_of_families:
                     collect_candidates(cof.get_children())
 
-            # candidantes = set()
-            items = list(reversed(sorted([(child.birth_date_ov, index, child) for index, child in enumerate(candidantes)])))
+            nSteps = self._positioning['debug_optimization_flipping_steps']
+
             failed = []
-            for ov, _, gr_child in items:
+            has_been_done = set()
+            for gr_child in candidates:
+                ov = gr_child.birth_date_ov
                 c_pos = list(
                     gr_child.get_x_position().values())[1:]
                 for x_pos in c_pos:
                     if x_pos[2] is None:
                         continue
+                    if x_pos[2].graphical_representations[0] in has_been_done:
+                        continue
+                    has_been_done.add(x_pos[2].graphical_representations[0])
                     # family_id = key2[2]
                     # x_pos = c_pos[key2]
+                    if nSteps > 0:
+                        nSteps -= 1
+                    if nSteps == 0:
+                        break
                     self._flip_family(x_pos[2].graphical_representations[0])
+                    if nSteps > 0:
+                        nSteps -= 1
+                    if nSteps == 0:
+                        break
                     failed, _, _ = self.check_unique_x_position()
                     if len(failed) > 0:
                         logger.error("failed flipping " +
@@ -466,6 +482,8 @@ class AncestorChart(BaseSVGChart):
                     else:
                         width = new_width
                 # print (x_pos)
+                if nSteps == 0:
+                    break
                 if len(failed) > 0:
                     break
 
