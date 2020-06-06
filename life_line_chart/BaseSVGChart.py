@@ -254,6 +254,9 @@ class BaseSVGChart(BaseChart):
                     if gr_marriage_family.marriage is None:
                         continue
                     if gr_marriage_family.family_id not in x_pos:
+                        # Maybe not an error. This might also happen, if the first and second marriage of one person
+                        # reunite in later generations. If the number of the generations is not the same, then one
+                        # marriage might be added, while the other is not (due to max generations)
                         logger.error(gr_marriage_family.family_id + ' has a graphical representation, but was not placed!')
                         continue
                     spouse_representation = gr_marriage_family.get_spouse(
