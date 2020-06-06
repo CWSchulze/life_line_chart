@@ -319,12 +319,24 @@ class AncestorChart(BaseSVGChart):
         if gr_family.husb is not None and gr_family.husb.has_graphical_representation():
             x_pos_husb = gr_family.husb.graphical_representations[0].get_x_position()[
                 gr_family.family_id][1]
-            gr_individuals.append((1, gr_family.husb.graphical_representations[0]))
+            if gr_family.husb.child_of_families and gr_family.husb.child_of_families[0] \
+                    and (gr_family.husb.child_of_families[0].husb and gr_family.husb.child_of_families[0].husb.has_graphical_representation()) \
+                    and (gr_family.husb.child_of_families[0].wife and gr_family.husb.child_of_families[0].wife.has_graphical_representation()):
+                gr_individuals.append((1, gr_family.husb.graphical_representations[0]))
         if gr_family.wife is not None and gr_family.wife.has_graphical_representation():
             x_pos_wife = gr_family.wife.graphical_representations[0].get_x_position()[
                 gr_family.family_id][1]
-            gr_individuals.append((-1, gr_family.wife.graphical_representations[0]))
-        if x_pos_husb and x_pos_wife and x_pos_husb > x_pos_wife:
+            if gr_family.wife.child_of_families and gr_family.wife.child_of_families[0] \
+                    and (gr_family.wife.child_of_families[0].husb and gr_family.wife.child_of_families[0].husb.has_graphical_representation()) \
+                    and (gr_family.wife.child_of_families[0].wife and gr_family.wife.child_of_families[0].wife.has_graphical_representation()):
+                gr_individuals.append((-1, gr_family.wife.graphical_representations[0]))
+
+        vcs = gr_family.visible_children
+        children_width = len(vcs)
+        children_x_positions = [gr_child.get_x_position(gr_family)[1] for gr_child in vcs]
+        children_x_center = sum(children_x_positions)*1.0/children_width
+
+        if x_pos_husb and children_x_center < x_pos_husb or x_pos_wife and x_pos_wife < children_x_center:
             family_was_flipped = True
 
         for _, gr_individual in sorted(gr_individuals):
