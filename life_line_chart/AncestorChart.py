@@ -30,7 +30,8 @@ class AncestorChart(BaseSVGChart):
     """
 
     DEFAULT_POSITIONING = {
-        'compression_steps': -1,  # debugging option
+        'debug_optimization_compression_steps': -1,  # debugging option
+        'debug_optimization_flipping_steps': -1,  # debugging option
         'compress': False,
         'flip_to_optimize': False,
         'fathers_have_the_same_color': False,

@@ -2,6 +2,14 @@
     "en_US.UTF-8": {
         "formatting": {},
         "positioning": {
+            "debug_optimization_compression_steps": {
+                "short_description": "Maximum number of compression steps",
+                "long_description": "Debugging of the compression algorithm. Abort after x steps."
+            },
+            "debug_optimization_flipping_steps": {
+                "short_description": "Maximum number of flipping steps",
+                "long_description": "Debugging of the flipping algorithm. Abort after x steps."
+            },
             "compress": {
                 "short_description": "Compress the chart vertically",
                 "long_description": "By default every individual has a unique vertical slot. This can be inefficient with many generations. This algorithm lets several people share a vertical slot, if they do not overlap."
@@ -20,17 +28,25 @@
     "de_DE.UTF-8": {
         "formatting": {},
         "positioning": {
+            "debug_optimization_compression_steps": {
+                "short_description": "Maximale Anzahl an Komprimierungsschritten",
+                "long_description": "Debuggen des Komprimierungsalgorithmus. Abbruch nach x Schritten."
+            },
+            "debug_optimization_flipping_steps": {
+                "short_description": "Maximale Anzahl an Spiegelungs Schritten",
+                "long_description": "Debuggen des Flipping-Algorithmus. Abbruch nach x Schritten."
+            },
             "compress": {
                 "short_description": "Vertikal komprimieren",
-                "long_description": "Normalerweise werden Personen auf einem Raster verteilt. Die vertikale Position kann nur einer Person zugewiesen sein kann. Bei größeren Diagrammen führt dies dazu, dass die Diagramme unübersichtlich werden. Dieser Algorithmus erlaubt es, dass Personen übereinander erscheinen können. Dies führt jedoch nicht zu Überlappungen."
+                "long_description": "Normalerweise werden Personen auf einem Raster verteilt. Die vertikale Position kann nur einer Person zugewiesen sein kann. Bei gr\u00f6\u00dferen Diagrammen f\u00fchrt dies dazu, dass die Diagramme un\u00fcbersichtlich werden. Dieser Algorithmus erlaubt es, dass Personen \u00fcbereinander erscheinen k\u00f6nnen. Dies f\u00fchrt jedoch nicht zu \u00dcberlappungen."
             },
             "flip_to_optimize": {
-                "short_description": "Spiegeln von Familien zur Verkürzung von Querverbindungen",
-                "long_description": "In jeder Familie können Mutter und Vater können die Position tauschen. Dies führt ggf. zu einer Verkürzung der Querverbindungen in großen Diagrammen. Die Querverbindungen werden durch den Ahnenschwund und Wiederheirat verursacht."
+                "short_description": "Spiegeln von Familien zur Verk\u00fcrzung von Querverbindungen",
+                "long_description": "In jeder Familie k\u00f6nnen Mutter und Vater k\u00f6nnen die Position tauschen. Dies f\u00fchrt ggf. zu einer Verk\u00fcrzung der Querverbindungen in gro\u00dfen Diagrammen. Die Querverbindungen werden durch den Ahnenschwund und Wiederheirat verursacht."
             },
             "fathers_have_the_same_color": {
-                "short_description": "Vätern dieselbe Farbe zuordnen",
-                "long_description": "Ausgehend von der Hauptperson wird rekursiv Vätern dieselbe Farbe zugeordnet."
+                "short_description": "V\u00e4tern dieselbe Farbe zuordnen",
+                "long_description": "Ausgehend von der Hauptperson wird rekursiv V\u00e4tern dieselbe Farbe zugeordnet."
             }
         },
         "chart_configuration_root_individual": {}
