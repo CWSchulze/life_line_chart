@@ -54,7 +54,8 @@ class GedcomFamily(BaseFamily):
         except KeyError:
             return []
 
-    def _get_husb_name(self):
+    @property
+    def husb_name(self):
         """
         get the husband name
 
@@ -67,7 +68,8 @@ class GedcomFamily(BaseFamily):
             name = "unknown"
         return name
 
-    def _get_wife_name(self):
+    @property
+    def wife_name(self):
         """
         get the wife name
 
@@ -80,5 +82,3 @@ class GedcomFamily(BaseFamily):
             name = "unknown"
         return name
 
-    husb_name = property(_get_husb_name)
-    wife_name = property(_get_wife_name)

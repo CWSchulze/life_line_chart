@@ -132,25 +132,25 @@ class BaseFamily():
             raise NotImplementedError()
         return []
 
-    def _get_husb_name(self):
+    @property
+    def husb_name(self):
         if True:
             raise NotImplementedError()
         return ""
 
-    husb_name = property(_get_husb_name)
-
-    def _get_wife_name(self):
+    @property
+    def wife_name(self):
         if True:
             raise NotImplementedError()
-    wife_name = property(_get_wife_name)
+        return ""
 
-    def _get_husb(self):
+    @property
+    def husb(self):
         return self._instances[('i', self.husband_individual_id)]
-    husb = property(_get_husb)
 
-    def _get_wife(self):
+    @property
+    def wife(self):
         return self._instances[('i', self.wife_individual_id)]
-    wife = property(_get_wife)
 
     @property
     def marriage_date(self):
