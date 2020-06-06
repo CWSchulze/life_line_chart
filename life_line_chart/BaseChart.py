@@ -304,17 +304,33 @@ class BaseChart():
         Args:
             gr_family (GraphicalFamily): family instance
         """
-        if gr_family.gr_husb is None or gr_family.gr_wife is None:
+        if gr_family.gr_husb is None and gr_family.gr_wife is None:
             return
-        husb_x_pos = gr_family.gr_husb.get_x_position()[
-            gr_family.family_id][1]
-        husb_width = gr_family.husb_width()
-        wife_x_pos = gr_family.gr_wife.get_x_position()[
-            gr_family.family_id][1]
-        wife_width = gr_family.wife_width()
-        children_width = len(gr_family.visible_children)
+        if gr_family.gr_husb is not None:
+            husb_x_pos = gr_family.gr_husb.get_x_position()[
+                gr_family.family_id][1]
+            husb_width = gr_family.husb_width()
+        else:
+            husb_x_pos = None
+            husb_width = 0
+        if gr_family.gr_wife is not None:
+            wife_x_pos = gr_family.gr_wife.get_x_position()[
+                gr_family.family_id][1]
+            wife_width = gr_family.wife_width()
+        else:
+            wife_x_pos = None
+            wife_width = 0
+        vcs = gr_family.visible_children
+        children_width = len(vcs)
+        if children_width == 0:
+            if gr_family.gr_husb is None or gr_family.gr_wife is None:
+                return
+            children_x_center = (husb_x_pos + wife_x_pos)/2.0
+        else:
+            children_x_positions = [gr_child.get_x_position(gr_family)[1] for gr_child in vcs]
+            children_x_center = sum(children_x_positions)*1.0/children_width
 
-        if husb_x_pos < wife_x_pos:
+        if wife_x_pos and children_x_center < wife_x_pos or husb_x_pos and husb_x_pos < children_x_center:
             husb_x_delta = wife_width + children_width
             wife_x_delta = -husb_width - children_width
             child_x_delta = wife_width - husb_width
@@ -323,16 +339,15 @@ class BaseChart():
             wife_x_delta = husb_width + children_width
             child_x_delta = husb_width - wife_width
 
-        for gr_child_individual in gr_family.visible_children:
-            pos = sorted(
-                list(gr_child_individual.get_x_position().values()))
+        for gr_child in vcs:
+            pos = list(gr_child.get_x_position().values())
             self._move_single_individual(
-                gr_child_individual, pos[0][2], child_x_delta)
+                gr_child, pos[0][2], child_x_delta)
 
-        self._move_individual_and_ancestors(
-            gr_family.gr_husb, gr_family, husb_x_delta+1000000)
-        self._move_individual_and_ancestors(gr_family.gr_wife, gr_family, wife_x_delta)
-        self._move_individual_and_ancestors(gr_family.gr_husb, gr_family, -1000000)
+        if gr_family.gr_husb:
+            self._move_individual_and_ancestors(gr_family.gr_husb, gr_family, husb_x_delta)
+        if gr_family.gr_wife:
+            self._move_individual_and_ancestors(gr_family.gr_wife, gr_family, wife_x_delta)
         self._instances.ancestor_width_cache.clear()
 
     def _check_compressed_x_position(self, early_raise):
