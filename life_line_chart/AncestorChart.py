@@ -368,6 +368,13 @@ class AncestorChart(BaseSVGChart):
                             cof.graphical_representations[0])
                     except KeyError as e:
                         pass
+
+                if self.debug_optimization_compression_steps <= 0:
+                    break
+            if self.debug_optimization_compression_steps <= 0:
+                break
+        if self.debug_optimization_compression_steps <= 0:
+            return
         for original_direction_factor, gr_individual in sorted(gr_individuals):
             if gr_individual is None:
                 continue
@@ -377,10 +384,6 @@ class AncestorChart(BaseSVGChart):
                 direction_factor = - original_direction_factor
             else:
                 direction_factor = original_direction_factor
-
-            self.compression_steps -= 1
-            if self.compression_steps <= 0:
-                continue
 
             vms = gr_individual.visible_marriages
             if vms:
@@ -393,15 +396,24 @@ class AncestorChart(BaseSVGChart):
                     while i < 50000:
                         self._move_individual_and_ancestors(
                             gr_individual, strongly_connected_parent_family, direction_factor*1)
+                        self.debug_optimization_compression_steps -= 1
+                        if self.debug_optimization_compression_steps <= 0:
+                            break
                         self._check_compressed_x_position(True)
                         i += 1
                 except LifeLineChartCollisionDetected as e:
                     self._move_individual_and_ancestors(
                         gr_individual, strongly_connected_parent_family, -direction_factor*1)
+                    self.debug_optimization_compression_steps -= 1
+                    if self.debug_optimization_compression_steps <= 0:
+                        break
                 except LifeLineChartCannotMoveIndividual as e:
                     pass
                 except KeyError as e:
                     pass
+
+                if self.debug_optimization_compression_steps <= 0:
+                    break
                 if i != 0:
                     logger.info('moved ' + ' '.join(gr_individual.get_name()) +
                                 ' by ' + str(i * direction_factor * 1))
@@ -468,9 +480,9 @@ class AncestorChart(BaseSVGChart):
 
             failed, old_x_min_index, old_x_max_index = self.check_unique_x_position()
             old_width = old_x_max_index - old_x_min_index
-            self.compression_steps = 1e30
-            if 'compression_steps' in self._formatting and self._formatting['compression_steps'] > 0:
-                self.compression_steps = self._formatting['compression_steps']
+            self.debug_optimization_compression_steps = 1e30
+            if 'debug_optimization_compression_steps' in self._positioning and self._positioning['debug_optimization_compression_steps'] > 0:
+                self.debug_optimization_compression_steps = self._positioning['debug_optimization_compression_steps']
             for family in gr_root_individual.connected_parent_families:
                 self._compress_chart_ancestor_graph(family)
 
