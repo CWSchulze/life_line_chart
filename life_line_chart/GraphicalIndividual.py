@@ -50,6 +50,20 @@ class GraphicalIndividual():
         """
         return self.birth_date_ov < other.birth_date_ov
 
+    def __eq__(self, other):
+        """
+        == operator
+
+        Args:
+            other (GraphicalIndividual): other instance
+
+        Returns:
+            bool: is equal
+        """
+        if type(other) != GraphicalIndividual:
+            return False
+        return self.g_id == other.g_id
+
     def get_marriages(self):
         marriages = self.individual.marriages
         return [m.graphical_representations[0] for m in marriages if m.has_graphical_representation()]
@@ -391,3 +405,16 @@ class GraphicalIndividual():
     @property
     def children(self):
         return self.individual.children
+
+    @property
+    def visible_children(self):
+        """
+        get the all visible children of this individual (all visible marriages)
+
+        Returns:
+            list: list of children individuals
+        """
+        gr_children = []
+        for vm in self.visible_marriages:
+            gr_children += vm.visible_children
+        return gr_children
