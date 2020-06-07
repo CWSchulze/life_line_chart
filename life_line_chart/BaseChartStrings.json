@@ -144,6 +144,14 @@
             "debug_visualize_ambiguous_placement": {
                 "short_description": "Visualize ambiguous placement",
                 "long_description": "Visualize automatically detected errors in the placement algorithm."
+            },
+            "coloring_of_individuals": {
+                "short_description": "Coloring of individuals",
+                "long_description": "There are different ways to determine the color of an individual.",
+                "choices": {
+                    "unique": "Unique",
+                    "surname": "Based on surname"
+                }
             }
         },
         "positioning": {},
@@ -299,6 +307,14 @@
             "debug_visualize_ambiguous_placement": {
                 "short_description": "Mehrdeutig Platzierung anzeigen",
                 "long_description": "Visualisieren Sie automatisch erkannte Fehler des Platzierungs-Algorithmus."
+            },
+            "coloring_of_individuals": {
+                "short_description": "Einf\u00e4rben von Individuen",
+                "long_description": "Es gibt verschiedene M\u00f6glichkeiten die Farbe eines Individuums zu bestimmen.",
+                "choices": {
+                    "unique": "Einzigartig",
+                    "surname": "Basierend auf dem Nachnamen"
+                }
             }
         },
         "positioning": {},

@@ -1,6 +1,11 @@
 {
     "en_US.UTF-8": {
-        "formatting": {},
+        "formatting": {
+            "fathers_have_the_same_color": {
+                "short_description": "Fathers have the same color",
+                "long_description": "Starting from the root person, each father of an added individual has the same color as that individual."
+            }
+        },
         "positioning": {
             "debug_optimization_compression_steps": {
                 "short_description": "Maximum number of compression steps",
@@ -17,16 +22,17 @@
             "flip_to_optimize": {
                 "short_description": "Flip families to reduce vertical connections",
                 "long_description": "Switch the position of mother and father in a family, to reduce the overall vertical cross connections in larger graphs. This is happens if one person is shown in more than one family or it is caused by pedigree collapse."
-            },
-            "fathers_have_the_same_color": {
-                "short_description": "Fathers have the same color",
-                "long_description": "Starting from the root person, each father of an added individual has the same color as that individual."
             }
         },
         "chart_configuration_root_individual": {}
     },
     "de_DE.UTF-8": {
-        "formatting": {},
+        "formatting": {
+            "fathers_have_the_same_color": {
+                "short_description": "V\u00e4tern dieselbe Farbe zuordnen",
+                "long_description": "Ausgehend von der Hauptperson wird rekursiv V\u00e4tern dieselbe Farbe zugeordnet."
+            }
+        },
         "positioning": {
             "debug_optimization_compression_steps": {
                 "short_description": "Maximale Anzahl an Komprimierungsschritten",
@@ -43,10 +49,6 @@
             "flip_to_optimize": {
                 "short_description": "Spiegeln von Familien zur Verk\u00fcrzung von Querverbindungen",
                 "long_description": "In jeder Familie k\u00f6nnen Mutter und Vater k\u00f6nnen die Position tauschen. Dies f\u00fchrt ggf. zu einer Verk\u00fcrzung der Querverbindungen in gro\u00dfen Diagrammen. Die Querverbindungen werden durch den Ahnenschwund und Wiederheirat verursacht."
-            },
-            "fathers_have_the_same_color": {
-                "short_description": "V\u00e4tern dieselbe Farbe zuordnen",
-                "long_description": "Ausgehend von der Hauptperson wird rekursiv V\u00e4tern dieselbe Farbe zugeordnet."
             }
         },
         "chart_configuration_root_individual": {}

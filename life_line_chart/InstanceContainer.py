@@ -37,6 +37,10 @@ class InstanceContainer():
         self.ancestor_width_cache = {}
         self.connection_container = {}
         self.connection_container.update({'i': connection_container_type(), 'f': connection_container_type()})
+        self.color_getters = {
+            'unique': self.color_generator_unique,
+            'surname': self.color_generator_surname
+        }
 
     def __iter__(self):  # iterate over all keys
         for type_id, instance in self._data.keys():
@@ -106,20 +110,63 @@ class InstanceContainer():
         self.connection_container.clear()
         self.connection_container.update({'i': connection_container_type(), 'f': connection_container_type()})
 
-    def color_generator(self, individual):
+    def color_generator_unique(self, gr_individual):
         """
         generate color for an individual
 
         Args:
-            individual (BaseIndividual): individual to generate a color for
+            individual (GraphicalIndividual): individual to generate a color for
         """
-        i = int(hashlib.sha1(individual.plain_name.encode(
+        individual = gr_individual.individual
+        seed = individual.plain_name + str(individual.individual_id)
+        i = int(hashlib.sha1(seed.encode(
             'utf8')).hexdigest(), 16) % (10 ** 8)
         c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
         f = 255/max(c)
         c = [int(x*f) for x in c]
         f = min(1, 500/sum(c))
         return [int(x*f) for x in c]
+
+    def color_generator_surname(self, gr_individual):
+        """
+        generate color for an individual
+
+        Args:
+            individual (GraphicalIndividual): individual to generate a color for
+        """
+        individual = gr_individual.individual
+        seed = ""
+        try:
+            seed = "".join(individual.get_name()[1:])
+        except Exception as e:
+            pass
+        i = int(hashlib.sha1(seed.encode(
+            'utf8')).hexdigest(), 16) % (10 ** 8)
+        c = (i*23 % 255, i*41 % 255, (i*79 % 245) + 10)
+        f = 255/max(c)
+        c = [int(x*f) for x in c]
+        f = min(1, 500/sum(c))
+        return [int(x*f) for x in c]
+
+    def color_generator_fathers_have_the_same_color(self, gr_individual):
+        """
+        generate color for an individual
+
+        Args:
+            individual (GraphicalIndividual): individual to generate a color for
+        """
+        f = gr_individual.strongly_connected_parent_family
+        gr_husb = None
+        while f is not None and f.gr_husb is not None:
+            gr_husb = f.gr_husb
+            f = gr_husb.strongly_connected_parent_family
+        if gr_husb:
+            if gr_husb.color == (0,0,0):
+                gr_husb.color = self.color_getter(gr_husb)
+            return gr_husb.color
+        return self.color_getter(gr_individual)
+
+    color_getter = color_generator_unique
 
     def display_plain_name(self, individual):
         return ' '.join([n.strip() for n in individual.get_name() if n.strip() != ''])

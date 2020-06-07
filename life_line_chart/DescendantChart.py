@@ -4,12 +4,14 @@ import logging
 import datetime
 import svgwrite
 from copy import deepcopy
-from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
-#from cmath import sqrt, exp, pi
-from math import floor, ceil, sqrt, exp, pi
 from .BaseSVGChart import BaseSVGChart
+from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
+from .Translation import get_strings, recursive_merge_dict_members
 
 logger = logging.getLogger("life_line_chart")
+
+_strings = get_strings('DescendantChart')
+_, _strings = recursive_merge_dict_members(BaseSVGChart.SETTINGS_DESCRIPTION, _strings, remove_unknown_keys=False)
 
 
 class DescendantChart(BaseSVGChart):
@@ -25,12 +27,18 @@ class DescendantChart(BaseSVGChart):
     of that, ancestor collapse is visualized.
     """
 
+    DEFAULT_FORMATTING = {
+        'highlight_descendants': False,
+    }
+    DEFAULT_FORMATTING.update(BaseSVGChart.DEFAULT_FORMATTING)
+
     DEFAULT_CHART_CONFIGURATION = {
             'root_individuals': [],
             'discovery_blacklist': []
     }
     DEFAULT_CHART_CONFIGURATION.update(BaseSVGChart.DEFAULT_CHART_CONFIGURATION)
 
+    SETTINGS_DESCRIPTION = _strings
 
     def __init__(self, positioning=None, formatting=None, instance_container=None):
         BaseSVGChart.__init__(self, positioning, formatting, instance_container)
@@ -38,14 +46,13 @@ class DescendantChart(BaseSVGChart):
         # configuration of this chart
         self._chart_configuration.update(DescendantChart.DEFAULT_CHART_CONFIGURATION)
 
-    def select_descendants(self, individual, generations=None, color=None, filter=None):
+    def select_descendants(self, individual, generations=None, filter=None):
         """
         create graphical representations for all descendants.
 
         Args:
             individual (BaseIndividual): parent individual
             generations (int, optional): number of generations to go deeper. Defaults to None.
-            color (tuple, optional): RGB value of the individuals. Defaults to None.
             filter (lambda, optional): filter for individuals. Defaults to None.
         """
         if filter and filter(individual):
@@ -57,11 +64,6 @@ class DescendantChart(BaseSVGChart):
 
             if gr_individual is None:
                 return
-
-            if color is None:
-                gr_individual.color = self._instances.color_generator(individual)
-            else:
-                gr_individual.color = color
         else:
             logger.warning('why this?')
             gr_individual = individual.graphical_representations[-1]
@@ -84,12 +86,6 @@ class DescendantChart(BaseSVGChart):
                     if filter is None or filter(spouse) == False:
                         gr_spouse = self._create_individual_graphical_representation(
                             spouse)
-
-                        if gr_spouse is not None:
-                            if color is None:
-                                gr_spouse.color = self._instances.color_generator(spouse)
-                            else:
-                                gr_spouse.color = color
 
                     if gr_marriage.husb == spouse:
                         gr_marriage.gr_husb = gr_spouse
@@ -206,6 +202,19 @@ class DescendantChart(BaseSVGChart):
                 False)
 
     def update_chart(self, filter_lambda=None, color_lambda=None, images_lambda=None, rebuild_all=False, update_view=False):
+        """
+        Update the chart, caching of positioning data is regarded
+
+        Args:
+            filter_lambda (lambda(BaseIndividual), optional): filtering of individuals. Defaults to None.
+            color_lambda (lambda(GraphicalIndividual), optional): coloring of individuals. Defaults to None.
+            images_lambda (lambda(BaseIndividual), optional): images of individuals. Defaults to None.
+            rebuild_all (bool, optional): clear cache, rebuild everything. Defaults to False.
+            update_view (bool, optional): update formatting only. Defaults to False.
+
+        Returns:
+            bool: view has changed
+        """
         rebuild_all = rebuild_all or self._positioning != self._backup_positioning or \
             self._chart_configuration != self._backup_chart_configuration
         update_view = update_view or rebuild_all or self._formatting != self._backup_formatting
@@ -215,6 +224,11 @@ class DescendantChart(BaseSVGChart):
             if _filter_lambda is not None:
                 return _filter_lambda(individual)
             return False
+        if color_lambda:
+            update_view = True
+        if images_lambda:
+            update_view = True
+        self._instances.color_getter = self._instances.color_getters[self._formatting['coloring_of_individuals']]
 
         if rebuild_all:
             self.clear_graphical_representations()
@@ -247,18 +261,28 @@ class DescendantChart(BaseSVGChart):
                 except Exception as e:
                     pass
 
-            #backup color
-            for gir in self.gr_individuals:
-                gir.color_backup = gir.color
 
             for gir in self.gr_individuals:
-                gir.color = gir.color_backup
-                if color_lambda:
-                    color = color_lambda(gir.individual_id)
-                    if color:
-                        gir.color = color
+                color = None
+                if color_lambda is None:
+                    color = color_lambda
+                if color_lambda is None or color is None:
+                    if self._formatting['highlight_descendants']:
+                        cofs = gir.individual.child_of_families
+                        if not cofs or not cofs[0].has_graphical_representation():
+                            marriages = gir.visible_marriages
+                            if marriages:
+                                spouse = marriages[0].get_spouse(gir)
+                                if spouse and spouse.individual.child_of_families and spouse.individual.child_of_families[0].has_graphical_representation():
+                                    color = (225,225,225)
+                    if color is None:
+                        color = self._instances.color_getter(gir)
+                gir.color = color
                 if images_lambda:
-                    gir.individual.images = images_lambda(gir.individual.individual_id)
+                    images = images_lambda(gir.individual)
+                else:
+                    images = {}
+                gir.individual.images = images
 
             self.define_svg_items()
 
@@ -266,13 +290,23 @@ class DescendantChart(BaseSVGChart):
             self.clear_svg_items()
 
             for gir in self.gr_individuals:
-                gir.color = gir.color_backup
-                if color_lambda:
-                    color = color_lambda(gir.individual_id)
-                    if color:
-                        gir.color = color
+                color = None
+                if color_lambda is None:
+                    color = color_lambda
+                if color_lambda is None or color is None:
+                    if self._formatting['highlight_descendants']:
+                        cofs = gir.child_of_families
+                        if cofs and cofs[0].has_graphical_representation():
+                            color = (215,215,215)
+                    if color is None:
+                        color = self._instances.color_getter(gir)
+                gir.color = color
                 if images_lambda:
-                    gir.individual.images = images_lambda(gir.individual.individual_id)
+                    images = images_lambda(gir.individual)
+                else:
+                    images = {}
+                gir.individual.images = images
+
             self.define_svg_items()
         self._backup_chart_configuration = deepcopy(self._chart_configuration)
         self._backup_formatting = deepcopy(self._formatting)

@@ -1,0 +1,22 @@
+{
+    "en_US.UTF-8": {
+        "formatting": {
+            "highlight_descendants": {
+                "short_description": "Highlight descandants",
+                "long_description": "Highlight the persons which are descendants."
+            }
+        },
+        "positioning": {},
+        "chart_configuration_root_individual": {}
+    },
+    "de_DE.UTF-8": {
+        "formatting": {
+            "highlight_descendants": {
+                "short_description": "Highlight descandants",
+                "long_description": "Highlight the persons which are descendants."
+            }
+        },
+        "positioning": {},
+        "chart_configuration_root_individual": {}
+    }
+}

@@ -34,9 +34,13 @@ class AncestorChart(BaseSVGChart):
         'debug_optimization_flipping_steps': -1,  # debugging option
         'compress': False,
         'flip_to_optimize': False,
-        'fathers_have_the_same_color': False,
     }
     DEFAULT_POSITIONING.update(BaseSVGChart.DEFAULT_POSITIONING)
+
+    DEFAULT_FORMATTING = {
+        'fathers_have_the_same_color': False,
+    }
+    DEFAULT_FORMATTING.update(BaseSVGChart.DEFAULT_FORMATTING)
 
     DEFAULT_CHART_CONFIGURATION = {
             'root_individuals': [],
@@ -54,14 +58,13 @@ class AncestorChart(BaseSVGChart):
         # configuration of this chart
         self._chart_configuration.update(AncestorChart.DEFAULT_CHART_CONFIGURATION)
 
-    def select_individuals(self, individual, generations=None, color=None, filter=None, discovery_cache=[]):
+    def select_individuals(self, individual, generations=None, filter=None, discovery_cache=[]):
         """
         Select individuals to show. This is done by creating instances of graphical representations.
 
         Args:
             individual (BaseIndividual): starting point for selection
             generations (int): number of generations to search for ancestors.
-            color (list, optional): RGB color. Defaults to None.
             filter (lambda, optional): lambda(BaseIndividual) : return Boolean. Defaults to None.
         """
 
@@ -75,10 +78,7 @@ class AncestorChart(BaseSVGChart):
             if gr_individual is None:
                 return
 
-            if color is None:
-                gr_individual.color = self._instances.color_generator(individual)
-            else:
-                gr_individual.color = color
+            gr_individual.color = (0,0,0)
             discovery_cache.append(individual.individual_id)
             gr_individual.debug_label = '\n' + str(len(discovery_cache))
         else:
@@ -104,7 +104,6 @@ class AncestorChart(BaseSVGChart):
                     gr_father = self.select_individuals(
                         father,
                         generations - 1 if go_deeper else 0,
-                        color=gr_individual.color if self._positioning['fathers_have_the_same_color'] else None,
                         filter=filter,
                         discovery_cache=discovery_cache)
 
@@ -145,7 +144,7 @@ class AncestorChart(BaseSVGChart):
                 if gr_child is None:
                     return
 
-                gr_child.color = self._instances.color_generator(child)
+                gr_child.color = (0,0,0)
 
                 family.graphical_representations[0].add_visible_children(gr_child)
                 gr_child.strongly_connected_parent_family = family.graphical_representations[0]
@@ -432,19 +431,18 @@ class AncestorChart(BaseSVGChart):
             width, loli = self._calculate_sum_of_distances()
             old_width = width
             for key in loli.keys():
-                def collect_candidates(children):
-                    for child in children:
-                        if len(child.graphical_representations) > 0:
-                            if child.graphical_representations[0] not in candidates:
-                                candidates.append(child.graphical_representations[0])
-                            collect_candidates(child.children)
+                def collect_candidates(gr_children):
+                    for gr_child in gr_children:
+                        # if gr_child not in candidates:
+                        candidates.append(gr_child)
+                        collect_candidates(gr_child.visible_children)
 
-                individual = loli[key]
-                if individual not in candidates:
-                    candidates.append(individual)
-                collect_candidates(individual.children)
-                for cof in individual.individual.child_of_families:
-                    collect_candidates(cof.get_children())
+                gr_individual = loli[key]
+                if gr_individual not in candidates:
+                    candidates.append(gr_individual)
+                collect_candidates(gr_individual.visible_children)
+                for gr_cof in gr_individual.connected_parent_families:
+                    collect_candidates(gr_cof.visible_children)
 
             nSteps = self._positioning['debug_optimization_flipping_steps']
 
@@ -529,9 +527,9 @@ class AncestorChart(BaseSVGChart):
         Update the chart, caching of positioning data is regarded
 
         Args:
-            filter_lambda (lambda, optional): filtering of individuals. Defaults to None.
-            color_lambda (lambda, optional): coloring of individuals. Defaults to None.
-            images_lambda (lambda, optional): images of individuals. Defaults to None.
+            filter_lambda (lambda(BaseIndividual), optional): filtering of individuals. Defaults to None.
+            color_lambda (lambda(GraphicalIndividual), optional): coloring of individuals. Defaults to None.
+            images_lambda (lambda(BaseIndividual), optional): images of individuals. Defaults to None.
             rebuild_all (bool, optional): clear cache, rebuild everything. Defaults to False.
             update_view (bool, optional): update formatting only. Defaults to False.
 
@@ -547,6 +545,11 @@ class AncestorChart(BaseSVGChart):
             if _filter_lambda is not None:
                 return _filter_lambda(individual)
             return False
+        if color_lambda:
+            update_view = True
+        if images_lambda:
+            update_view = True
+        self._instances.color_getter = self._instances.color_getters[self._formatting['coloring_of_individuals']]
 
         if rebuild_all:
             self.clear_graphical_representations()
@@ -594,18 +597,21 @@ class AncestorChart(BaseSVGChart):
                 except Exception as e:
                     pass
 
-            #backup color
             for gir in self.gr_individuals:
-                gir.color_backup = gir.color
-
-            for gir in self.gr_individuals:
-                gir.color = gir.color_backup
-                if color_lambda:
-                    color = color_lambda(gir.individual_id)
-                    if color:
-                        gir.color = color
+                color = None
+                if color_lambda is None:
+                    color = color_lambda
+                if color_lambda is None or color is None:
+                    if self._formatting['fathers_have_the_same_color']:
+                        color = self._instances.color_generator_fathers_have_the_same_color(gir)
+                    if color is None:
+                        color = self._instances.color_getter(gir)
+                gir.color = color
                 if images_lambda:
-                    gir.individual.images = images_lambda(gir.individual.individual_id)
+                    images = images_lambda(gir.individual)
+                else:
+                    images = {}
+                gir.individual.images = images
 
             self.define_svg_items()
 
@@ -613,13 +619,21 @@ class AncestorChart(BaseSVGChart):
             self.clear_svg_items()
 
             for gir in self.gr_individuals:
-                gir.color = gir.color_backup
+                color = None
                 if color_lambda:
-                    color = color_lambda(gir.individual_id)
-                    if color:
-                        gir.color = color
+                    color = color_lambda
+                if color_lambda is None or color is None:
+                    if self._formatting['fathers_have_the_same_color']:
+                        color = self._instances.color_generator_fathers_have_the_same_color(gir)
+                    if color is None:
+                        color = self._instances.color_getter(gir)
+                gir.color = color
                 if images_lambda:
-                    gir.individual.images = images_lambda(gir.individual.individual_id)
+                    images = images_lambda(gir.individual)
+                else:
+                    images = {}
+                gir.individual.images = images
+
             self.define_svg_items()
         self._backup_chart_configuration = deepcopy(self._chart_configuration)
         self._backup_formatting = deepcopy(self._formatting)
