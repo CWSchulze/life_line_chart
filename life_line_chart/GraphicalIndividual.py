@@ -15,6 +15,10 @@ class GraphicalIndividual():
     # This individual is placed in this marriage, so it is strongly connected.
     # Optimization algorithms must not break this connection.
     # strongly_connected_marriage = None
+    # ordinal value of the birth date
+    __birth_date_ov = None
+    # ordinal value of the death date
+    __death_date_ov = None
 
     def __init__(self, instances, individual_id):
         self.items = []
@@ -353,7 +357,11 @@ class GraphicalIndividual():
         Returns:
             float: ordinal value of birth date
         """
-        return self.individual.birth_date_ov
+        if self.__birth_date_ov is None:
+            self.__birth_date_ov = self.individual.birth_date_ov
+            return self.__birth_date_ov
+        else:
+            return self.__birth_date_ov
 
     @property
     def death_date_ov(self):
@@ -363,7 +371,11 @@ class GraphicalIndividual():
         Returns:
             float: ordinal value of death date
         """
-        return self.individual.death_date_ov
+        if self.__death_date_ov is None:
+            self.__death_date_ov = self.individual.death_date_ov
+            return self.__death_date_ov
+        else:
+            return self.__death_date_ov
 
     @property
     def birth_label(self):
