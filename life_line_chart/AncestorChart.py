@@ -503,8 +503,8 @@ class AncestorChart(BaseSVGChart):
                 self._compress_chart_ancestor_graph(family)
 
             # compressed chart should be aligned left
-            _, min_index_x, max_index_x, self.position_to_person_map = self._check_compressed_x_position(
-                False)
+            _, min_index_x, max_index_x = self._check_compressed_x_position(
+                False, self.position_to_person_map)
             self._move_individual_and_ancestors(
                 root_individual.graphical_representations[0],
                 sorted(list(gr_root_individual.get_x_position().values()))[0][2],
@@ -519,8 +519,8 @@ class AncestorChart(BaseSVGChart):
             logger.info(
                 f"compression reduced the total width by {width - old_width} (i.e. from {old_width} to {width})")
         else:
-            _, _, _, self.position_to_person_map = self._check_compressed_x_position(
-                False)
+            self._check_compressed_x_position(
+                False, self.position_to_person_map)
 
     def update_chart(self, filter_lambda=None, color_lambda=None, images_lambda=None, rebuild_all=False, update_view=False):
         """
