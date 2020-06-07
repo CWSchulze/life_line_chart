@@ -642,4 +642,5 @@ class BaseChart():
         self._instances.clear_connections()
         self.position_to_person_map = {}
         for _, instance in self._instances.items():
-            instance.graphical_representations.clear()
+            if instance is not None:
+                instance.graphical_representations.clear()

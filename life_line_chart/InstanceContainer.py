@@ -67,22 +67,26 @@ class InstanceContainer():
         if key[1] is None:
             return self._data[key]
         elif key[0] == 'i':
-            item = self._data.get(key)
-            if item is None:
+            item = self._data.get(key,'none')
+            if item == 'none':
                 try:
                     item = self._individual_constructor(self, key)
                     self._data[key] = item
-                except LifeLineChartNotEnoughInformationToDisplay:
+                except LifeLineChartNotEnoughInformationToDisplay as e:
+                    logger.info(str(e))
                     item = None
+                    self._data[key] = item
             return item
         elif key[0] == 'f':
-            item = self._data.get(key)
-            if item is None:
+            item = self._data.get(key,'none')
+            if item == 'none':
                 try:
                     item = self._family_constructor(self, key)
                     self._data[key] = item
-                except LifeLineChartNotEnoughInformationToDisplay:
+                except LifeLineChartNotEnoughInformationToDisplay as e:
+                    logger.info(str(e))
                     item = None
+                    self._data[key] = item
             return item
         return None
 
