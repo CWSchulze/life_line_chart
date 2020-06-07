@@ -180,7 +180,7 @@ class BaseIndividual():
         if self.__birth_date_ov is None:
             boc = self.events.get('birth_or_christening')
             if boc:
-                self.__birth_date_ov = boc['date'].date().toordinal()
+                self.__birth_date_ov = boc['ordinal_value']
                 return self.__birth_date_ov
             return None
         else:
@@ -239,7 +239,7 @@ class BaseIndividual():
         if self.__death_date_ov is None:
             dob = self.events.get('death_or_burial')
             if dob:
-                self.__death_date_ov = dob['date'].date().toordinal()
+                self.__death_date_ov = dob['ordinal_value']
                 return self.__death_date_ov
             return None
         else:
