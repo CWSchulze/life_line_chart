@@ -23,7 +23,9 @@ class GedcomFamily(BaseFamily):
                 self.location = self._database_fam[self.family_id]['MARR']['PLAC']['tag_data']
         estimate_marriage_date(self)
         if self.marriage is None:
-            raise LifeLineChartNotEnoughInformationToDisplay()
+            raise LifeLineChartNotEnoughInformationToDisplay(
+                "Marriage date missing"
+                +"\n" + self.family_id)
 
     def _get_husband_and_wife_id(self):
         """
