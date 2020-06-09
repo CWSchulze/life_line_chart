@@ -51,7 +51,6 @@ class AncestorChart(BaseSVGChart):
 
     SETTINGS_DESCRIPTION = _strings
 
-
     def __init__(self, positioning=None, formatting=None, instance_container=None):
         BaseSVGChart.__init__(self, positioning, formatting, instance_container)
 
@@ -148,8 +147,6 @@ class AncestorChart(BaseSVGChart):
 
                 family.graphical_representations[0].add_visible_children(gr_child)
                 gr_child.strongly_connected_parent_family = family.graphical_representations[0]
-
-
 
     def place_selected_individuals(self, gr_individual, child_family, spouse_family, child_of_family, x_offset=0, discovery_cache=[], root_node_discovery_cache=[]):
         """
@@ -470,7 +467,7 @@ class AncestorChart(BaseSVGChart):
                     failed, _, _ = self.check_unique_x_position()
                     if len(failed) > 0:
                         logger.error("failed flipping " +
-                                     str((x_pos[2].family_id, ov)))
+                                     str((x_pos[2], x_pos[2].family_id, ov)) + str(nSteps))
                         break
                     new_width, _ = self._calculate_sum_of_distances()
                     if new_width >= width:

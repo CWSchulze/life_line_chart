@@ -1,5 +1,6 @@
 from .BaseIndividual import BaseIndividual, estimate_birth_date, estimate_death_date
 from .GedcomParsing import _get_relevant_events
+from .Exceptions import LifeLineChartNotEnoughInformationToDisplay
 
 
 class GedcomIndividual(BaseIndividual):
@@ -22,6 +23,9 @@ class GedcomIndividual(BaseIndividual):
                              self.individual_id, self.events)
         estimate_birth_date(self, self._instances)
         estimate_death_date(self)
+        if self.events['birth_or_christening'] is None:
+            raise LifeLineChartNotEnoughInformationToDisplay(
+                "birth date is missing " + self.individual_id)
 
     def get_name(self):
         if 'NAME' in self._database_indi[self.individual_id]:
