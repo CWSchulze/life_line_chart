@@ -460,13 +460,11 @@ class AncestorChart(BaseSVGChart):
                     has_been_done.add(x_pos[2].graphical_representations[0])
                     # family_id = key2[2]
                     # x_pos = c_pos[key2]
-                    if nSteps > 0:
-                        nSteps -= 1
+                    nSteps -= 1
                     if nSteps == 0:
                         break
                     self._flip_family(x_pos[2].graphical_representations[0])
-                    if nSteps > 0:
-                        nSteps -= 1
+                    nSteps -= 1
                     if nSteps == 0:
                         break
                     failed, _, _ = self.check_unique_x_position()
