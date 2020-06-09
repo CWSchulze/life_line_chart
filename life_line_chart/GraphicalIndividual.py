@@ -418,3 +418,15 @@ class GraphicalIndividual():
         for vm in self.visible_marriages:
             gr_children += vm.visible_children
         return gr_children
+
+    def get_all_ancestors(self):
+        gr_ancestors = []
+        if self.strongly_connected_parent_family:
+            if self.strongly_connected_parent_family.gr_husb:
+                gr_ancestors += [(self.strongly_connected_parent_family, self.strongly_connected_parent_family.gr_husb)]
+                gr_ancestors += self.strongly_connected_parent_family.gr_husb.get_all_ancestors()
+            gr_ancestors += [(self.strongly_connected_parent_family, c) for c in self.strongly_connected_parent_family.visible_children]
+            if self.strongly_connected_parent_family.gr_wife:
+                gr_ancestors += [(self.strongly_connected_parent_family, self.strongly_connected_parent_family.gr_wife)]
+                gr_ancestors += self.strongly_connected_parent_family.gr_wife.get_all_ancestors()
+        return gr_ancestors
