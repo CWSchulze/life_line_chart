@@ -368,6 +368,8 @@ class BaseChart():
         collisions = []
         min_x = 999999
         max_x = 0
+        if position_to_person_map is not None:
+            position_to_person_map.clear()
         # assign the individuals to all x_indices in which they appear
         for gr_individual in self.gr_individuals:
             x_pos_vector = list(gr_individual.get_x_position().values())
