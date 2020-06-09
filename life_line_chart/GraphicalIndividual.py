@@ -350,9 +350,11 @@ class GraphicalIndividual():
             self._x_position[family_id] = (
                 (ov, x_position, family, parent_starting_point))
         _x_position = {}
-        if None in self._x_position:
-            _x_position[None] = self._x_position[None]
-        _x_position.update(dict(sorted([i for i in self._x_position.items() if i[0] is not None], key=lambda t: t[1])))
+        # None is not always first, root may have none for spouse
+        # if None in self._x_position:
+        #     _x_position[None] = self._x_position[None]
+        # _x_position.update(dict(sorted([i for i in self._x_position.items() if i[0] is not None], key=lambda t: t[1])))
+        _x_position.update(dict(sorted(self._x_position.items(), key=lambda t: t[1])))
         self._x_position = _x_position
 
     x_position = property(get_x_position, set_x_position)
