@@ -383,7 +383,7 @@ class BaseChart():
                 if x_index not in v:
                     v[x_index] = []
 
-                    if position_to_person_map:
+                    if position_to_person_map is not None:
                         position_to_person_map[x_index] = []
                 if i == 0:
                     start_y = gr_individual.birth_date_ov
@@ -400,7 +400,7 @@ class BaseChart():
                 #     end_y,
                 #     gr_individual
                 # ))
-                if position_to_person_map:
+                if position_to_person_map is not None:
                     position_to_person_map[x_index].append({
                         'start': start_y,
                         'end': end_y,
