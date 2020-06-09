@@ -370,6 +370,25 @@ class BaseChart():
         max_x = 0
         if position_to_person_map is not None:
             position_to_person_map.clear()
+
+        def check_collision(gr_individual_a, start_y_a, end_y_a, gr_individual_b, start_y_b, end_y_b):
+            if gr_individual_a == gr_individual_b:
+                return False
+            start_position_a = start_y_a - 365*15
+            start_position_b = start_y_b - 365*15
+            end_position_a = end_y_a + 365*15
+            end_position_b = end_y_b + 365*15
+            if ((start_position_a - start_position_b)
+                * (start_position_a - end_position_b) < 0 or
+                (end_position_a - start_position_b)
+                * (end_position_a - end_position_b) < 0 or
+                (start_position_b - start_position_a)
+                * (start_position_b - end_position_a) < 0 or
+                (end_position_b - start_position_a)
+                    * (end_position_b - end_position_a) < 0):
+                    return True
+            return False
+
         # assign the individuals to all x_indices in which they appear
         for gr_individual in self.gr_individuals:
             x_pos_vector = list(gr_individual.get_x_position().values())
@@ -396,6 +415,10 @@ class BaseChart():
                 else:
                     end_y = gr_individual.death_date_ov
 
+                if start_y == end_y:
+                    # happens in ancestor charts if spouse family is None (i.e. the root individual)
+                    continue
+
                 # position_to_person_map[x_index].append(
                 #     PositionToPersonMapItem(
                 #     start_y,
@@ -409,7 +432,7 @@ class BaseChart():
                         'individual': gr_individual
                     })
 
-                v[x_index].append((gr_individual, gr_individual.birth_date_ov, gr_individual.death_date_ov))
+                v[x_index].append((gr_individual, start_y, end_y))#, gr_individual.birth_date_ov, gr_individual.death_date_ov))
                 max_x = max(max_x, x_index)
                 min_x = min(min_x, x_index)
         if len(collisions) > 0:
@@ -417,20 +440,9 @@ class BaseChart():
 
         # block every x_index from birth to death in which an individual appears
         for x_index, gr_individuals in v.items():
-            for index, (gr_individual_a, gr_individual_a_birth_date_ov, gr_individual_a_death_date_ov) in enumerate(gr_individuals):
-                for gr_individual_b, gr_individual_b_birth_date_ov, gr_individual_b_death_date_ov in gr_individuals[index+1:]:
-                    birth_position_a = gr_individual_a_birth_date_ov - 365*15
-                    birth_position_b = gr_individual_b_birth_date_ov - 365*15
-                    death_position_a = gr_individual_a_death_date_ov + 365*15
-                    death_position_b = gr_individual_b_death_date_ov + 365*15
-                    if ((birth_position_a - birth_position_b)
-                        * (birth_position_a - death_position_b) < 0 or
-                        (death_position_a - birth_position_b)
-                        * (death_position_a - death_position_b) < 0 or
-                        (birth_position_b - birth_position_a)
-                        * (birth_position_b - death_position_a) < 0 or
-                        (death_position_b - birth_position_a)
-                            * (death_position_b - death_position_a) < 0):
+            for index, (gr_individual_a, start_y_a, end_y_a) in enumerate(gr_individuals):
+                for gr_individual_b, start_y_b, end_y_b in gr_individuals[index+1:]:
+                    if check_collision(gr_individual_a, start_y_a, end_y_a, gr_individual_b, start_y_b, end_y_b):
                         if early_raise:
                             raise LifeLineChartCollisionDetected(
                                 gr_individual_a, gr_individual_b)
