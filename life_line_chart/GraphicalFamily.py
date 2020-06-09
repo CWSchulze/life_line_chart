@@ -6,7 +6,6 @@ class GraphicalFamily():
     """
 
     def __init__(self, instances, family_id):
-        self.graphical_representations = []
         self.family_id = family_id
         self.__instances = instances
         self.family = self.__instances[('f', self.family_id)]
