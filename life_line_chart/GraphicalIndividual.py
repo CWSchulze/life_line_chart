@@ -340,10 +340,10 @@ class GraphicalIndividual():
             if family.marriage:
                 ov = family.marriage['ordinal_value']
             else:
-                ov = 0
+                ov = self.birth_date_ov
         else:
             family_id = None
-            ov = 0
+            ov = self.birth_date_ov
         if not self._x_position:
             self._x_position = {}
         if family_id not in self._x_position:
