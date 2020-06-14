@@ -596,8 +596,8 @@ class AncestorChart(BaseSVGChart):
 
             for gir in self.gr_individuals:
                 color = None
-                if color_lambda is None:
-                    color = color_lambda
+                if color_lambda:
+                    color = color_lambda(gir)
                 if color_lambda is None or color is None:
                     if self._formatting['fathers_have_the_same_color']:
                         color = self._instances.color_generator_fathers_have_the_same_color(gir)
@@ -618,7 +618,7 @@ class AncestorChart(BaseSVGChart):
             for gir in self.gr_individuals:
                 color = None
                 if color_lambda:
-                    color = color_lambda
+                    color = color_lambda(gir)
                 if color_lambda is None or color is None:
                     if self._formatting['fathers_have_the_same_color']:
                         color = self._instances.color_generator_fathers_have_the_same_color(gir)
