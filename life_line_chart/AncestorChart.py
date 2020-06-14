@@ -407,13 +407,15 @@ class AncestorChart(BaseSVGChart):
 
                 try:
                     while i < 50000:
+                        if (i+1)%1000 == 0:
+                            logger.warning(f'i {i} for gr_individual {gr_individual}')
+                        i += 1
                         self._move_individual_and_ancestors(
                             gr_individual, strongly_connected_parent_family, direction_factor*1)
                         self.debug_optimization_compression_steps -= 1
                         if self.debug_optimization_compression_steps <= 0:
                             break
                         self._check_compressed_x_position(True)
-                        i += 1
                 except LifeLineChartCollisionDetected as e:
                     self._move_individual_and_ancestors(
                         gr_individual, strongly_connected_parent_family, -direction_factor*1)
