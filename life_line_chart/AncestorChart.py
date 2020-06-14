@@ -415,10 +415,20 @@ class AncestorChart(BaseSVGChart):
                         self.debug_optimization_compression_steps -= 1
                         if self.debug_optimization_compression_steps <= 0:
                             break
-                        self._check_compressed_x_position(True)
+                        self._check_compressed_x_position(True, min_distance=1)
                 except LifeLineChartCollisionDetected as e:
-                    self._move_individual_and_ancestors(
-                        gr_individual, strongly_connected_parent_family, -direction_factor*1)
+                    # print(e)
+                    i2 = i
+                    while i2 >= 0:
+                        i2 -= 1
+                        try:
+                            self._move_individual_and_ancestors(
+                                gr_individual, strongly_connected_parent_family, -direction_factor*1)
+                            self._check_compressed_x_position(True)
+                        except:
+                            pass
+                        else:
+                            break
                     self.debug_optimization_compression_steps -= 1
                     if self.debug_optimization_compression_steps <= 0:
                         break
@@ -429,9 +439,9 @@ class AncestorChart(BaseSVGChart):
 
                 if self.debug_optimization_compression_steps <= 0:
                     break
-                if i != 0:
+                if i2 != 0:
                     logger.info('moved ' + ' '.join(gr_individual.get_name()) +
-                                ' by ' + str(i * direction_factor * 1))
+                                ' by ' + str(i2 * direction_factor * 1))
 
     def modify_layout(self, root_individual_id):
         """
