@@ -492,36 +492,41 @@ class AncestorChart(BaseSVGChart):
             nSteps = self._positioning['debug_optimization_flipping_steps']
 
             failed = []
-            has_been_done = set()
+            has_been_done = []
             for gr_child in candidates:
                 ov = gr_child.birth_date_ov
-                c_pos = list(
-                    gr_child.get_x_position().values())[1:]
+                c_pos = list(gr_child.get_x_position().values())
+                c_pos = c_pos[1:]
+
                 for x_pos in c_pos:
-                    if x_pos[2] is None:
+                    family = x_pos[2]
+                    if family is None:
                         continue
-                    if x_pos[2].graphical_representations[0] in has_been_done:
-                        continue
-                    has_been_done.add(x_pos[2].graphical_representations[0])
-                    # family_id = key2[2]
-                    # x_pos = c_pos[key2]
-                    nSteps -= 1
-                    if nSteps == 0:
-                        break
-                    self._flip_family(x_pos[2].graphical_representations[0])
-                    nSteps -= 1
-                    if nSteps == 0:
-                        break
-                    failed, _, _ = self.check_unique_x_position()
-                    if len(failed) > 0:
-                        logger.error("failed flipping " +
-                                     str((x_pos[2], x_pos[2].family_id, ov)) + str(nSteps))
-                        break
-                    new_width, _ = self._calculate_sum_of_distances()
-                    if new_width >= width:
-                        self._flip_family(x_pos[2].graphical_representations[0])
-                    else:
-                        width = new_width
+                    gr_family = family.graphical_representations[0]
+                    if gr_family not in has_been_done:
+                        has_been_done.append(gr_family)
+
+                        nSteps -= 1
+                        if nSteps == 0:
+                            break
+
+                        self._flip_family(gr_family)
+
+                        nSteps -= 1
+                        if nSteps == 0:
+                            break
+
+                        failed, _, _ = self.check_unique_x_position()
+                        if len(failed) > 0:
+                            logger.error("failed flipping " +
+                                        str((family, family.family_id, ov)) + str(nSteps))
+                            break
+                        new_width, _ = self._calculate_sum_of_distances()
+                        # print (f'step={nSteps} new_width={new_width} width_difference={new_width-old_width} algorithm_failed={len(failed) > 0} better={new_width < width}')
+                        if new_width >= width:
+                            self._flip_family(gr_family)
+                        else:
+                            width = new_width
                 # print (x_pos)
                 if nSteps == 0:
                     break
