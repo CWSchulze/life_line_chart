@@ -36,6 +36,20 @@ class GraphicalFamily():
         """
         return self.family.marriage['ordinal_value'] < other.family.marriage['ordinal_value']
 
+    def __eq__(self, other):
+        """
+        == operator
+
+        Args:
+            other (GraphicalFamily): other instance
+
+        Returns:
+            bool: is equal
+        """
+        if type(other) != GraphicalFamily:
+            return False
+        return self.g_id == other.g_id
+
     def get_spouse(self, individual):
         """
         get the spouse of the individual
