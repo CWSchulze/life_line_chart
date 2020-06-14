@@ -7,3 +7,4 @@ dist
 docs
 Images
 tests/output
+*.pyc
