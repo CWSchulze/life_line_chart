@@ -282,13 +282,15 @@ class AncestorChart(BaseSVGChart):
             self.max_ordinal = death_ordinal_value
         discovery_cache.append((gr_individual,spouse_family))
 
-    def _compress_single_individual_position(self, gr_individual, cof, direction):
+    def _compress_single_individual_position(self, gr_individual, cof, direction, nSteps=50000):
         """
         move single gr_individual until it collides
         """
+        if nSteps <= 0:
+            return
         try:
             i = 0
-            while i < 5000:
+            while i < nSteps:
                 i += 1
                 self._move_single_individual(gr_individual, cof, direction)
                 self._check_compressed_x_position(True)
