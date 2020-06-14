@@ -301,10 +301,22 @@ class AncestorChart(BaseSVGChart):
             while i < nSteps:
                 i += 1
                 self._move_single_individual(gr_individual, cof, direction)
-                self._check_compressed_x_position(True)
-        except LifeLineChartCollisionDetected:
-            pass
-        self._move_single_individual(gr_individual, cof, - direction)
+                if i < nSteps:
+                    self._check_compressed_x_position(True, min_distance=1)
+                else:
+                    self._check_compressed_x_position(True)
+        except LifeLineChartCollisionDetected as e:
+            # print(e)
+            i2 = i
+            while i2 >= 0:
+                i2 -= 1
+                try:
+                    self._move_single_individual(gr_individual, cof, -direction)
+                    self._check_compressed_x_position(True)
+                except:
+                    pass
+                else:
+                    break
 
     def _compress_chart_ancestor_graph(self, gr_family):
         """
