@@ -532,6 +532,7 @@ class AncestorChart(BaseSVGChart):
                 self.debug_optimization_compression_steps = self._positioning['debug_optimization_compression_steps']
             for family in gr_root_individual.connected_parent_families:
                 self._compress_chart_ancestor_graph(family)
+            self._move_child_to_center_between_parents(gr_root_individual)
 
             # compressed chart should be aligned left
             _, min_index_x, max_index_x = self._check_compressed_x_position(
