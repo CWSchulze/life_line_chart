@@ -32,7 +32,7 @@ class GraphicalIndividual():
         self.first_marriage_strongly_connected_to_parent_family = None
         # This individual is placed in this parent family, so it is strongly connected.
         # Optimization algorithms must not break this connection.
-        self.strongly_connected_parent_family = None
+        self.strongly_connected_parent_family = None, None
         pass
 
     def __repr__(self):
@@ -281,25 +281,38 @@ class GraphicalIndividual():
             LifeLineChartUnknownPlacementError: placing error
 
         Returns:
-            GraphicalFamily: strongly connected parent family
+            tuple: strongly connected parent family and spouse family
         """
         if self.g_id not in self.__instances.connection_container['i']:
             return None
         strongly_connected_parent_families = []
+        strongly_connected_spouse_families = []
         for g_id, connections in self.__instances.connection_container['i'][self.g_id].items():
             if 'strong_child' in connections:
                 strongly_connected_parent_families.append(self.__instances[('f', g_id[1])].graphical_representations[g_id[0]])
+            if 'strong_marriage' in connections:
+                strongly_connected_spouse_families.append(self.__instances[('f', g_id[1])].graphical_representations[g_id[0]])
         if len(strongly_connected_parent_families) > 1:
             raise LifeLineChartUnknownPlacementError("Something went wrong in the placement algorithm")
-        elif len(strongly_connected_parent_families) > 0:
-            return strongly_connected_parent_families[0]
-        return None
+        elif len(strongly_connected_spouse_families) > 1:
+            raise LifeLineChartUnknownPlacementError("Something went wrong in the placement algorithm")
+        strongly_connected_parent_family = None
+        strongly_connected_spouse_family = None
+        if len(strongly_connected_parent_families) > 0:
+            strongly_connected_parent_family = strongly_connected_parent_families[0]
+        if len(strongly_connected_spouse_families) > 0:
+            strongly_connected_spouse_family = strongly_connected_spouse_families[0]
+        return strongly_connected_parent_family, strongly_connected_spouse_family
 
     @strongly_connected_parent_family.setter
-    def strongly_connected_parent_family(self, gr_family):
-        if gr_family != None:
-            self.__instances.connection_container['i'][self.g_id][gr_family.g_id].append('strong_child')
-            self.__instances.connection_container['f'][gr_family.g_id][self.g_id].append('strong_child')
+    def strongly_connected_parent_family(self, gr_families):
+        gr_parent_family, gr_spouse_family = gr_families
+        if gr_parent_family != None:
+            self.__instances.connection_container['i'][self.g_id][gr_parent_family.g_id].append('strong_child')
+            self.__instances.connection_container['f'][gr_parent_family.g_id][self.g_id].append('strong_child')
+        if gr_spouse_family != None:
+            self.__instances.connection_container['i'][self.g_id][gr_spouse_family.g_id].append('strong_marriage')
+            self.__instances.connection_container['f'][gr_spouse_family.g_id][self.g_id].append('strong_marriage')
 
     def get_name(self):
         return self.individual.get_name()
@@ -423,12 +436,13 @@ class GraphicalIndividual():
 
     def get_all_ancestors(self):
         gr_ancestors = []
-        if self.strongly_connected_parent_family:
-            if self.strongly_connected_parent_family.gr_husb:
-                gr_ancestors += [(self.strongly_connected_parent_family, self.strongly_connected_parent_family.gr_husb)]
-                gr_ancestors += self.strongly_connected_parent_family.gr_husb.get_all_ancestors()
-            gr_ancestors += [(self.strongly_connected_parent_family, c) for c in self.strongly_connected_parent_family.visible_children]
-            if self.strongly_connected_parent_family.gr_wife:
-                gr_ancestors += [(self.strongly_connected_parent_family, self.strongly_connected_parent_family.gr_wife)]
-                gr_ancestors += self.strongly_connected_parent_family.gr_wife.get_all_ancestors()
+        strongly_connected_parent_family, strongly_connected_spouse_family = self.strongly_connected_parent_family
+        if strongly_connected_parent_family:
+            if strongly_connected_parent_family.gr_husb:
+                gr_ancestors += [(strongly_connected_parent_family, strongly_connected_parent_family.gr_husb)]
+                gr_ancestors += strongly_connected_parent_family.gr_husb.get_all_ancestors()
+            gr_ancestors += [(strongly_connected_parent_family, c) for c in strongly_connected_parent_family.visible_children]
+            if strongly_connected_parent_family.gr_wife:
+                gr_ancestors += [(strongly_connected_parent_family, strongly_connected_parent_family.gr_wife)]
+                gr_ancestors += strongly_connected_parent_family.gr_wife.get_all_ancestors()
         return gr_ancestors

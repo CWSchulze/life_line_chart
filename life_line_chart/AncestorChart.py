@@ -145,8 +145,9 @@ class AncestorChart(BaseSVGChart):
 
                 gr_child.color = (0,0,0)
 
-                family.graphical_representations[0].add_visible_children(gr_child)
-                gr_child.strongly_connected_parent_family = family.graphical_representations[0]
+                gr_family = family.graphical_representations[0]
+                gr_family.add_visible_children(gr_child)
+                gr_child.strongly_connected_parent_family = gr_family, None
 
     def place_selected_individuals(self, gr_individual, child_family, spouse_family, child_of_family, x_offset=0, discovery_cache=[], root_node_discovery_cache=[]):
         """
@@ -235,7 +236,7 @@ class AncestorChart(BaseSVGChart):
                         parent_born_in_family = None
 
                     if local_child_of_family.has_graphical_representation():
-                        gr_individual.strongly_connected_parent_family = gr_local_child_of_family
+                        gr_individual.strongly_connected_parent_family = gr_local_child_of_family, gr_spouse_family
                     self.place_selected_individuals(
                         gr_parent, spouse_family, local_child_of_family, parent_born_in_family,
                         x_position, discovery_cache, root_node_discovery_cache)
@@ -263,7 +264,6 @@ class AncestorChart(BaseSVGChart):
                         # not added yet, so this is the primary cof placement
                         gr_sibling.set_x_position(
                             x_position, child_of_family, True)
-                        gr_sibling.first_marriage_strongly_connected_to_parent_family = True
 
                     x_position += 1
 
@@ -272,7 +272,10 @@ class AncestorChart(BaseSVGChart):
                     x_position,
                     child_of_family)
                 x_position += 1
-                gr_sibling.first_marriage_strongly_connected_to_parent_family = False
+
+        if gr_child_of_family is not None and gr_child_of_family.gr_husb is None and gr_child_of_family.gr_wife is None:
+            if gr_child_of_family.strongly_connected_children[0] is None:
+                gr_individual.strongly_connected_parent_family = gr_child_of_family, gr_spouse_family
 
         # add the mother branch
         x_position = add_parent('wife', x_position)

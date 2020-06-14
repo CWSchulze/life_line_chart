@@ -103,9 +103,9 @@ class GraphicalFamily():
         return []
 
     @property
-    def strongly_connected_child(self):
+    def strongly_connected_children(self):
         """
-        get the list of the strongly connected child
+        get the list of the strongly connected children
 
         Raises:
             LifeLineChartUnknownPlacementError: [description]
@@ -113,23 +113,27 @@ class GraphicalFamily():
         Returns:
             [type]: [description]
         """
+
         if self.g_id not in self.__instances.connection_container['f']:
             return None
-        strongly_connected_children = []
+        strongly_connected_parent_families = []
+        strongly_connected_spouse_families = []
         for g_id, connections in self.__instances.connection_container['f'][self.g_id].items():
             if 'strong_child' in connections:
-                strongly_connected_children.append(self.__instances[('i', g_id[1])].graphical_representations[g_id[0]])
-        if len(strongly_connected_children) > 1:
+                strongly_connected_parent_families.append(self.__instances[('i', g_id[1])].graphical_representations[g_id[0]])
+            if 'strong_marriage' in connections:
+                strongly_connected_spouse_families.append(self.__instances[('i', g_id[1])].graphical_representations[g_id[0]])
+        if len(strongly_connected_parent_families) > 1:
             raise LifeLineChartUnknownPlacementError("Something went wrong in the placement algorithm")
-        elif len(strongly_connected_children) > 0:
-            return strongly_connected_children[0]
-        return None
-
-    @strongly_connected_child.setter
-    def strongly_connected_child(self, gr_child):
-        if gr_child != None:
-            self.__instances.connection_container['f'][self.g_id][gr_child.g_id].append('strong_child')
-            self.__instances.connection_container['i'][gr_child.g_id][self.g_id].append('strong_child')
+        elif len(strongly_connected_spouse_families) > 1:
+            raise LifeLineChartUnknownPlacementError("Something went wrong in the placement algorithm")
+        strongly_connected_parent_family = None
+        strongly_connected_spouse_family = None
+        if len(strongly_connected_parent_families) > 0:
+            strongly_connected_parent_family = strongly_connected_parent_families[0]
+        if len(strongly_connected_spouse_families) > 0:
+            strongly_connected_spouse_family = strongly_connected_spouse_families[0]
+        return strongly_connected_parent_family, strongly_connected_spouse_family
 
     @property
     def gr_husb(self):

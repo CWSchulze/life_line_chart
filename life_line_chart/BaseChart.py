@@ -244,33 +244,24 @@ class BaseChart():
                 'This family does not exist')
         return x_pos
 
-    def _move_individual_and_ancestors(self, gr_individual, family, x_index_offset):
+    def _move_individual_and_ancestors(self, gr_individual, gr_family, x_index_offset):
         """
         move an individual and its ancestors vertically. Only ancestors are moved, which are strongly coupled with the individual.
 
         Args:
             gr_individual (GraphicalIndividual): gr_individual instance
-            family (BaseFamily): family instance
+            gr_family (GraphicalFamily): family instance
             x_index_offset (int): vertical offset
         """
 
-        if family is None:
-            family_id = family
+        if gr_family is None:
+            family_id = gr_family
         else:
-            family_id = family.family_id
+            family_id = gr_family.family_id
 
         # move this individual
         x_pos = self._move_single_individual(
-            gr_individual, family, x_index_offset)
-
-        if gr_individual.first_marriage_strongly_connected_to_parent_family == False:
-            # if the head of the individual is detached, then dont move anyone else
-            return
-        vms = gr_individual.visible_marriages
-        if vms:
-            # if this is not the first marriage, dont move anyone else
-            if vms[0] != family:
-                return
+            gr_individual, gr_family, x_index_offset)
 
         cofs = gr_individual.individual.child_of_families
         if len(cofs) == 0 or not cofs[0].has_graphical_representation():
@@ -279,8 +270,8 @@ class BaseChart():
         gr_cof = cofs[0].graphical_representations[0]
 
         #for strongly_connected_parent_family in gr_individual.connected_parent_families:
-        strongly_connected_parent_family = gr_individual.strongly_connected_parent_family
-        if strongly_connected_parent_family:
+        strongly_connected_parent_family, strongly_connected_spouse_family = gr_individual.strongly_connected_parent_family
+        if strongly_connected_parent_family and (strongly_connected_spouse_family == strongly_connected_parent_family or gr_family == strongly_connected_spouse_family or strongly_connected_spouse_family == None):
             if strongly_connected_parent_family.gr_husb:
                 # if cof.gr_husb.get_x_position() and len(cof.gr_husb.get_x_position()) == 1:
                     self._move_individual_and_ancestors(
@@ -289,12 +280,13 @@ class BaseChart():
                 # if cof.gr_wife.get_x_position() and len(cof.gr_wife.get_x_position()) == 1:
                     self._move_individual_and_ancestors(
                         strongly_connected_parent_family.gr_wife, strongly_connected_parent_family, x_index_offset)
-        # print (gr_individual.get)
-        for gr_child_individual in gr_cof.visible_children:
-            if gr_child_individual == gr_individual:
-                continue
-            x_pos = self._move_single_individual(
-                gr_child_individual, cof, x_index_offset)
+            # print (gr_individual.get)
+            if True or gr_cof and gr_cof.gr_husb is None and gr_cof.gr_wife is None:
+                for gr_child_individual in gr_cof.visible_children:
+                    if gr_child_individual == gr_individual:
+                        continue
+                    x_pos = self._move_single_individual(
+                        gr_child_individual, cof, x_index_offset)
 
     def _flip_family(self, gr_family):
         """
