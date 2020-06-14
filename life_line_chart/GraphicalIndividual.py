@@ -113,8 +113,8 @@ class GraphicalIndividual():
             if gr_father:
                 # only handle if the father is visible
                 f_x_positions = gr_father.get_x_position()
-                index_of_first_marriage = 1 if f_x_positions[list(f_x_positions.keys())[0]][3] else 0
-                if list(f_x_positions.keys())[index_of_first_marriage] == strongly_connected_parent_family.family_id:
+                f_strongly_connected_parent_family, f_strongly_connected_spouse_family = gr_father.strongly_connected_parent_family
+                if f_strongly_connected_parent_family and f_strongly_connected_spouse_family == strongly_connected_parent_family:
                     # count ancestors only, if the visible parent family is the first marriage (strong graphical connection)
                     f_x_min, f_x_max = gr_father.get_ancestor_range(
                         strongly_connected_parent_family)
@@ -129,8 +129,8 @@ class GraphicalIndividual():
             if gr_mother:
                 # only handle if the father is visible
                 m_x_positions = gr_mother.get_x_position()
-                index_of_first_marriage = 1 if m_x_positions[list(m_x_positions.keys())[0]][3] else 0
-                if list(m_x_positions.keys())[index_of_first_marriage] == strongly_connected_parent_family.family_id:
+                m_strongly_connected_parent_family, m_strongly_connected_spouse_family = gr_mother.strongly_connected_parent_family
+                if m_strongly_connected_parent_family and m_strongly_connected_spouse_family == strongly_connected_parent_family:
                     # count ancestors only, if the visible parent family is the first marriage (strong graphical connection)
                     m_x_min, m_x_max = gr_mother.get_ancestor_range(
                         strongly_connected_parent_family)
