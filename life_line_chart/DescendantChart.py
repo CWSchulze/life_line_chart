@@ -125,7 +125,6 @@ class DescendantChart(BaseSVGChart):
                 if marriage.has_graphical_representation() and (child_of_family is None or \
                     marriage.graphical_representations[0].visual_placement_parent_family.family_id == child_of_family.family_id)]
 
-
         if len(visible_marriages) == 0:
             gr_individual.set_x_position(
                     x_position, child_of_family, True)
@@ -154,7 +153,6 @@ class DescendantChart(BaseSVGChart):
                         gr_spouse.set_x_position(
                             x_position, marriage)
                         x_position += 1
-
 
             for child in marriage.get_sorted_children():
                 self.place_selected_individuals(
@@ -260,7 +258,6 @@ class DescendantChart(BaseSVGChart):
                     self.modify_layout(root_individual_id)
                 except Exception as e:
                     pass
-
 
             for gir in self.gr_individuals:
                 color = None
