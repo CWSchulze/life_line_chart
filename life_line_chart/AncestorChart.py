@@ -1,9 +1,9 @@
 import os
-from .SimpleSVGItems import Line, Path, CubicBezier
 import logging
 import datetime
 import svgwrite
 from copy import deepcopy
+from .SimpleSVGItems import Line, Path, CubicBezier
 from .BaseSVGChart import BaseSVGChart
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 from .Translation import get_strings, recursive_merge_dict_members
