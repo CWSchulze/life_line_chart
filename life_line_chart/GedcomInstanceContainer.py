@@ -42,12 +42,18 @@ def get_gedcom_instance_container(filename='gramps_testdata.ged'):
     def instantiate_all(self, database_fam, database_indi):
         for family_id in list(database_fam.keys()):
             if not ('f', family_id) in self:
-                self[('f', family_id)] = GedcomFamily(
-                    self, database_fam, database_indi, family_id)
+                try:
+                    self[('f', family_id)] = GedcomFamily(
+                        self, database_fam, database_indi, family_id)
+                except:
+                    pass
         for individual_id in list(database_indi.keys()):
             if not ('i', individual_id) in self:
-                self[('i', individual_id)] = GedcomIndividual(
-                    self, database_fam, database_indi, individual_id)
+                try:
+                    self[('i', individual_id)] = GedcomIndividual(
+                        self, database_fam, database_indi, individual_id)
+                except:
+                    pass
 
     logger.debug('start creating instances')
     return InstanceContainer(
