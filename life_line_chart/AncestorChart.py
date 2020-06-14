@@ -322,20 +322,20 @@ class AncestorChart(BaseSVGChart):
         family_was_flipped = False
         x_pos_husb = None
         x_pos_wife = None
-        if gr_family.husb is not None and gr_family.husb.has_graphical_representation():
-            x_pos_husb = gr_family.husb.graphical_representations[0].get_x_position()[
+        if gr_family.gr_husb:
+            x_pos_husb = gr_family.gr_husb.get_x_position()[
                 gr_family.family_id][1]
-            if gr_family.husb.child_of_families and gr_family.husb.child_of_families[0] \
-                    and (gr_family.husb.child_of_families[0].husb and gr_family.husb.child_of_families[0].husb.has_graphical_representation()) \
-                    and (gr_family.husb.child_of_families[0].wife and gr_family.husb.child_of_families[0].wife.has_graphical_representation()):
-                gr_individuals.append((1, gr_family.husb.graphical_representations[0]))
-        if gr_family.wife is not None and gr_family.wife.has_graphical_representation():
-            x_pos_wife = gr_family.wife.graphical_representations[0].get_x_position()[
+            if gr_family.husb.child_of_families and gr_family.husb.child_of_families[0]:# \
+                    #and (gr_family.husb.child_of_families[0].husb and gr_family.husb.child_of_families[0].husb.has_graphical_representation()) \
+                    #and (gr_family.husb.child_of_families[0].wife and gr_family.husb.child_of_families[0].wife.has_graphical_representation()):
+                gr_individuals.append((1, gr_family.gr_husb))
+        if gr_family.gr_wife:
+            x_pos_wife = gr_family.gr_wife.get_x_position()[
                 gr_family.family_id][1]
-            if gr_family.wife.child_of_families and gr_family.wife.child_of_families[0] \
-                    and (gr_family.wife.child_of_families[0].husb and gr_family.wife.child_of_families[0].husb.has_graphical_representation()) \
-                    and (gr_family.wife.child_of_families[0].wife and gr_family.wife.child_of_families[0].wife.has_graphical_representation()):
-                gr_individuals.append((-1, gr_family.wife.graphical_representations[0]))
+            if gr_family.wife.child_of_families and gr_family.wife.child_of_families[0]:# \
+                    #and (gr_family.wife.child_of_families[0].husb and gr_family.wife.child_of_families[0].husb.has_graphical_representation()) \
+                    #and (gr_family.wife.child_of_families[0].wife and gr_family.wife.child_of_families[0].wife.has_graphical_representation()) \
+                gr_individuals.append((-1, gr_family.gr_wife))
 
         vcs = gr_family.visible_children
         children_width = len(vcs)
