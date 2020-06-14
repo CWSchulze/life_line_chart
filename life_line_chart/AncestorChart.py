@@ -533,6 +533,7 @@ class AncestorChart(BaseSVGChart):
         Returns:
             bool: view has changed
         """
+        self._debug_check_collision_counter = 0
         rebuild_all = rebuild_all or self._positioning != self._backup_positioning or \
             self._chart_configuration != self._backup_chart_configuration
         update_view = update_view or rebuild_all or self._formatting != self._backup_formatting

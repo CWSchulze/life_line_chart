@@ -95,6 +95,7 @@ class BaseChart():
         self._backup_positioning = None
         self._backup_formatting = None
         self._backup_chart_configuration = None
+        self._debug_check_collision_counter = 0
 
     def instantiate_all(self):
         """
@@ -372,6 +373,7 @@ class BaseChart():
         Returns:
             [type]: [description]
         """
+        self._debug_check_collision_counter += 1
         v = {}
         collisions = []
         min_x = 999999
