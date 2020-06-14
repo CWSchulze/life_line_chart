@@ -660,6 +660,7 @@ class BaseSVGChart(BaseChart):
             filename += '.svg'
         # print(filename)
         svg_document = svgwrite.Drawing(filename=filename,
+                                        debug=False,
                                         size=(
                                             str(self.get_full_width()),
                                             str(self.get_full_height())))
