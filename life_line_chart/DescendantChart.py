@@ -295,9 +295,13 @@ class DescendantChart(BaseSVGChart):
                     color = color_lambda
                 if color_lambda is None or color is None:
                     if self._formatting['highlight_descendants']:
-                        cofs = gir.child_of_families
-                        if cofs and cofs[0].has_graphical_representation():
-                            color = (215,215,215)
+                        cofs = gir.individual.child_of_families
+                        if not cofs or not cofs[0].has_graphical_representation():
+                            marriages = gir.visible_marriages
+                            if marriages:
+                                spouse = marriages[0].get_spouse(gir)
+                                if spouse and spouse.individual.child_of_families and spouse.individual.child_of_families[0].has_graphical_representation():
+                                    color = (225,225,225)
                     if color is None:
                         color = self._instances.color_getter(gir)
                 gir.color = color
