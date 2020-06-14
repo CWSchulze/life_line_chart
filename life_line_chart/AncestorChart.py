@@ -352,29 +352,9 @@ class AncestorChart(BaseSVGChart):
             cofs = gr_individual.individual.child_of_families
             for cof in cofs:
                 if cof.has_graphical_representation():
-                    if cof.husb is None or cof.wife is None \
-                            or not cof.husb.has_graphical_representation() \
-                            or not cof.wife.has_graphical_representation():
-                        this_individual_x_pos = gr_individual.get_x_position()[
-                            cof.family_id][1]
-                        parent_x_pos = None
-                        if cof.husb is not None and cof.husb.has_graphical_representation():
-                            parent_x_pos = cof.husb.graphical_representations[0].get_x_position()[
-                                cof.family_id][1]
-                        if cof.wife is not None and cof.wife.has_graphical_representation():
-                            parent_x_pos = cof.wife.graphical_representations[0].get_x_position()[
-                                cof.family_id][1]
-                        if parent_x_pos is not None and this_individual_x_pos > parent_x_pos:
-                            self._compress_single_individual_position(
-                                gr_individual, cof, -1)
-                            # self._move_single_individual(individual, cof, parent_x_pos - this_individual_x_pos + 1)
-                        elif parent_x_pos is not None and this_individual_x_pos < parent_x_pos:
-                            self._compress_single_individual_position(
-                                gr_individual, cof, 1)
-                            # self._move_single_individual(individual, cof, parent_x_pos - this_individual_x_pos - 1)
+                    gr_cof = cof.graphical_representations[0]
                     try:
-                        self._compress_chart_ancestor_graph(
-                            cof.graphical_representations[0])
+                        self._compress_chart_ancestor_graph(gr_cof)
                     except KeyError as e:
                         pass
 
