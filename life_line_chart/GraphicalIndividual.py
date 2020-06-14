@@ -112,35 +112,17 @@ class GraphicalIndividual():
             gr_father = strongly_connected_parent_family.gr_husb
             if gr_father:
                 # only handle if the father is visible
-                f_x_positions = gr_father.get_x_position()
-                f_strongly_connected_parent_family, f_strongly_connected_spouse_family = gr_father.strongly_connected_parent_family
-                if f_strongly_connected_parent_family and f_strongly_connected_spouse_family == strongly_connected_parent_family:
-                    # count ancestors only, if the visible parent family is the first marriage (strong graphical connection)
-                    f_x_min, f_x_max = gr_father.get_ancestor_range(
-                        strongly_connected_parent_family)
-                    x_min.append(f_x_min)
-                    x_max.append(f_x_max)
-                else:
-                    # ignore ancestors
-                    x_pos = gr_father.get_x_position()[strongly_connected_parent_family.family_id][1]
-                    x_min.append(x_pos)
-                    x_max.append(x_pos)
+                f_x_min, f_x_max = gr_father.get_ancestor_range(
+                    strongly_connected_parent_family)
+                x_min.append(f_x_min)
+                x_max.append(f_x_max)
             gr_mother = strongly_connected_parent_family.gr_wife
             if gr_mother:
-                # only handle if the father is visible
-                m_x_positions = gr_mother.get_x_position()
-                m_strongly_connected_parent_family, m_strongly_connected_spouse_family = gr_mother.strongly_connected_parent_family
-                if m_strongly_connected_parent_family and m_strongly_connected_spouse_family == strongly_connected_parent_family:
-                    # count ancestors only, if the visible parent family is the first marriage (strong graphical connection)
-                    m_x_min, m_x_max = gr_mother.get_ancestor_range(
-                        strongly_connected_parent_family)
-                    x_min.append(m_x_min)
-                    x_max.append(m_x_max)
-                else:
-                    # ignore ancestors
-                    x_pos = gr_mother.get_x_position()[strongly_connected_parent_family.family_id][1]
-                    x_min.append(x_pos)
-                    x_max.append(x_pos)
+                # only handle if the mother is visible
+                m_x_min, m_x_max = gr_mother.get_ancestor_range(
+                    strongly_connected_parent_family)
+                x_min.append(m_x_min)
+                x_max.append(m_x_max)
             # add siblings
             x_v = [gr_c.get_x_position()[strongly_connected_parent_family.family_id][1] for gr_c in strongly_connected_parent_family.visible_children
                         if strongly_connected_parent_family.family_id in gr_c.get_x_position()]
