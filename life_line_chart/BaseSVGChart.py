@@ -309,19 +309,22 @@ class BaseSVGChart(BaseChart):
                     marriage_ring_index, marriage_ordinal = calculate_ring_position(self._instances[('f',f_g_id[1])].graphical_representations[0])
                     for connection in connections:
                         if connection == 'weak_child':
-                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.1
+                            thickness = 0.5*self._formatting['vertical_step_size']*0.1
                             color = (175, 225, 175)
                         elif connection == 'strong_child':
-                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.3
+                            thickness = 0.5*self._formatting['vertical_step_size']*0.3
                             color = (25, 25, 25)
                         elif connection == 'gr_wife':
-                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.2
+                            thickness = 0.5*self._formatting['vertical_step_size']*0.2
                             color = (225, 25, 25)
                         elif connection == 'gr_husb':
-                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*0.2
+                            thickness = 0.5*self._formatting['vertical_step_size']*0.2
                             color = (25, 25, 225)
+                        elif connection == 'strong_marriage':
+                            thickness = 0.5*self._formatting['vertical_step_size']*0.3
+                            color = (25, 225, 25)
                         else:
-                            thickness = self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*1
+                            thickness = 0.5*self._formatting['vertical_step_size']*1
                             color = (25, 25, 25)
                         def coordinate_transformation(x, y):
                             new_x, new_y = self._map_position(x, y)
