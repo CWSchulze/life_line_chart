@@ -398,7 +398,11 @@ class AncestorChart(BaseSVGChart):
             if vms:
                 strongly_connected_parent_family = vms[0]
 
+                this_individual_x_pos = gr_individual.get_x_position()[
+                    strongly_connected_parent_family.family_id][1]
                 if not gr_individual.has_x_position(strongly_connected_parent_family):
+                    continue
+                if this_individual_x_pos and (this_individual_x_pos + direction_factor*1) in blocked_positions:
                     continue
 
                 try:
