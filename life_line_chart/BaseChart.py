@@ -351,7 +351,7 @@ class BaseChart():
             self._move_individual_and_ancestors(gr_family.gr_wife, gr_family, wife_x_delta)
         self._instances.ancestor_width_cache.clear()
 
-    def _check_compressed_x_position(self, early_raise, position_to_person_map=None):
+    def _check_compressed_x_position(self, early_raise, position_to_person_map=None, min_distance=15):
         """
         check the compressed chart for overlapping individuals
 
@@ -374,10 +374,10 @@ class BaseChart():
         def check_collision(gr_individual_a, start_y_a, end_y_a, gr_individual_b, start_y_b, end_y_b):
             if gr_individual_a == gr_individual_b:
                 return False
-            start_position_a = start_y_a - 365*15
-            start_position_b = start_y_b - 365*15
-            end_position_a = end_y_a + 365*15
-            end_position_b = end_y_b + 365*15
+            start_position_a = start_y_a - 365*min_distance
+            start_position_b = start_y_b - 365*min_distance
+            end_position_a = end_y_a + 365*min_distance
+            end_position_b = end_y_b + 365*min_distance
             if ((start_position_a - start_position_b)
                 * (start_position_a - end_position_b) < 0 or
                 (end_position_a - start_position_b)
