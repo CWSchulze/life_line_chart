@@ -4,17 +4,21 @@ from .Exceptions import LifeLineChartUnknownPlacementError
 class GraphicalIndividual():
     """
     Class which represents one appearance of an individual
+
+    If a parent family is strongly connected to a child, then the family will
+    be moved if the child is moved. Weak connections are ignored.
+
+    There are two degrees of freedom when placing the parent family.
+    1. If several siblings are visible, then one sibling needs to be selected
+    for the strong connection.
+    2. If the selected sibling was married several times, then the marriage
+    needs to be selected.
     """
+
     # x positions in different family appearances
     _x_position = None
     # color of this individual
     color = [200, 200, 255]
-    # child individual where this individual was placed, so it is strongly connected.
-    # Optimization algorithms must not break this connection.
-    # strongly_connected_child = None
-    # This individual is placed in this marriage, so it is strongly connected.
-    # Optimization algorithms must not break this connection.
-    # strongly_connected_marriage = None
     # ordinal value of the birth date
     __birth_date_ov = None
     # ordinal value of the death date
@@ -29,11 +33,7 @@ class GraphicalIndividual():
         self.debug_label = ""
         self.g_id = None
 
-        self.first_marriage_strongly_connected_to_parent_family = None
-        # This individual is placed in this parent family, so it is strongly connected.
-        # Optimization algorithms must not break this connection.
         self.strongly_connected_parent_family = None, None
-        pass
 
     def __repr__(self):
         return 'gr_individual "' + self.individual.plain_name + '" ' + self.individual.birth_date
@@ -71,6 +71,7 @@ class GraphicalIndividual():
     def get_ancestor_width(self, gr_family):
         """
         width of the ancestor individuals which are strongly connected
+        (only tested with ancestor chart)
 
         Args:
             gr_family (GraphicalFamily): gr_family which is examined
@@ -85,6 +86,7 @@ class GraphicalIndividual():
     def get_ancestor_range(self, gr_family):
         """
         get the x range from min to max
+        (only tested with ancestor chart)
 
         Args:
             gr_family (GraphicalFamily): family which is examined
@@ -103,19 +105,10 @@ class GraphicalIndividual():
         x_min = x_v.copy()
         x_max = x_v.copy()
         # if [3] is true, then that index is the ancestor family
-        index_of_first_marriage = 1 if self._x_position[list(self._x_position.keys())[0]][3] else 0
 
-        if self.connected_parent_families:
-            strongly_connected_parent_family = self.connected_parent_families[0]
-        else:
-            strongly_connected_parent_family = None
+        strongly_connected_parent_family, strongly_connected_spouse_family = self.strongly_connected_parent_family
 
-        ancestors_are_visible = strongly_connected_parent_family is not None
-        # ancestors are not placed over first marriage, if the placement of the ancestors has already been done. E.g. siblings are not strongly connected
-        ancestors_are_strongly_connected_to_first_marriage = list(self._x_position.values())[0][1]==list(self._x_position.values())[index_of_first_marriage][1]
-        # ancestors are usually placed over first marriage, so count ancestors only if the searched family is the first one
-        first_marriage_is_what_we_search = list(self._x_position.keys())[index_of_first_marriage] == family_id
-        if ancestors_are_visible and ancestors_are_strongly_connected_to_first_marriage and first_marriage_is_what_we_search:
+        if strongly_connected_parent_family and strongly_connected_spouse_family == gr_family:
             gr_father = strongly_connected_parent_family.gr_husb
             if gr_father:
                 # only handle if the father is visible
@@ -159,10 +152,10 @@ class GraphicalIndividual():
         self.__instances.ancestor_width_cache[(self.individual_id, family_id)] = x_min, x_max
         return x_min, x_max
 
-
     def get_descendant_width(self, family):
         """
         width of the descendant individuals which are strongly connected
+        (only tested with descendant chart)
 
         Args:
             family (BaseFamily): family which is examined
@@ -177,6 +170,7 @@ class GraphicalIndividual():
     def get_descendant_range(self, family):
         """
         get the x range from min to max
+        (only tested with descendant chart)
 
         Args:
             family (BaseFamily): family which is examined
@@ -275,7 +269,7 @@ class GraphicalIndividual():
     @property
     def strongly_connected_parent_family(self):
         """
-        parent families which are strongly connected
+        This is the tuple with parent family and spouse/marriage family which are strongly connected.
 
         Raises:
             LifeLineChartUnknownPlacementError: placing error
