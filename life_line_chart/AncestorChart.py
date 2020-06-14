@@ -149,7 +149,7 @@ class AncestorChart(BaseSVGChart):
                 gr_family.add_visible_children(gr_child)
                 gr_child.strongly_connected_parent_family = gr_family, None
 
-    def place_selected_individuals(self, gr_individual, child_family, spouse_family, child_of_family, x_offset=0, discovery_cache=[], root_node_discovery_cache=[]):
+    def place_selected_individuals(self, gr_individual, child_family, spouse_family, child_of_family, x_offset=0, discovery_cache=None, root_node_discovery_cache=None):
         """
         Place the graphical representations in direction of x
 
@@ -159,6 +159,10 @@ class AncestorChart(BaseSVGChart):
             spouse_family (BaseFamily): Spouse family of this individual
             child_of_family (BaseFamily): child-of-family of this individual
         """
+        if discovery_cache is None:
+            discovery_cache = []
+        if root_node_discovery_cache is None:
+            root_node_discovery_cache = []
 
         individual = gr_individual.individual
         if child_of_family and child_of_family.has_graphical_representation():
