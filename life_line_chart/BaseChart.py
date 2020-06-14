@@ -305,6 +305,14 @@ class BaseChart():
         Args:
             gr_family (GraphicalFamily): family instance
         """
+        def func(gr_family):
+            xpos_w = []
+            for gr_f, gr_i in gr_family.gr_wife.get_all_ancestors():
+                xpos_w.append(gr_i.get_x_position(gr_f.family)[1])
+            xpos_h = []
+            for gr_f, gr_i in gr_family.gr_husb.get_all_ancestors():
+                xpos_h.append(gr_i.get_x_position(gr_f.family)[1])
+            return (max(xpos_w), min(xpos_w), max(xpos_w)- min(xpos_w), gr_family.gr_wife.get_ancestor_range(gr_family)),(max(xpos_h), min(xpos_h), max(xpos_h)- min(xpos_h), gr_family.gr_husb.get_ancestor_range(gr_family))
         if gr_family.gr_husb is None and gr_family.gr_wife is None:
             return
         if gr_family.gr_husb is not None:
