@@ -160,6 +160,14 @@ class AncestorChart(BaseSVGChart):
         """
 
         individual = gr_individual.individual
+        if child_of_family and child_of_family.has_graphical_representation():
+            gr_child_of_family = child_of_family.graphical_representations[0]
+        else:
+            gr_child_of_family = None
+        if spouse_family and spouse_family.has_graphical_representation():
+            gr_spouse_family = spouse_family.graphical_representations[0]
+        else:
+            gr_spouse_family = None
         if (gr_individual, spouse_family) in discovery_cache:
             # if this individual has already been placed in this marriage family
             return
@@ -333,6 +341,9 @@ class AncestorChart(BaseSVGChart):
         children_width = len(vcs)
         children_x_positions = [gr_child.get_x_position(gr_family)[1] for gr_child in vcs]
         children_x_center = sum(children_x_positions)*1.0/children_width
+        blocked_positions = children_x_positions.copy()
+        if x_pos_husb: blocked_positions.append(x_pos_husb)
+        if x_pos_wife: blocked_positions.append(x_pos_wife)
 
         if x_pos_husb and children_x_center < x_pos_husb or x_pos_wife and x_pos_wife < children_x_center:
             family_was_flipped = True
