@@ -149,15 +149,14 @@ class AncestorChart(BaseSVGChart):
                 gr_family.add_visible_children(gr_child)
                 gr_child.strongly_connected_parent_family = gr_family, None
 
-    def place_selected_individuals(self, gr_individual, child_family, spouse_family, child_of_family, x_offset=0, discovery_cache=None, root_node_discovery_cache=None):
+    def place_selected_individuals(self, gr_individual, gr_spouse_family, gr_child_of_family, x_offset=0, discovery_cache=None, root_node_discovery_cache=None):
         """
         Place the graphical representations in direction of x
 
         Args:
-            individual (BaseIndividual): individual
-            child_family (BaseFamily): I dont remember
-            spouse_family (BaseFamily): Spouse family of this individual
-            child_of_family (BaseFamily): child-of-family of this individual
+            gr_individual (GraphicalIndividual): individual
+            gr_spouse_family (GraphicalFamily): Spouse family of this individual
+            gr_child_of_family (GraphicalFamily): child-of-family of this individual
         """
         if discovery_cache is None:
             discovery_cache = []
@@ -165,15 +164,15 @@ class AncestorChart(BaseSVGChart):
             root_node_discovery_cache = []
 
         individual = gr_individual.individual
-        if child_of_family and child_of_family.has_graphical_representation():
-            gr_child_of_family = child_of_family.graphical_representations[0]
+        if gr_child_of_family:
+            child_of_family = gr_child_of_family.family
         else:
-            gr_child_of_family = None
-        if spouse_family and spouse_family.has_graphical_representation():
-            gr_spouse_family = spouse_family.graphical_representations[0]
+            child_of_family = None
+        if gr_spouse_family:
+            spouse_family = gr_spouse_family.family
         else:
-            gr_spouse_family = None
-        if (gr_individual, spouse_family) in discovery_cache:
+            spouse_family = None
+        if (gr_individual, gr_spouse_family) in discovery_cache:
             # if this individual has already been placed in this marriage family
             return
 
@@ -187,26 +186,26 @@ class AncestorChart(BaseSVGChart):
 
         # get siblings
         child_of_families = gr_individual.connected_parent_families
-        if child_of_family is not None and child_of_family.has_graphical_representation() and child_of_family.graphical_representations[0].visible_children:
-            siblings = child_of_family.graphical_representations[-1].visible_children
+        if gr_child_of_family and gr_child_of_family.visible_children:
+            siblings = gr_child_of_family.visible_children
         else:
             siblings = [gr_individual]
 
         # go back to root node
         root_node_discovery_cache += siblings
-        if spouse_family and spouse_family.has_graphical_representation():
-            for gr_child in spouse_family.graphical_representations[0].visible_children:
-                c_vms = [vm.family for vm in gr_child.visible_marriages]
+        if gr_spouse_family:
+            for gr_child in gr_spouse_family.visible_children:
+                c_vms = gr_child.visible_marriages
                 if not c_vms:
                     c_vms = [None]
                 for c_m in c_vms:
                     if gr_child not in root_node_discovery_cache:
                         if gr_child.get_x_position() is None:
                             self.place_selected_individuals(
-                                gr_child, None, c_m, spouse_family,
+                                gr_child, c_m, gr_spouse_family,
                                 x_position, discovery_cache, root_node_discovery_cache)
 
-        if (gr_individual,spouse_family) in discovery_cache:
+        if (gr_individual, spouse_family) in discovery_cache:
             # when this node was handled by the place_selected_individuals call in a root node
             # then we should return here
             return
@@ -233,16 +232,15 @@ class AncestorChart(BaseSVGChart):
                 if not gr_parent:
                     continue
                 if not gr_parent.has_x_position(local_child_of_family):
-                    parent_child_of_families = gr_parent.individual.child_of_families
-                    if parent_child_of_families:
-                        parent_born_in_family = parent_child_of_families[0]
+                    gr_parent_families = gr_parent.connected_parent_families
+                    if gr_parent_families:
+                        gr_parent_family = gr_parent_families[0]
                     else:
-                        parent_born_in_family = None
+                        gr_parent_family = None
 
-                    if local_child_of_family.has_graphical_representation():
-                        gr_individual.strongly_connected_parent_family = gr_local_child_of_family, gr_spouse_family
+                    gr_individual.strongly_connected_parent_family = gr_local_child_of_family, gr_spouse_family
                     self.place_selected_individuals(
-                        gr_parent, spouse_family, local_child_of_family, parent_born_in_family,
+                        gr_parent, gr_local_child_of_family, gr_parent_family,
                         x_position, discovery_cache, root_node_discovery_cache)
                     width = gr_parent.get_ancestor_width(
                         gr_local_child_of_family)
@@ -295,7 +293,7 @@ class AncestorChart(BaseSVGChart):
         elif death_ordinal_value and birth_ordinal_value:
             self.min_ordinal = birth_ordinal_value
             self.max_ordinal = death_ordinal_value
-        discovery_cache.append((gr_individual,spouse_family))
+        discovery_cache.append((gr_individual, gr_spouse_family))
 
     def _compress_single_individual_position(self, gr_individual, cof, direction, nSteps=50000):
         """
@@ -638,11 +636,11 @@ class AncestorChart(BaseSVGChart):
                 if vms:
                     for vm in vms:
                         self.place_selected_individuals(
-                            root_individual.graphical_representations[0], None, vm.family, self._instances[('f', cof_family_id)], x_pos, [], [])
+                            root_individual.graphical_representations[0], vm, self._instances[('f', cof_family_id)].graphical_representations[0], x_pos, [], [])
                         spouse_family = vm.family.graphical_representations[0]
                 else:
                     self.place_selected_individuals(
-                        root_individual.graphical_representations[0], None, None, self._instances[('f', cof_family_id)], x_pos, [], [])
+                        root_individual.graphical_representations[0], None, self._instances[('f', cof_family_id)].graphical_representations[0], x_pos, [], [])
 
                 x_pos = max(0, self.max_x_index)
 

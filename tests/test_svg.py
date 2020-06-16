@@ -35,7 +35,7 @@ def test_generate_svg_file():
     if cof_ids:
         child_of_family = chart._instances[('f', cof_ids[0])]
     chart.place_selected_individuals(
-        gr_root_individual, None, None, child_of_family, x_position)
+        gr_root_individual, None, child_of_family.graphical_representations[0], x_position)
     x_min, x_max = gr_root_individual.get_ancestor_range(None)
     x_position += x_max - x_min + 1
 
@@ -85,7 +85,7 @@ def test_generate_svg_file_with_two_roots():
         chart._instances[('i', second_individual_id)], generations=max_generations)
 
     chart.place_selected_individuals(
-        gr_root_individual, None, None, child_of_family, x_position)
+        gr_root_individual, None, child_of_family.graphical_representations[0], x_position)
     x_min, x_max = gr_root_individual.get_ancestor_range(None)
     x_position += x_max - x_min + 1
 
@@ -96,7 +96,7 @@ def test_generate_svg_file_with_two_roots():
     if cof_ids:
         child_of_family = chart._instances[('f', cof_ids[0])]
     chart.place_selected_individuals(
-        gr_second_root_individual, None, None, child_of_family, x_position)
+        gr_second_root_individual, None, child_of_family.graphical_representations[0], x_position)
     x_min, x_max = gr_second_root_individual.get_ancestor_range(None)
     x_position += x_max - x_min + 1
 
@@ -146,7 +146,7 @@ def test_generate_svg_file_ancestor_and_children():
     if cof_ids:
         child_of_family = chart._instances[('f', cof_ids[0])]
     chart.place_selected_individuals(
-        gr_root_individual, None, None, child_of_family, x_position)
+        gr_root_individual, None, child_of_family.graphical_representations[0], x_position)
     x_min, x_max = chart._instances[('i', individual_id)
                              ].graphical_representations[0].get_ancestor_range(None)
     x_position += x_max - x_min + 1
@@ -215,7 +215,7 @@ def test_photos_in_chart():
     if cof_ids:
         child_of_family = chart._instances[('f', cof_ids[0])]
     chart.place_selected_individuals(
-        gr_root_individual, None, None, child_of_family, x_position)
+        gr_root_individual, None, child_of_family.graphical_representations[0], x_position)
     x_min, x_max = chart._instances[('i', individual_id)
                              ].graphical_representations[0].get_ancestor_range(None)
     x_position += x_max - x_min + 1
