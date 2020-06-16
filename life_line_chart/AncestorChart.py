@@ -70,21 +70,14 @@ class AncestorChart(BaseSVGChart):
         if filter and filter(individual):
             return
 
-        if not individual.has_graphical_representation():
-            gr_individual = self._create_individual_graphical_representation(
-                individual)
+        gr_individual = self._create_individual_graphical_representation(
+            individual)
 
-            if gr_individual is None:
-                return
+        if gr_individual is None:
+            return
 
-            gr_individual.color = (0,0,0)
-            discovery_cache.append(individual.individual_id)
-            gr_individual.debug_label = '\n' + str(len(discovery_cache))
-        else:
-            # must not leave here, because merging of different family branches would stop here
-            # if len(individual.child_of_families) > 0 and individual.child_of_families[0].has_graphical_representation():
-            #     return
-            gr_individual = individual.graphical_representations[0]
+        discovery_cache.append(individual.individual_id)
+        gr_individual.debug_label = '\n' + str(len(discovery_cache))
 
         go_deeper = True
         child_of_families = individual.child_of_families[:1]
@@ -552,7 +545,7 @@ class AncestorChart(BaseSVGChart):
             _, min_index_x, max_index_x = self._check_compressed_x_position(
                 False, self.position_to_person_map)
             self._move_individual_and_ancestors(
-                root_individual.graphical_representations[0],
+                gr_root_individual,
                 sorted(list(gr_root_individual.get_x_position().values()))[0][2],
                 -(min_index_x-old_x_min_index)*1)
             keys = sorted(list(self.position_to_person_map.keys()))
@@ -620,19 +613,20 @@ class AncestorChart(BaseSVGChart):
                     'i', root_individual_id)]
                 if root_individual.has_graphical_representation() and root_individual.graphical_representations[0].get_x_position() is not None:
                     continue
+                gr_root_individual = root_individual.graphical_representations[0]
                 cof_family_id = None
                 if root_individual.child_of_family_id:
                     cof_family_id = root_individual.child_of_family_id[0]
                 spouse_family = None
-                vms = root_individual.graphical_representations[0].visible_marriages
+                vms = gr_root_individual.visible_marriages
                 if vms:
                     for vm in vms:
+                        gr_spouse_family = vm
                         self.place_selected_individuals(
-                            root_individual.graphical_representations[0], vm, self._instances[('f', cof_family_id)].graphical_representations[0], x_pos, [], [])
-                        spouse_family = vm.family.graphical_representations[0]
+                            gr_root_individual, gr_spouse_family, self._instances[('f', cof_family_id)].graphical_representations[0], x_pos, [], [])
                 else:
                     self.place_selected_individuals(
-                        root_individual.graphical_representations[0], None, self._instances[('f', cof_family_id)].graphical_representations[0], x_pos, [], [])
+                        gr_root_individual, None, self._instances[('f', cof_family_id)].graphical_representations[0], x_pos, [], [])
 
                 x_pos = max(0, self.max_x_index)
 

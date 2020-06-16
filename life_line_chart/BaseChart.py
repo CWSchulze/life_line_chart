@@ -139,7 +139,7 @@ class BaseChart():
         """
         return deepcopy(self._chart_configuration)
 
-    def _create_individual_graphical_representation(self, individual):
+    def _create_individual_graphical_representation(self, individual, always_instantiate_new = False):
         """
         create a graphical representation for an individual
 
@@ -149,16 +149,21 @@ class BaseChart():
         Returns:
             ancestor_chart_inidividual: created instance
         """
-        new_instance = self._graphical_individual_class(
-            self._instances, individual.individual_id)
-        if new_instance.birth_date is None or new_instance.death_date is None:
-            del new_instance
-            return None
-        self.gr_individuals.append(new_instance)
-        new_instance.g_id = (len(individual.graphical_representations) - 1, individual.individual_id)
+        if not individual.graphical_representations or always_instantiate_new:
+            new_instance = self._graphical_individual_class(
+                self._instances, individual.individual_id)
+            if new_instance.birth_date is None or new_instance.death_date is None:
+                del new_instance
+                return None
+            new_instance.g_id = (len(individual.graphical_representations) - 1, individual.individual_id)
+            new_instance.color = (0,0,0)
+            self.gr_individuals.append(new_instance)
+        else:
+            new_instance = individual.graphical_representations[-1]
+
         return new_instance
 
-    def _create_family_graphical_representation(self, family):
+    def _create_family_graphical_representation(self, family, always_instantiate_new = False):
         """
         create a graphical representation for a family
 
@@ -168,14 +173,14 @@ class BaseChart():
         Returns:
             GraphicalFamily: created instance
         """
-        if not family.graphical_representations:
+        if not family.graphical_representations or always_instantiate_new:
             new_instance = self._graphical_family_class(
                 self._instances, family.family_id)
+            new_instance.g_id = (len(family.graphical_representations) - 1, family.family_id)
             self.gr_families.append(new_instance)
         else:
-            new_instance = family.graphical_representations[0]
+            new_instance = family.graphical_representations[-1]
             # print('the family was added twice:'+family.family_id)
-        new_instance.g_id = (len(family.graphical_representations) - 1, family.family_id)
         return new_instance
 
     def _calculate_sum_of_distances(self):
