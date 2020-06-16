@@ -366,17 +366,12 @@ class AncestorChart(BaseSVGChart):
             family_was_flipped = True
 
         for _, gr_individual in sorted(gr_individuals):
-            cofs = gr_individual.individual.child_of_families
-            for cof in cofs:
-                if cof.has_graphical_representation():
-                    gr_cof = cof.graphical_representations[0]
-                    try:
-                        self._compress_chart_ancestor_graph(gr_cof)
-                    except KeyError as e:
-                        pass
-
-                if self.debug_optimization_compression_steps <= 0:
-                    break
+            gr_cofs = gr_individual.connected_parent_families
+            for gr_cof in gr_cofs:
+                try:
+                    self._compress_chart_ancestor_graph(gr_cof)
+                except KeyError as e:
+                    pass
             if self.debug_optimization_compression_steps <= 0:
                 break
         if self.debug_optimization_compression_steps <= 0:
@@ -384,7 +379,6 @@ class AncestorChart(BaseSVGChart):
         for original_direction_factor, gr_individual in sorted(gr_individuals):
             if gr_individual is None:
                 continue
-            #gr_individual = individual.graphical_representations[0]
             i = 0
             if family_was_flipped:
                 direction_factor = - original_direction_factor
@@ -443,29 +437,27 @@ class AncestorChart(BaseSVGChart):
             self._move_child_to_center_between_parents(gr_individual)
 
     def _move_child_to_center_between_parents(self, gr_individual):
-        cofs = gr_individual.individual.child_of_families
-        for cof in cofs:
-            if cof.has_graphical_representation():
-                gr_cof = cof.graphical_representations[0]
-                husb_x_pos = None
-                if gr_cof.gr_husb is not None:
-                    husb_x_pos = gr_cof.gr_husb.get_x_position()[
-                        cof.family_id][1]
-                wife_x_pos = None
-                if cof.wife is not None and cof.wife.has_graphical_representation():
-                    wife_x_pos = gr_cof.gr_wife.get_x_position()[
-                        cof.family_id][1]
-                if husb_x_pos and wife_x_pos and True:
-                    middle_x_pos = (husb_x_pos + wife_x_pos)/2.0
-                    this_individual_x_pos = gr_individual.get_x_position()[
-                        cof.family_id][1]
-                    nSteps = int(abs(this_individual_x_pos - middle_x_pos))
-                    if nSteps > 0:
-                        if nSteps > 1000:
-                            logger.error(f'nSteps {nSteps} for gr_individual {gr_individual}')
-                        direction = -1 if this_individual_x_pos > middle_x_pos else 1
-                        self._compress_single_individual_position(
-                            gr_individual, cof, direction, nSteps)
+        gr_cofs = gr_individual.connected_parent_families
+        for gr_cof in gr_cofs:
+            husb_x_pos = None
+            if gr_cof.gr_husb is not None:
+                husb_x_pos = gr_cof.gr_husb.get_x_position()[
+                    gr_cof.family_id][1]
+            wife_x_pos = None
+            if gr_cof.gr_wife is not None:
+                wife_x_pos = gr_cof.gr_wife.get_x_position()[
+                    gr_cof.family_id][1]
+            if husb_x_pos and wife_x_pos and True:
+                middle_x_pos = (husb_x_pos + wife_x_pos)/2.0
+                this_individual_x_pos = gr_individual.get_x_position()[
+                    gr_cof.family_id][1]
+                nSteps = int(abs(this_individual_x_pos - middle_x_pos))
+                if nSteps > 0:
+                    if nSteps > 1000:
+                        logger.error(f'nSteps {nSteps} for gr_individual {gr_individual}')
+                    direction = -1 if this_individual_x_pos > middle_x_pos else 1
+                    self._compress_single_individual_position(
+                        gr_individual, gr_cof.family, direction, nSteps)
 
     def modify_layout(self, root_individual_id):
         """
