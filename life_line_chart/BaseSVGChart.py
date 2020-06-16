@@ -329,7 +329,7 @@ class BaseSVGChart(BaseChart):
                         def coordinate_transformation(x, y):
                             new_x, new_y = self._map_position(x, y)
                             return new_x + new_y*1j
-                        l_i = gr_individual#self._instances[('i', i_id)].graphical_representations[0]
+                        l_i = gr_individual
                         x_p_ = sorted([(ov, pos, index, family_id, flag)
                                     for index, (family_id, (ov, pos, f, flag)) in enumerate(l_i.get_x_position().items())])
                         x_p = x_p_[0][1]

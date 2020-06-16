@@ -70,14 +70,17 @@ class AncestorChart(BaseSVGChart):
         if filter and filter(individual):
             return
 
+        needs_instance = not individual.has_graphical_representation()
+
         gr_individual = self._create_individual_graphical_representation(
             individual)
 
+        if needs_instance:
+            discovery_cache.append(individual.individual_id)
+            gr_individual.debug_label = '\n' + str(len(discovery_cache))
+
         if gr_individual is None:
             return
-
-        discovery_cache.append(individual.individual_id)
-        gr_individual.debug_label = '\n' + str(len(discovery_cache))
 
         go_deeper = True
         child_of_families = individual.child_of_families[:1]
@@ -114,7 +117,7 @@ class AncestorChart(BaseSVGChart):
                         gr_child_of_family.gr_wife = gr_mother
         return gr_individual
 
-    def select_family_children(self, family, filter=None):
+    def select_family_children(self, gr_family, filter=None):
         """
         Select children of a family. This is done by creating instances of graphical representations.
 
@@ -123,9 +126,9 @@ class AncestorChart(BaseSVGChart):
             filter (lambda, optional): lambda(BaseIndividual) : return Boolean. Defaults to None.
         """
 
-        if not family.has_graphical_representation():
+        if gr_family:
             return
-        for child in family.get_children():
+        for child in gr_family.family.get_children():
             if filter and filter(child):
                 continue
 
@@ -138,7 +141,6 @@ class AncestorChart(BaseSVGChart):
 
                 gr_child.color = (0,0,0)
 
-                gr_family = family.graphical_representations[0]
                 gr_family.add_visible_children(gr_child)
                 gr_child.strongly_connected_parent_family = gr_family, None
 
