@@ -288,7 +288,7 @@ class AncestorChart(BaseSVGChart):
             self.max_ordinal = death_ordinal_value
         discovery_cache.append((gr_individual, gr_spouse_family))
 
-    def _compress_single_individual_position(self, gr_individual, cof, direction, nSteps=50000):
+    def _compress_single_individual_position(self, gr_individual, gr_cof, direction, nSteps=50000):
         """
         move single gr_individual until it collides
         """
@@ -298,7 +298,7 @@ class AncestorChart(BaseSVGChart):
             i = 0
             while i < nSteps:
                 i += 1
-                self._move_single_individual(gr_individual, cof, direction)
+                self._move_single_individual(gr_individual, gr_cof, direction)
                 if i < nSteps:
                     self._check_compressed_x_position(True, min_distance=1)
                 else:
@@ -309,7 +309,7 @@ class AncestorChart(BaseSVGChart):
             while i2 >= 0:
                 i2 -= 1
                 try:
-                    self._move_single_individual(gr_individual, cof, -direction)
+                    self._move_single_individual(gr_individual, gr_cof, -direction)
                     self._check_compressed_x_position(True)
                 except:
                     pass
@@ -450,7 +450,7 @@ class AncestorChart(BaseSVGChart):
                         logger.error(f'nSteps {nSteps} for gr_individual {gr_individual}')
                     direction = -1 if this_individual_x_pos > middle_x_pos else 1
                     self._compress_single_individual_position(
-                        gr_individual, gr_cof.family, direction, nSteps)
+                        gr_individual, gr_cof, direction, nSteps)
 
     def modify_layout(self, root_individual_id):
         """
@@ -546,7 +546,7 @@ class AncestorChart(BaseSVGChart):
                 False, self.position_to_person_map)
             self._move_individual_and_ancestors(
                 gr_root_individual,
-                sorted(list(gr_root_individual.get_x_position().values()))[0][2],
+                sorted(list(gr_root_individual.get_x_position().values()))[0][2].graphical_representations[0],
                 -(min_index_x-old_x_min_index)*1)
             keys = sorted(list(self.position_to_person_map.keys()))
             for key in keys:

@@ -204,13 +204,13 @@ class BaseChart():
                     distance_of_this_individual, index)] = gr_individual
         return total_distance, list_of_linked_individuals
 
-    def _move_single_individual(self, gr_individual, family, x_index_offset):
+    def _move_single_individual(self, gr_individual, gr_family, x_index_offset):
         """
         move a single individual vertically
 
         Args:
-            individual (BaseIndividual): individual instance
-            family (BaseFamily): family instance
+            gr_individual (GraphicalIndividual): individual instance
+            gr_family (GraphicalFamily): family instance
             x_index_offset (int): vertical offset
 
         Returns:
@@ -218,8 +218,8 @@ class BaseChart():
         """
         x_pos = gr_individual.get_x_position()
         positions = sorted(list(x_pos.values()))
-        if family is not None:
-            family_id = family.family_id
+        if gr_family is not None:
+            family_id = gr_family.family.family_id
         else:
             family_id = None
 
@@ -268,11 +268,10 @@ class BaseChart():
         x_pos = self._move_single_individual(
             gr_individual, gr_family, x_index_offset)
 
-        cofs = gr_individual.individual.child_of_families
-        if len(cofs) == 0 or not cofs[0].has_graphical_representation():
+        gr_cofs = gr_individual.connected_parent_families
+        if len(gr_cofs) == 0:
             return
-        cof = cofs[0]
-        gr_cof = cofs[0].graphical_representations[0]
+        gr_cof = gr_cofs[0]
 
         #for strongly_connected_parent_family in gr_individual.connected_parent_families:
         strongly_connected_parent_family, strongly_connected_spouse_family = gr_individual.strongly_connected_parent_family
@@ -291,7 +290,7 @@ class BaseChart():
                     if gr_child_individual == gr_individual:
                         continue
                     x_pos = self._move_single_individual(
-                        gr_child_individual, cof, x_index_offset)
+                        gr_child_individual, gr_cof, x_index_offset)
 
     def _flip_family(self, gr_family):
         """
@@ -349,7 +348,7 @@ class BaseChart():
         for gr_child in vcs:
             pos = list(gr_child.get_x_position().values())
             self._move_single_individual(
-                gr_child, pos[0][2], child_x_delta)
+                gr_child, pos[0][2].graphical_representations[0], child_x_delta)
 
         if gr_family.gr_husb:
             self._move_individual_and_ancestors(gr_family.gr_husb, gr_family, husb_x_delta)
