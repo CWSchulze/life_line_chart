@@ -101,7 +101,7 @@ class DescendantChart(BaseSVGChart):
                         child, gr_marriage, generations - 1, filter=filter)
                     if gr_child:
                         gr_marriage.add_visible_children(gr_child)
-                        #gr_child.strongly_connected_parent_family = gr_marriage
+                        #gr_child.ancestor_chart_parent_family_placement = gr_marriage
                 cofs = individual.child_of_families
                 for cof in cofs[:1]:
                     gr_marriage.visual_placement_parent_family = gr_child_of_family

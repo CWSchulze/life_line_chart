@@ -33,7 +33,7 @@ class GraphicalIndividual():
         self.debug_label = ""
         self.g_id = None
 
-        self.strongly_connected_parent_family = None, None
+        self.ancestor_chart_parent_family_placement = None, None
 
     def __repr__(self):
         return 'gr_individual "' + self.individual.plain_name + '" ' + self.individual.birth_date
@@ -108,7 +108,7 @@ class GraphicalIndividual():
         x_max = x_v.copy()
         # if [3] is true, then that index is the ancestor family
 
-        strongly_connected_parent_family, strongly_connected_spouse_family = self.strongly_connected_parent_family
+        strongly_connected_parent_family, strongly_connected_spouse_family = self.ancestor_chart_parent_family_placement
 
         if strongly_connected_parent_family and strongly_connected_spouse_family == gr_family:
             gr_father = strongly_connected_parent_family.gr_husb
@@ -415,7 +415,7 @@ class GraphicalIndividual():
 
     def get_all_ancestors(self):
         gr_ancestors = []
-        strongly_connected_parent_family, strongly_connected_spouse_family = self.strongly_connected_parent_family
+        strongly_connected_parent_family, strongly_connected_spouse_family = self.ancestor_chart_parent_family_placement
         if strongly_connected_parent_family:
             if strongly_connected_parent_family.gr_husb:
                 gr_ancestors += [(strongly_connected_parent_family, strongly_connected_parent_family.gr_husb)]

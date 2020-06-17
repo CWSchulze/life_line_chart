@@ -155,11 +155,11 @@ class InstanceContainer():
         Args:
             individual (GraphicalIndividual): individual to generate a color for
         """
-        parent_family, spouse_family = gr_individual.strongly_connected_parent_family
+        parent_family, spouse_family = gr_individual.ancestor_chart_parent_family_placement
         gr_husb = None
         while parent_family is not None and parent_family.gr_husb is not None:
             gr_husb = parent_family.gr_husb
-            parent_family, spouse_family = gr_husb.strongly_connected_parent_family
+            parent_family, spouse_family = gr_husb.ancestor_chart_parent_family_placement
         if gr_husb:
             if gr_husb.color == (0,0,0):
                 gr_husb.color = self.color_getter(gr_husb)

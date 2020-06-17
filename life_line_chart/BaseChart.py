@@ -274,7 +274,7 @@ class BaseChart():
         gr_cof = gr_cofs[0]
 
         #for strongly_connected_parent_family in gr_individual.connected_parent_families:
-        strongly_connected_parent_family, strongly_connected_spouse_family = gr_individual.strongly_connected_parent_family
+        strongly_connected_parent_family, strongly_connected_spouse_family = gr_individual.ancestor_chart_parent_family_placement
         if strongly_connected_parent_family and (strongly_connected_spouse_family == strongly_connected_parent_family or gr_family == strongly_connected_spouse_family or strongly_connected_spouse_family == None):
             if strongly_connected_parent_family.gr_husb:
                 # if cof.gr_husb.get_x_position() and len(cof.gr_husb.get_x_position()) == 1:

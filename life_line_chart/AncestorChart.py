@@ -142,7 +142,7 @@ class AncestorChart(BaseSVGChart):
                 gr_child.color = (0,0,0)
 
                 gr_family.add_visible_children(gr_child)
-                gr_child.strongly_connected_parent_family = gr_family, None
+                gr_child.ancestor_chart_parent_family_placement = gr_family, None
 
     def place_selected_individuals(self, gr_individual, gr_spouse_family, gr_child_of_family, x_offset=0, discovery_cache=None, root_node_discovery_cache=None):
         """
@@ -233,7 +233,7 @@ class AncestorChart(BaseSVGChart):
                     else:
                         gr_parent_family = None
 
-                    gr_individual.strongly_connected_parent_family = gr_local_child_of_family, gr_spouse_family
+                    gr_individual.ancestor_chart_parent_family_placement = gr_local_child_of_family, gr_spouse_family
                     self.place_selected_individuals(
                         gr_parent, gr_local_child_of_family, gr_parent_family,
                         x_position, discovery_cache, root_node_discovery_cache)
@@ -272,7 +272,7 @@ class AncestorChart(BaseSVGChart):
 
         if gr_child_of_family is not None and gr_child_of_family.gr_husb is None and gr_child_of_family.gr_wife is None:
             if gr_child_of_family.strongly_connected_children[0] is None:
-                gr_individual.strongly_connected_parent_family = gr_child_of_family, gr_spouse_family
+                gr_individual.ancestor_chart_parent_family_placement = gr_child_of_family, gr_spouse_family
 
         # add the mother branch
         x_position = add_parent('wife', x_position)
