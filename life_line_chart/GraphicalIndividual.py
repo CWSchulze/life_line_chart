@@ -95,12 +95,14 @@ class GraphicalIndividual():
             tuple: x_min, x_max
         """
         family_id = None
+        gr_family_g_id = None
         if gr_family is not None:
             family_id = gr_family.family.family_id
+            gr_family_g_id = gr_family.g_id
             # at least root node has None
-        if (self.individual_id, family_id) in self.__instances.ancestor_width_cache:
+        if (self.g_id, gr_family_g_id) in self.__instances.ancestor_width_cache:
             # caching
-            return self.__instances.ancestor_width_cache[(self.individual_id, family_id)]
+            return self.__instances.ancestor_width_cache[(self.g_id, gr_family_g_id)]
         x_v = [self._x_position[family_id][1]]
         x_min = x_v.copy()
         x_max = x_v.copy()
@@ -131,7 +133,7 @@ class GraphicalIndividual():
 
         x_min = min(x_min)
         x_max = max(x_max)
-        self.__instances.ancestor_width_cache[(self.individual_id, family_id)] = x_min, x_max
+        self.__instances.ancestor_width_cache[(self.g_id, gr_family_g_id)] = x_min, x_max
         return x_min, x_max
 
     def get_descendant_width(self, family):
