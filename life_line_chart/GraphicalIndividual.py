@@ -252,6 +252,7 @@ class GraphicalIndividual():
     def strongly_connected_parent_family(self):
         """
         This is the tuple with parent family and spouse/marriage family which are strongly connected.
+        The parent family is placed above the individual at the marriage family position.
 
         Raises:
             LifeLineChartUnknownPlacementError: placing error

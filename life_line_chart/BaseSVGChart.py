@@ -306,7 +306,7 @@ class BaseSVGChart(BaseChart):
                 # show items to help debugging the algorithms
                 individual_connections = self._instances.connection_container['i'][gr_individual.g_id]
                 for f_g_id, connections in individual_connections.items():
-                    marriage_ring_index, marriage_ordinal = calculate_ring_position(self._instances[('f',f_g_id[1])].graphical_representations[0])
+                    marriage_ring_index, marriage_ordinal = calculate_ring_position(self._instances[('f',f_g_id[1])].graphical_representations[f_g_id[0]])
                     for connection in connections:
                         if connection == 'weak_child':
                             thickness = 0.5*self._formatting['vertical_step_size']*0.1
