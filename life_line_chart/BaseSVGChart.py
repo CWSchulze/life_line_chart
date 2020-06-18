@@ -90,7 +90,7 @@ class BaseSVGChart(BaseChart):
             # for x_index in x_indices:
                 if x_index not in v:
                     v[x_index] = gr_individual.individual_id
-                else:
+                elif (always_has_child_of_family or v[x_index] != gr_individual.individual_id):
                     failed.append(x_index)
                     # value = index_map[x_index]
                     logger.error(
