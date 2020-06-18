@@ -681,7 +681,7 @@ class BaseSVGChart(BaseChart):
         setup svg file and save it.
 
         Args:
-            individual_id (BaseIndividual): root person used for filename
+            individual_id (str): root person used for filename
             filename (str, optional): user defined filename. Defaults to None.
         """
 
