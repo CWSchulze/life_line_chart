@@ -136,35 +136,37 @@ class GraphicalIndividual():
         self.__instances.ancestor_width_cache[(self.g_id, gr_family_g_id)] = x_min, x_max
         return x_min, x_max
 
-    def get_descendant_width(self, family):
+    def get_descendant_width(self, gr_family):
         """
         width of the descendant individuals which are strongly connected
         (only tested with descendant chart)
 
         Args:
-            family (BaseFamily): family which is examined
+            gr_family (GraphicalFamily): family which is examined
 
         Returns:
             int: width
         """
-        x_min, x_max = self.get_descendant_range(family)
+        x_min, x_max = self.get_descendant_range(gr_family)
         width = x_max - x_min + 1
         return width
 
-    def get_descendant_range(self, family):
+    def get_descendant_range(self, gr_family):
         """
         get the x range from min to max
         (only tested with descendant chart)
 
         Args:
-            family (BaseFamily): family which is examined
+            gr_family (GraphicalFamily): family which is examined
 
         Returns:
             tuple: x_min, x_max
         """
         family_id = None
-        if family is not None:
-            family_id = family.family_id
+        family = None
+        if gr_family is not None:
+            family_id = gr_family.family_id
+            family = gr_family.family
             # at least root node has None
         if (self.individual_id, family_id) in self.__instances.ancestor_width_cache:
             # caching
@@ -179,29 +181,31 @@ class GraphicalIndividual():
             #return 1
             pass
 
+        # marriages which have been placed over this parent family
+        visible_local_marriages = \
+            [marriage for marriage in self.visible_marriages \
+                if gr_family is None or \
+                    marriage.descendant_chart_parent_family_placement == gr_family]
+
         marriages = self.individual.marriages
-        if len(marriages) > 0:
-            for marriage in marriages:
-                if not marriage.has_graphical_representation():
-                    continue
-                gr_marriage = marriage.graphical_representations[0]
+        for vm in visible_local_marriages:
+                marriage = vm.family
+                gr_marriage = vm
                 if family_id is None or gr_marriage.visual_placement_parent_family is not None and \
                     gr_marriage.visual_placement_parent_family.family_id == family_id:
 
                     x_min.append(self._x_position[marriage.family_id][1])
                     x_max.append(self._x_position[marriage.family_id][1])
 
-                    for child in marriage.children:
-                        if not child.has_graphical_representation():
-                            continue
-                        c_x_min, c_x_max = child.graphical_representations[0].get_descendant_range(
-                            marriage)
+                    for gr_child in gr_marriage.visible_children:
+                        c_x_min, c_x_max = gr_child.get_descendant_range(
+                            gr_marriage)
                         x_min.append(c_x_min)
                         x_max.append(c_x_max)
 
-                    spouse = marriage.get_spouse(self.individual.individual_id)
-                    if spouse and spouse.has_graphical_representation():
-                        x_v = spouse.graphical_representations[0].get_x_position()[marriage.family_id][1]
+                    gr_spouse = gr_marriage.get_gr_spouse(self)
+                    if gr_spouse:
+                        x_v = gr_spouse.get_x_position()[gr_marriage.family_id][1]
                         x_min.append(x_v)
                         x_max.append(x_v)
 

@@ -130,28 +130,28 @@ class DescendantChart(BaseSVGChart):
             gr_child_of_family = None
 
         # marriages which have been placed over this parent family
-        visible_marriages = \
+        visible_local_marriages = \
             [marriage for marriage in gr_individual.visible_marriages \
                 if child_of_family is None or \
                     marriage.descendant_chart_parent_family_placement == gr_child_of_family]
 
-        if len(visible_marriages) == 0:
+        if len(visible_local_marriages) == 0:
             gr_individual.set_x_position(
                     x_position, child_of_family, True)
             x_position += 1
 
-        for marriage_index, gr_marriage in enumerate(reversed(visible_marriages)):
+        for marriage_index, gr_marriage in enumerate(reversed(visible_local_marriages)):
             marriage = gr_marriage.family
             gr_spouse = gr_marriage.get_gr_spouse(gr_individual)
             spouse = gr_spouse.individual
 
             # starting x index of gr_individual is first marriage (i.e. last in reversed list)
-            if marriage_index == len(visible_marriages) - 1:
+            if marriage_index == len(visible_local_marriages) - 1:
                 if not gr_individual.has_x_position(gr_child_of_family):
                     gr_individual.set_x_position(
-                        x_position, gr_child_of_family)
+                        x_position, gr_child_of_family, True)
 
-            if marriage_index == len(visible_marriages) - 1:
+            if marriage_index == len(visible_local_marriages) - 1:
                 if not gr_individual.has_x_position(gr_marriage):
                     gr_individual.set_x_position(
                         x_position, gr_marriage)
@@ -171,7 +171,7 @@ class DescendantChart(BaseSVGChart):
                     gr_marriage)
                 x_position += width
 
-            if marriage_index < len(visible_marriages) - 1:
+            if marriage_index < len(visible_local_marriages) - 1:
                 if not gr_individual.has_x_position(gr_marriage):
                     gr_individual.set_x_position(
                         x_position, gr_marriage)
