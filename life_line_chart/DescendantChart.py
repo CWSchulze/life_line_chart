@@ -251,10 +251,14 @@ class DescendantChart(BaseSVGChart):
                 cof_family_id = None
                 if root_individual.child_of_family_id:
                     cof_family_id = root_individual.child_of_family_id[0]
+                cof_family = self._instances[('f', cof_family_id)]
+                gr_cof_family = None
+                if cof_family:
+                    gr_cof_family = cof_family.graphical_representations[0]
                 self.place_selected_individuals(
-                    root_individual, self._instances[('f', cof_family_id)], x_pos)
+                    root_individual, cof_family, x_pos)
 
-                x_pos += root_individual.graphical_representations[0].get_descendant_width(self._instances[('f', cof_family_id)].graphical_representations[0])
+                x_pos += root_individual.graphical_representations[0].get_descendant_width(gr_cof_family)
 
             for settings in self._chart_configuration['root_individuals']:
                 root_individual_id = settings['individual_id']
