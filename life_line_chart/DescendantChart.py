@@ -270,8 +270,8 @@ class DescendantChart(BaseSVGChart):
 
             for gir in self.gr_individuals:
                 color = None
-                if color_lambda is None:
-                    color = color_lambda
+                if color_lambda:
+                    color = color_lambda(gir)
                 if color_lambda is None or color is None:
                     if self._formatting['highlight_descendants']:
                         cofs = gir.individual.child_of_families
@@ -297,8 +297,8 @@ class DescendantChart(BaseSVGChart):
 
             for gir in self.gr_individuals:
                 color = None
-                if color_lambda is None:
-                    color = color_lambda
+                if color_lambda:
+                    color = color_lambda(gir)
                 if color_lambda is None or color is None:
                     if self._formatting['highlight_descendants']:
                         cofs = gir.individual.child_of_families
