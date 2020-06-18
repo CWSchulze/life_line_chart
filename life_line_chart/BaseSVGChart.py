@@ -60,9 +60,6 @@ class BaseSVGChart(BaseChart):
     def __init__(self, positioning=None, formatting=None, instance_container=None):
         BaseChart.__init__(self, positioning, formatting, instance_container)
 
-        # self._graphical_family_class = GraphicalFamily # TODO: necessary if other graphs are implemented
-        # self._graphical_individual_class = GraphicalIndividual # TODO: necessary if other graphs are implemented
-
     def check_unique_x_position(self, always_has_child_of_family=True):
         """
         check if every individual position has a unique vertical slot
@@ -257,7 +254,7 @@ class BaseSVGChart(BaseChart):
                         # Maybe not an error. This might also happen, if the first and second marriage of one person
                         # reunite in later generations. If the number of the generations is not the same, then one
                         # marriage might be added, while the other is not (due to max generations)
-                        logger.error(gr_marriage_family.g_id + ' has a graphical representation, but was not placed!')
+                        # logger.error(gr_marriage_family.family_id + ' has a graphical representation, but was not placed!')
                         continue
                     spouse_representation = gr_marriage_family.get_spouse(
                         gr_individual.individual)
