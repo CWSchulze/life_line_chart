@@ -251,7 +251,7 @@ class GraphicalIndividual():
         return []
 
     @property
-    def strongly_connected_parent_family(self):
+    def ancestor_chart_parent_family_placement(self):
         """
         This is the tuple with parent family and spouse/marriage family which are strongly connected.
         The parent family is placed above the individual at the marriage family position.
@@ -283,8 +283,8 @@ class GraphicalIndividual():
             strongly_connected_spouse_family = strongly_connected_spouse_families[0]
         return strongly_connected_parent_family, strongly_connected_spouse_family
 
-    @strongly_connected_parent_family.setter
-    def strongly_connected_parent_family(self, gr_families):
+    @ancestor_chart_parent_family_placement.setter
+    def ancestor_chart_parent_family_placement(self, gr_families):
         gr_parent_family, gr_spouse_family = gr_families
         if gr_parent_family != None:
             self.__instances.connection_container['i'][self.g_id][gr_parent_family.g_id].append('strong_child')

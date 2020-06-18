@@ -190,6 +190,26 @@ class GraphicalFamily():
             self.__instances.connection_container['i'][gr_wife.g_id][self.g_id].append('gr_wife')
 
     @property
+    def descendant_chart_parent_family_placement(self):
+        if self.g_id not in self.__instances.connection_container['f']:
+            return None
+        strong_parent_families = []
+        for g_id, connections in self.__instances.connection_container['f'][self.g_id].items():
+            if 'gr_strong_parent_family' in connections:
+                strong_parent_families.append(self.__instances[('f', g_id[1])].graphical_representations[g_id[0]])
+        if len(strong_parent_families) > 1:
+            raise LifeLineChartUnknownPlacementError("Something went wrong in the placement algorithm")
+        elif len(strong_parent_families) > 0:
+            return strong_parent_families[0]
+        return None
+
+    @descendant_chart_parent_family_placement.setter
+    def descendant_chart_parent_family_placement(self, gr_strong_parent_family):
+        if gr_strong_parent_family != None:
+            self.__instances.connection_container['f'][self.g_id][gr_strong_parent_family.g_id].append('gr_strong_parent_family')
+            self.__instances.connection_container['f'][gr_strong_parent_family.g_id][self.g_id].append('gr_strong_spouse_family')
+
+    @property
     def husb_name(self):
         return self.family.husb_name
 

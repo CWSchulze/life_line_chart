@@ -86,7 +86,7 @@ class DescendantChart(BaseSVGChart):
                     gr_marriage.gr_wife = gr_individual
 
                 spouse = marriage.get_spouse(individual.individual_id)
-                if spouse is not None and not spouse.has_graphical_representation():
+                if spouse is not None:
                     if filter is None or filter(spouse) == False:
                         gr_spouse = self._create_individual_graphical_representation(
                             spouse)
@@ -104,6 +104,7 @@ class DescendantChart(BaseSVGChart):
                         #gr_child.ancestor_chart_parent_family_placement = gr_marriage
                 cofs = individual.child_of_families
                 for cof in cofs[:1]:
+                    gr_marriage.descendant_chart_parent_family_placement = gr_child_of_family
                     gr_marriage.visual_placement_parent_family = gr_child_of_family
         return gr_individual
 
@@ -123,63 +124,63 @@ class DescendantChart(BaseSVGChart):
         x_position = x_offset
         gr_individual = individual.graphical_representations[0]
         self.min_x_index = min(self.min_x_index, x_position)
+        if child_of_family and child_of_family.has_graphical_representation():
+            gr_child_of_family = child_of_family.graphical_representations[0]
+        else:
+            gr_child_of_family = None
 
         # marriages which have been placed over this parent family
         visible_marriages = \
-            [marriage for marriage in individual.marriages \
-                if marriage.has_graphical_representation() and (child_of_family is None or \
-                    marriage.graphical_representations[0].visual_placement_parent_family.family_id == child_of_family.family_id)]
+            [marriage for marriage in gr_individual.visible_marriages \
+                if child_of_family is None or \
+                    marriage.descendant_chart_parent_family_placement == gr_child_of_family]
 
         if len(visible_marriages) == 0:
             gr_individual.set_x_position(
                     x_position, child_of_family, True)
             x_position += 1
 
-        for marriage_index, marriage in enumerate(reversed(visible_marriages)):
-            if not marriage.has_graphical_representation():
-                continue
-            spouse = marriage.get_spouse(individual.individual_id)
+        for marriage_index, gr_marriage in enumerate(reversed(visible_marriages)):
+            marriage = gr_marriage.family
+            gr_spouse = gr_marriage.get_gr_spouse(gr_individual)
+            spouse = gr_spouse.individual
 
             # starting x index of gr_individual is first marriage (i.e. last in reversed list)
             if marriage_index == len(visible_marriages) - 1:
-                if not gr_individual.has_x_position(child_of_family):
+                if not gr_individual.has_x_position(gr_child_of_family):
                     gr_individual.set_x_position(
-                        x_position, child_of_family)
+                        x_position, gr_child_of_family)
 
             if marriage_index == len(visible_marriages) - 1:
-                if not gr_individual.has_x_position(marriage):
+                if not gr_individual.has_x_position(gr_marriage):
                     gr_individual.set_x_position(
-                        x_position, marriage)
+                        x_position, gr_marriage)
                     x_position += 1
             else:
-                if spouse is not None and spouse.has_graphical_representation():
-                    gr_spouse = spouse.graphical_representations[0]
-                    if not gr_spouse.has_x_position(marriage):
-                        gr_spouse.set_x_position(
-                            x_position, marriage)
-                        x_position += 1
+                if gr_spouse and not gr_spouse.has_x_position(gr_marriage):
+                    gr_spouse.set_x_position(
+                        x_position, gr_marriage)
+                    x_position += 1
 
-            for child in marriage.get_sorted_children():
+            for gr_child in gr_marriage.visible_children:
+                child = gr_child.individual
                 self.place_selected_individuals(
                     child, marriage, x_position,
                     discovery_cache=discovery_cache)
-                if child.has_graphical_representation():
-                    width = child.graphical_representations[0].get_descendant_width(
-                        marriage)
-                    x_position += width
+                width = gr_child.get_descendant_width(
+                    gr_marriage)
+                x_position += width
 
             if marriage_index < len(visible_marriages) - 1:
-                if not gr_individual.has_x_position(marriage):
+                if not gr_individual.has_x_position(gr_marriage):
                     gr_individual.set_x_position(
-                        x_position, marriage)
+                        x_position, gr_marriage)
                     x_position += 1
             else:
-                if spouse is not None and spouse.has_graphical_representation():
-                    gr_spouse = spouse.graphical_representations[0]
-                    if not gr_spouse.has_x_position(marriage):
-                        gr_spouse.set_x_position(
-                            x_position, marriage)
-                        x_position += 1
+                if gr_spouse and not gr_spouse.has_x_position(gr_marriage):
+                    gr_spouse.set_x_position(
+                        x_position, gr_marriage)
+                    x_position += 1
 
         self.max_x_index = max(self.max_x_index, x_position)
 
