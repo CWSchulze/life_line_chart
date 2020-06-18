@@ -219,30 +219,30 @@ class BaseChart():
         x_pos = gr_individual.get_x_position()
         positions = sorted(list(x_pos.values()))
         if gr_family is not None:
-            family_id = gr_family.family.family_id
+            g_id = gr_family.g_id
         else:
-            family_id = None
+            g_id = None
 
         for position in positions:
             if position[2]:
-                other_family_id = position[2].family_id
+                other_g_id = position[2].g_id
             else:
-                other_family_id = position[2]
-            if family_id == other_family_id:
+                other_g_id = position[2]
+            if g_id == other_g_id:
                 continue
-            if family_id in x_pos and position[1] == x_pos[family_id][1] and (position[3] or x_pos[family_id][3]):
-                x_pos[other_family_id] = (
-                    x_pos[other_family_id][0],
-                    x_pos[other_family_id][1]+x_index_offset,
-                    x_pos[other_family_id][2],
-                    x_pos[other_family_id][3],
+            if g_id in x_pos and position[1] == x_pos[g_id][1] and (position[3] or x_pos[g_id][3]):
+                x_pos[other_g_id] = (
+                    x_pos[other_g_id][0],
+                    x_pos[other_g_id][1]+x_index_offset,
+                    x_pos[other_g_id][2],
+                    x_pos[other_g_id][3],
                 )
-        if family_id in x_pos:
-            x_pos[family_id] = (
-                x_pos[family_id][0],
-                x_pos[family_id][1]+x_index_offset,
-                x_pos[family_id][2],
-                x_pos[family_id][3],
+        if g_id in x_pos:
+            x_pos[g_id] = (
+                x_pos[g_id][0],
+                x_pos[g_id][1]+x_index_offset,
+                x_pos[g_id][2],
+                x_pos[g_id][3],
             )
         else:
             raise LifeLineChartCannotMoveIndividual(
@@ -258,11 +258,6 @@ class BaseChart():
             gr_family (GraphicalFamily): family instance
             x_index_offset (int): vertical offset
         """
-
-        if gr_family is None:
-            family_id = gr_family
-        else:
-            family_id = gr_family.family_id
 
         # move this individual
         x_pos = self._move_single_individual(
@@ -314,14 +309,14 @@ class BaseChart():
             return
         if gr_family.gr_husb is not None:
             husb_x_pos = gr_family.gr_husb.get_x_position()[
-                gr_family.family_id][1]
+                gr_family.g_id][1]
             husb_width = gr_family.husb_width()
         else:
             husb_x_pos = None
             husb_width = 0
         if gr_family.gr_wife is not None:
             wife_x_pos = gr_family.gr_wife.get_x_position()[
-                gr_family.family_id][1]
+                gr_family.g_id][1]
             wife_width = gr_family.wife_width()
         else:
             wife_x_pos = None
@@ -348,7 +343,7 @@ class BaseChart():
         for gr_child in vcs:
             pos = list(gr_child.get_x_position().values())
             self._move_single_individual(
-                gr_child, pos[0][2].graphical_representations[0], child_x_delta)
+                gr_child, pos[0][2], child_x_delta)
 
         if gr_family.gr_husb:
             self._move_individual_and_ancestors(gr_family.gr_husb, gr_family, husb_x_delta)

@@ -222,8 +222,8 @@ class BaseSVGChart(BaseChart):
             if x_pos is None:
                 # logger.error(gr_individual.individual.plain_name + ' has a graphical representation, but was not placed!')
                 continue
-            x_pos_list = sorted([(ov, pos, index, family_id, flag)
-                                 for index, (family_id, (ov, pos, f, flag)) in enumerate(x_pos.items())])
+            x_pos_list = sorted([(ov, pos, index, g_id, flag)
+                                 for index, (g_id, (ov, pos, f, flag)) in enumerate(x_pos.items())])
             birth_label = gr_individual.birth_label
             death_label = gr_individual.death_label
 
@@ -253,15 +253,15 @@ class BaseSVGChart(BaseChart):
                 for gr_marriage_family in gr_individual.get_marriages():
                     if gr_marriage_family.marriage is None:
                         continue
-                    if gr_marriage_family.family_id not in x_pos:
+                    if gr_marriage_family.g_id not in x_pos:
                         # Maybe not an error. This might also happen, if the first and second marriage of one person
                         # reunite in later generations. If the number of the generations is not the same, then one
                         # marriage might be added, while the other is not (due to max generations)
-                        logger.error(gr_marriage_family.family_id + ' has a graphical representation, but was not placed!')
+                        logger.error(gr_marriage_family.g_id + ' has a graphical representation, but was not placed!')
                         continue
                     spouse_representation = gr_marriage_family.get_spouse(
                         gr_individual.individual)
-                    marriage_x_index = x_pos[gr_marriage_family.family_id][1]
+                    marriage_x_index = x_pos[gr_marriage_family.g_id][1]
                     new_x_position_after_marriage.append(
                         self._map_x_position(marriage_x_index))
                     new_x_indices_after_marriage.append(marriage_x_index)
@@ -269,7 +269,7 @@ class BaseSVGChart(BaseChart):
                     if spouse_representation and spouse_representation.get_x_position() and gr_marriage_family.marriage:
                         # if there is a spouse, choose the middle between them
                         spouse_x_index = spouse_representation.get_x_position(
-                            )[gr_marriage_family.family_id][1]
+                            )[gr_marriage_family.g_id][1]
                         # spouse_x_position = self._map_x_position(spouse_x_index)
                         marriage_ring_positions.append((
                             (spouse_x_index + marriage_x_index)/2.,
@@ -280,7 +280,7 @@ class BaseSVGChart(BaseChart):
                         for visible_child in gr_marriage_family.visible_children:
                             try:
                                 child_x_indices.append(visible_child.get_x_position()[
-                                                       gr_marriage_family.family_id][1])
+                                                       gr_marriage_family.g_id][1])
                             except:
                                 logger.error('something went wrong with ' + "".join(visible_child.plain_name) +
                                              ". The position family 0 is not equal to the placement...")
@@ -330,8 +330,8 @@ class BaseSVGChart(BaseChart):
                             new_x, new_y = self._map_position(x, y)
                             return new_x + new_y*1j
                         l_i = gr_individual
-                        x_p_ = sorted([(ov, pos, index, family_id, flag)
-                                    for index, (family_id, (ov, pos, f, flag)) in enumerate(l_i.get_x_position().items())])
+                        x_p_ = sorted([(ov, pos, index, g_id, flag)
+                                    for index, (g_id, (ov, pos, f, flag)) in enumerate(l_i.get_x_position().items())])
                         x_p = x_p_[0][1]
                         new_marriage_ordinal = marriage_ordinal
                         if x_p == marriage_ring_index:

@@ -137,7 +137,7 @@ class DescendantChart(BaseSVGChart):
 
         if len(visible_local_marriages) == 0:
             gr_individual.set_x_position(
-                    x_position, child_of_family, True)
+                    x_position, gr_child_of_family, True)
             x_position += 1
 
         for marriage_index, gr_marriage in enumerate(reversed(visible_local_marriages)):

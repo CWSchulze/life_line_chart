@@ -94,16 +94,14 @@ class GraphicalIndividual():
         Returns:
             tuple: x_min, x_max
         """
-        family_id = None
         gr_family_g_id = None
         if gr_family is not None:
-            family_id = gr_family.family.family_id
             gr_family_g_id = gr_family.g_id
             # at least root node has None
         if (self.g_id, gr_family_g_id) in self.__instances.ancestor_width_cache:
             # caching
             return self.__instances.ancestor_width_cache[(self.g_id, gr_family_g_id)]
-        x_v = [self._x_position[family_id][1]]
+        x_v = [self._x_position[gr_family_g_id][1]]
         x_min = x_v.copy()
         x_max = x_v.copy()
         # if [3] is true, then that index is the ancestor family
@@ -126,8 +124,8 @@ class GraphicalIndividual():
                 x_min.append(m_x_min)
                 x_max.append(m_x_max)
             # add siblings
-            x_v = [gr_c.get_x_position()[strongly_connected_parent_family.family_id][1] for gr_c in strongly_connected_parent_family.visible_children
-                        if strongly_connected_parent_family.family_id in gr_c.get_x_position()]
+            x_v = [gr_c.get_x_position()[strongly_connected_parent_family.g_id][1] for gr_c in strongly_connected_parent_family.visible_children
+                        if strongly_connected_parent_family.g_id in gr_c.get_x_position()]
             x_min += x_v
             x_max += x_v
 
@@ -164,9 +162,11 @@ class GraphicalIndividual():
         """
         family_id = None
         family = None
+        family_g_id = None
         if gr_family is not None:
             family_id = gr_family.family_id
             family = gr_family.family
+            family_g_id = gr_family.g_id
             # at least root node has None
         if (self.individual_id, family_id) in self.__instances.ancestor_width_cache:
             # caching
@@ -194,8 +194,8 @@ class GraphicalIndividual():
                 if family_id is None or gr_marriage.visual_placement_parent_family is not None and \
                     gr_marriage.visual_placement_parent_family.family_id == family_id:
 
-                    x_min.append(self._x_position[marriage.family_id][1])
-                    x_max.append(self._x_position[marriage.family_id][1])
+                    x_min.append(self._x_position[gr_marriage.g_id][1])
+                    x_max.append(self._x_position[gr_marriage.g_id][1])
 
                     for gr_child in gr_marriage.visible_children:
                         c_x_min, c_x_max = gr_child.get_descendant_range(
@@ -205,12 +205,12 @@ class GraphicalIndividual():
 
                     gr_spouse = gr_marriage.get_gr_spouse(self)
                     if gr_spouse:
-                        x_v = gr_spouse.get_x_position()[gr_marriage.family_id][1]
+                        x_v = gr_spouse.get_x_position()[gr_marriage.g_id][1]
                         x_min.append(x_v)
                         x_max.append(x_v)
 
         if len(x_min) == 0 and len(x_max) == 0:
-            x_v = [self._x_position[family_id][1]]
+            x_v = [self._x_position[family_g_id][1]]
             x_min += x_v
             x_max += x_v
         x_min = min(x_min)
@@ -314,37 +314,37 @@ class GraphicalIndividual():
             return None
     death_date = property(__get_death_date)
 
-    def get_x_position(self, family = None):
-        if family is None:
+    def get_x_position(self, gr_family = None):
+        if gr_family is None:
             return self._x_position
         else:
-            return self._x_position.get(family.family_id)
+            return self._x_position.get(gr_family.g_id)
 
     def has_x_position(self, family):
         if self._x_position is None:
             return False
-        family_id = None
+        g_id = None
         if family is not None:
-            family_id = family.family_id
-        if family_id in self._x_position:
+            g_id = family.g_id
+        if g_id in self._x_position:
             return True
         return False
 
-    def set_x_position(self, x_position, family, parent_starting_point=False):
-        if family:
-            family_id = family.family_id
-            if family.marriage:
-                ov = family.marriage['ordinal_value']
+    def set_x_position(self, x_position, gr_family, parent_starting_point=False):
+        if gr_family:
+            g_id = gr_family.g_id
+            if gr_family.marriage:
+                ov = gr_family.marriage['ordinal_value']
             else:
                 ov = self.birth_date_ov
         else:
-            family_id = None
+            g_id = None
             ov = self.birth_date_ov
         if not self._x_position:
             self._x_position = {}
-        if family_id not in self._x_position:
-            self._x_position[family_id] = (
-                (ov, x_position, family, parent_starting_point))
+        if g_id not in self._x_position:
+            self._x_position[g_id] = (
+                (ov, x_position, gr_family, parent_starting_point))
         _x_position = {}
         # None is not always first, root may have none for spouse
         # if None in self._x_position:
