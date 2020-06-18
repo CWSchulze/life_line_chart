@@ -129,33 +129,31 @@ class DescendantChart(BaseSVGChart):
                 if marriage.descendant_chart_parent_family_placement == gr_child_of_family]
 
         if len(visible_local_marriages) == 0:
-            gr_individual.set_x_position(
+            gr_individual.set_position_vector(
                     x_position, gr_child_of_family, True)
             x_position += 1
 
         for marriage_index, gr_marriage in enumerate(reversed(visible_local_marriages)):
-            marriage = gr_marriage.family
             gr_spouse = gr_marriage.get_gr_spouse(gr_individual)
 
             # starting x index of gr_individual is first marriage (i.e. last in reversed list)
             if marriage_index == len(visible_local_marriages) - 1:
-                if not gr_individual.has_x_position(gr_child_of_family):
-                    gr_individual.set_x_position(
+                if not gr_individual.has_position_vector(gr_child_of_family):
+                    gr_individual.set_position_vector(
                         x_position, gr_child_of_family, True)
 
             if marriage_index == len(visible_local_marriages) - 1:
-                if not gr_individual.has_x_position(gr_marriage):
-                    gr_individual.set_x_position(
+                if not gr_individual.has_position_vector(gr_marriage):
+                    gr_individual.set_position_vector(
                         x_position, gr_marriage)
                     x_position += 1
             else:
-                if gr_spouse and not gr_spouse.has_x_position(gr_marriage):
-                    gr_spouse.set_x_position(
+                if gr_spouse and not gr_spouse.has_position_vector(gr_marriage):
+                    gr_spouse.set_position_vector(
                         x_position, gr_marriage)
                     x_position += 1
 
             for gr_child in gr_marriage.visible_children:
-                child = gr_child.individual
                 self.place_selected_individuals(
                     gr_child, gr_marriage, x_position,
                     discovery_cache=discovery_cache)
@@ -164,13 +162,13 @@ class DescendantChart(BaseSVGChart):
                 x_position += width
 
             if marriage_index < len(visible_local_marriages) - 1:
-                if not gr_individual.has_x_position(gr_marriage):
-                    gr_individual.set_x_position(
+                if not gr_individual.has_position_vector(gr_marriage):
+                    gr_individual.set_position_vector(
                         x_position, gr_marriage)
                     x_position += 1
             else:
-                if gr_spouse and not gr_spouse.has_x_position(gr_marriage):
-                    gr_spouse.set_x_position(
+                if gr_spouse and not gr_spouse.has_position_vector(gr_marriage):
+                    gr_spouse.set_position_vector(
                         x_position, gr_marriage)
                     x_position += 1
 

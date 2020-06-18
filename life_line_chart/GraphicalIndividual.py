@@ -124,8 +124,8 @@ class GraphicalIndividual():
                 x_min.append(m_x_min)
                 x_max.append(m_x_max)
             # add siblings
-            x_v = [gr_c.get_x_position()[strongly_connected_parent_family.g_id][1] for gr_c in strongly_connected_parent_family.visible_children
-                        if strongly_connected_parent_family.g_id in gr_c.get_x_position()]
+            x_v = [gr_c.get_x_index(strongly_connected_parent_family.g_id) for gr_c in strongly_connected_parent_family.visible_children
+                        if strongly_connected_parent_family.g_id in gr_c.get_position_vector()]
             x_min += x_v
             x_max += x_v
 
@@ -205,7 +205,7 @@ class GraphicalIndividual():
 
                     gr_spouse = gr_marriage.get_gr_spouse(self)
                     if gr_spouse:
-                        x_v = gr_spouse.get_x_position()[gr_marriage.g_id][1]
+                        x_v = gr_spouse.get_x_index(gr_marriage.g_id)
                         x_min.append(x_v)
                         x_max.append(x_v)
 
@@ -314,13 +314,16 @@ class GraphicalIndividual():
             return None
     death_date = property(__get_death_date)
 
-    def get_x_position(self, gr_family = None):
+    def get_position_vector(self, gr_family = None):
         if gr_family is None:
             return self._x_position
         else:
             return self._x_position.get(gr_family.g_id)
 
-    def has_x_position(self, family):
+    def get_x_index(self, g_id):
+        return self._x_position.get(g_id)[1]
+
+    def has_position_vector(self, family):
         if self._x_position is None:
             return False
         g_id = None
@@ -330,7 +333,7 @@ class GraphicalIndividual():
             return True
         return False
 
-    def set_x_position(self, x_position, gr_family, parent_starting_point=False):
+    def set_position_vector(self, x_position, gr_family, parent_starting_point=False):
         if gr_family:
             g_id = gr_family.g_id
             if gr_family.marriage:
@@ -353,7 +356,7 @@ class GraphicalIndividual():
         _x_position.update(dict(sorted(self._x_position.items(), key=lambda t: t[1])))
         self._x_position = _x_position
 
-    x_position = property(get_x_position, set_x_position)
+    x_position = property(get_position_vector, set_position_vector)
 
     def get_birth_event(self):
         return self.individual.events['birth_or_christening']

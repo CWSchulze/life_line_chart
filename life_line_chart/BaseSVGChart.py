@@ -73,7 +73,7 @@ class BaseSVGChart(BaseChart):
         failed = []
         v = {}
         for gr_individual in self.gr_individuals:
-            x_pos = gr_individual.get_x_position()
+            x_pos = gr_individual.get_position_vector()
             for value in x_pos.values():
                 x_index = value[1]
 
@@ -190,7 +190,7 @@ class BaseSVGChart(BaseChart):
         min_x_index = 9e99
         max_x_index = -9e99
         for gr_individual in self.gr_individuals:
-            x_positions = gr_individual.get_x_position()
+            x_positions = gr_individual.get_position_vector()
             if x_positions is None:
                 logger.error(gr_individual.individual.plain_name + ' has a graphical representation, but was not placed!')
                 continue
@@ -215,7 +215,7 @@ class BaseSVGChart(BaseChart):
             # positions[individual_id]
 
             # individual = self._instances[('i',individual_id)]
-            x_pos = gr_individual.get_x_position()
+            x_pos = gr_individual.get_position_vector()
             if x_pos is None:
                 # logger.error(gr_individual.individual.plain_name + ' has a graphical representation, but was not placed!')
                 continue
@@ -232,12 +232,12 @@ class BaseSVGChart(BaseChart):
             new_x_indices_after_marriage = []
             marriage_labels = []
             def calculate_ring_position(gr_family):
-                h_pos = gr_family.gr_husb.get_x_position(gr_family) if gr_family.gr_husb else None
-                w_pos = gr_family.gr_wife.get_x_position(gr_family) if gr_family.gr_wife else None
+                h_pos = gr_family.gr_husb.get_position_vector(gr_family) if gr_family.gr_husb else None
+                w_pos = gr_family.gr_wife.get_position_vector(gr_family) if gr_family.gr_wife else None
                 if h_pos is None or w_pos is None:
                     vcs = gr_family.visible_children
                     if vcs:
-                        vcs_pos = [vc.get_x_position(gr_family)[1] for vc in vcs]
+                        vcs_pos = [vc.get_position_vector(gr_family)[1] for vc in vcs]
                         return (
                                 sum(vcs_pos)/len(vcs_pos),
                                 gr_family.marriage['ordinal_value'])
@@ -263,9 +263,9 @@ class BaseSVGChart(BaseChart):
                         self._map_x_position(marriage_x_index))
                     new_x_indices_after_marriage.append(marriage_x_index)
 
-                    if spouse_representation and spouse_representation.get_x_position() and gr_marriage_family.marriage:
+                    if spouse_representation and spouse_representation.get_position_vector() and gr_marriage_family.marriage:
                         # if there is a spouse, choose the middle between them
-                        spouse_x_index = spouse_representation.get_x_position(
+                        spouse_x_index = spouse_representation.get_position_vector(
                             )[gr_marriage_family.g_id][1]
                         # spouse_x_position = self._map_x_position(spouse_x_index)
                         marriage_ring_positions.append((
@@ -276,8 +276,7 @@ class BaseSVGChart(BaseChart):
                         child_x_indices = []
                         for visible_child in gr_marriage_family.visible_children:
                             try:
-                                child_x_indices.append(visible_child.get_x_position()[
-                                                       gr_marriage_family.g_id][1])
+                                child_x_indices.append(visible_child.get_x_index(gr_marriage_family.g_id))
                             except:
                                 logger.error('something went wrong with ' + "".join(visible_child.plain_name) +
                                              ". The position family 0 is not equal to the placement...")
@@ -328,7 +327,7 @@ class BaseSVGChart(BaseChart):
                             return new_x + new_y*1j
                         l_i = gr_individual
                         x_p_ = sorted([(ov, pos, index, g_id, flag)
-                                    for index, (g_id, (ov, pos, f, flag)) in enumerate(l_i.get_x_position().items())])
+                                    for index, (g_id, (ov, pos, f, flag)) in enumerate(l_i.get_position_vector().items())])
                         x_p = x_p_[0][1]
                         new_marriage_ordinal = marriage_ordinal
                         if x_p == marriage_ring_index:

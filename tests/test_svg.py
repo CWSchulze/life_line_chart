@@ -136,7 +136,7 @@ def test_generate_svg_file_ancestor_and_children():
                     individual2_id = cof.wife.individual_id
                     break
         chart.select_family_children(
-            chart._instances[('f', cof.family_id)])
+            chart._instances[('f', cof.family_id)].graphical_representations[0])
         i += 1
 
     root_individual = chart._instances[('i', individual_id)]

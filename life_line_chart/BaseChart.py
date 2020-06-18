@@ -193,7 +193,7 @@ class BaseChart():
         total_distance = 0
         list_of_linked_individuals = {}
         for index, gr_individual in enumerate(self.gr_individuals):
-            x_positions = gr_individual.get_x_position()
+            x_positions = gr_individual.get_position_vector()
             distance_of_this_individual = 0
             if x_positions:
                 vector = [p[1] for k, p in x_positions.items()]
@@ -216,7 +216,7 @@ class BaseChart():
         Returns:
             dict: position dict of the graphical individual representation
         """
-        x_pos = gr_individual.get_x_position()
+        x_pos = gr_individual.get_position_vector()
         positions = sorted(list(x_pos.values()))
         if gr_family is not None:
             g_id = gr_family.g_id
@@ -272,11 +272,11 @@ class BaseChart():
         strongly_connected_parent_family, strongly_connected_spouse_family = gr_individual.ancestor_chart_parent_family_placement
         if strongly_connected_parent_family and (strongly_connected_spouse_family == strongly_connected_parent_family or gr_family == strongly_connected_spouse_family or strongly_connected_spouse_family == None):
             if strongly_connected_parent_family.gr_husb:
-                # if cof.gr_husb.get_x_position() and len(cof.gr_husb.get_x_position()) == 1:
+                # if cof.gr_husb.get_position_vector() and len(cof.gr_husb.get_position_vector()) == 1:
                     self._move_individual_and_ancestors(
                         strongly_connected_parent_family.gr_husb, strongly_connected_parent_family, x_index_offset)
             if strongly_connected_parent_family.gr_wife:
-                # if cof.gr_wife.get_x_position() and len(cof.gr_wife.get_x_position()) == 1:
+                # if cof.gr_wife.get_position_vector() and len(cof.gr_wife.get_position_vector()) == 1:
                     self._move_individual_and_ancestors(
                         strongly_connected_parent_family.gr_wife, strongly_connected_parent_family, x_index_offset)
             # print (gr_individual.get)
@@ -300,23 +300,21 @@ class BaseChart():
         def func(gr_family):
             xpos_w = []
             for gr_f, gr_i in gr_family.gr_wife.get_all_ancestors():
-                xpos_w.append(gr_i.get_x_position(gr_f.family)[1])
+                xpos_w.append(gr_i.get_position_vector(gr_f.family)[1])
             xpos_h = []
             for gr_f, gr_i in gr_family.gr_husb.get_all_ancestors():
-                xpos_h.append(gr_i.get_x_position(gr_f.family)[1])
+                xpos_h.append(gr_i.get_position_vector(gr_f.family)[1])
             return (max(xpos_w), min(xpos_w), max(xpos_w)- min(xpos_w), gr_family.gr_wife.get_ancestor_range(gr_family)),(max(xpos_h), min(xpos_h), max(xpos_h)- min(xpos_h), gr_family.gr_husb.get_ancestor_range(gr_family))
         if gr_family.gr_husb is None and gr_family.gr_wife is None:
             return
         if gr_family.gr_husb is not None:
-            husb_x_pos = gr_family.gr_husb.get_x_position()[
-                gr_family.g_id][1]
+            husb_x_pos = gr_family.gr_husb.get_x_index(gr_family.g_id)
             husb_width = gr_family.husb_width()
         else:
             husb_x_pos = None
             husb_width = 0
         if gr_family.gr_wife is not None:
-            wife_x_pos = gr_family.gr_wife.get_x_position()[
-                gr_family.g_id][1]
+            wife_x_pos = gr_family.gr_wife.get_x_index(gr_family.g_id)
             wife_width = gr_family.wife_width()
         else:
             wife_x_pos = None
@@ -328,7 +326,7 @@ class BaseChart():
                 return
             children_x_center = (husb_x_pos + wife_x_pos)/2.0
         else:
-            children_x_positions = [gr_child.get_x_position(gr_family)[1] for gr_child in vcs]
+            children_x_positions = [gr_child.get_position_vector(gr_family)[1] for gr_child in vcs]
             children_x_center = sum(children_x_positions)*1.0/children_width
 
         if wife_x_pos and children_x_center < wife_x_pos or husb_x_pos and husb_x_pos < children_x_center:
@@ -341,7 +339,7 @@ class BaseChart():
             child_x_delta = husb_width - wife_width
 
         for gr_child in vcs:
-            pos = list(gr_child.get_x_position().values())
+            pos = list(gr_child.get_position_vector().values())
             self._move_single_individual(
                 gr_child, pos[0][2], child_x_delta)
 
@@ -392,7 +390,7 @@ class BaseChart():
 
         # assign the individuals to all x_indices in which they appear
         for gr_individual in self.gr_individuals:
-            x_pos_vector = list(gr_individual.get_x_position().values())
+            x_pos_vector = list(gr_individual.get_position_vector().values())
 
             for i, value in enumerate(x_pos_vector):
                 x_index = value[1]
@@ -466,7 +464,7 @@ class BaseChart():
         failed = []
         v = {}
         for gr_individual in self.gr_individuals:
-            x_pos = gr_individual.get_x_position()
+            x_pos = gr_individual.get_position_vector()
             for value in x_pos.values():
                 x_index = value[1]
                 if value[3]:
