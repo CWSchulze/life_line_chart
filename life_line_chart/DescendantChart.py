@@ -143,7 +143,6 @@ class DescendantChart(BaseSVGChart):
         for marriage_index, gr_marriage in enumerate(reversed(visible_local_marriages)):
             marriage = gr_marriage.family
             gr_spouse = gr_marriage.get_gr_spouse(gr_individual)
-            spouse = gr_spouse.individual
 
             # starting x index of gr_individual is first marriage (i.e. last in reversed list)
             if marriage_index == len(visible_local_marriages) - 1:
@@ -255,7 +254,7 @@ class DescendantChart(BaseSVGChart):
                 self.place_selected_individuals(
                     root_individual, self._instances[('f', cof_family_id)], x_pos)
 
-                x_pos += root_individual.graphical_representations[0].get_descendant_width(self._instances[('f', cof_family_id)])
+                x_pos += root_individual.graphical_representations[0].get_descendant_width(self._instances[('f', cof_family_id)].graphical_representations[0])
 
             for settings in self._chart_configuration['root_individuals']:
                 root_individual_id = settings['individual_id']
