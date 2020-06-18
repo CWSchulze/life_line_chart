@@ -113,8 +113,8 @@ class DescendantChart(BaseSVGChart):
         Place the graphical representations in direction of x
 
         Args:
-            individual (BaseIndividual): individual
-            child_of_family (BaseFamily): child-of-family of this individual
+            gr_individual (GraphicalIndividual): individual
+            gr_child_of_family (GraphicalFamily): child-of-family of this individual
         """
         individual = gr_individual.individual
         discovery_cache.append(individual.plain_name)
@@ -122,16 +122,11 @@ class DescendantChart(BaseSVGChart):
 
         x_position = x_offset
         self.min_x_index = min(self.min_x_index, x_position)
-        if gr_child_of_family:
-            child_of_family = gr_child_of_family.family
-        else:
-            child_of_family = None
 
         # marriages which have been placed over this parent family
         visible_local_marriages = \
             [marriage for marriage in gr_individual.visible_marriages \
-                if child_of_family is None or \
-                    marriage.descendant_chart_parent_family_placement == gr_child_of_family]
+                if marriage.descendant_chart_parent_family_placement == gr_child_of_family]
 
         if len(visible_local_marriages) == 0:
             gr_individual.set_x_position(
