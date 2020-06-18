@@ -633,6 +633,48 @@ class BaseSVGChart(BaseChart):
                 )
             gr_individual.items += images
             gr_individual.items += debug_items
+        if self._formatting['debug_visualize_connections']:
+            for gr_family in self.gr_families:
+                # show items to help debugging the algorithms
+                gr_spouse = None
+                if gr_family.gr_husb:
+                    gr_spouse = gr_family.gr_husb
+                elif gr_family.gr_wife:
+                    gr_spouse = gr_family.gr_wife
+                if gr_spouse:
+                    individual_connections = self._instances.connection_container['f'][gr_family.g_id]
+                    for f_g_id, connections in individual_connections.items():
+                        for connection in connections:
+                            if connection == 'gr_strong_parent_family':
+                                thickness = 0.5*self._formatting['vertical_step_size']*0.3
+                                color = (175, 225, 255)
+                            else:
+                                continue
+                                thickness = 0.5*self._formatting['vertical_step_size']*1
+                                color = (25, 25, 25)
+                            gr_other_family = self._instances[('f',f_g_id[1])].graphical_representations[f_g_id[0]]
+                            if gr_other_family is None:
+                                continue
+                            marriage_pos_a = calculate_ring_position(gr_family)
+                            marriage_pos_b = calculate_ring_position(gr_other_family)
+                            if marriage_pos_b is None:
+                                continue
+                            def coordinate_transformation(x, y):
+                                new_x, new_y = self._map_position(x, y)
+                                return new_x + new_y*1j
+
+                            gr_spouse.items.append(
+                                    {
+                                    'type': 'path',
+                                    'config': {'type': 'Line', 'arguments': (
+                                            coordinate_transformation(*marriage_pos_a),
+                                            coordinate_transformation(*marriage_pos_b)
+                                        )},
+                                    'color': color,
+                                    'stroke_width': thickness
+                                    }
+                                )
+
 
     def paint_and_save(self, individual_id, filename=None):
         """
