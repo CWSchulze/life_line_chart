@@ -292,7 +292,7 @@ class BaseSVGChart(BaseChart):
                         else:
                             # place at the individual line... no spouse, no children, what is this information good for?
                             marriage_ring_positions.append((
-                                x_pos[gr_marriage_family.family_id][1],
+                                x_pos[gr_marriage_family.g_id][1],
                                 gr_marriage_family.marriage['ordinal_value']))
 
                     marriage_id.append(gr_marriage_family.family_id)

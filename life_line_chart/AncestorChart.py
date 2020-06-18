@@ -124,11 +124,11 @@ class AncestorChart(BaseSVGChart):
         Select children of a family. This is done by creating instances of graphical representations.
 
         Args:
-            individual (BaseIndividual): starting point for selection
+            gr_family (GraphicalFamily): starting point for selection
             filter (lambda, optional): lambda(BaseIndividual) : return Boolean. Defaults to None.
         """
 
-        if gr_family:
+        if gr_family is None:
             return
         for child in gr_family.family.get_children():
             if filter and filter(child):
@@ -606,7 +606,7 @@ class AncestorChart(BaseSVGChart):
             for family_id in self._chart_configuration['family_children']:
                 family = self._instances[(
                     'f', family_id)]
-                self.select_family_children(family, filter=local_filter_lambda)
+                self.select_family_children(family.graphical_representations[0], filter=local_filter_lambda)
 
             x_pos = 0
             for settings in self._chart_configuration['root_individuals']:
@@ -620,16 +620,20 @@ class AncestorChart(BaseSVGChart):
                 cof_family_id = None
                 if root_individual.child_of_family_id:
                     cof_family_id = root_individual.child_of_family_id[0]
+                cof_family = self._instances[('f', cof_family_id)]
+                gr_cof_family = None
+                if cof_family:
+                    gr_cof_family = cof_family.graphical_representations[0]
                 spouse_family = None
                 vms = gr_root_individual.visible_marriages
                 if vms:
                     for vm in vms:
                         gr_spouse_family = vm
                         self.place_selected_individuals(
-                            gr_root_individual, gr_spouse_family, self._instances[('f', cof_family_id)].graphical_representations[0], x_pos, [], [])
+                            gr_root_individual, gr_spouse_family, gr_cof_family, x_pos, [], [])
                 else:
                     self.place_selected_individuals(
-                        gr_root_individual, None, self._instances[('f', cof_family_id)].graphical_representations[0], x_pos, [], [])
+                        gr_root_individual, None, gr_cof_family, x_pos, [], [])
 
                 x_pos = max(0, self.max_x_index)
 
