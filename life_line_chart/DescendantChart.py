@@ -108,7 +108,7 @@ class DescendantChart(BaseSVGChart):
                     gr_marriage.visual_placement_parent_family = gr_child_of_family
         return gr_individual
 
-    def place_selected_individuals(self, individual, child_of_family, x_offset=0, discovery_cache=[]):
+    def place_selected_individuals(self, gr_individual, gr_child_of_family, x_offset=0, discovery_cache=[]):
         """
         Place the graphical representations in direction of x
 
@@ -116,18 +116,16 @@ class DescendantChart(BaseSVGChart):
             individual (BaseIndividual): individual
             child_of_family (BaseFamily): child-of-family of this individual
         """
+        individual = gr_individual.individual
         discovery_cache.append(individual.plain_name)
-
         logger.info(f"discovering {individual.plain_name}")
-        if not individual.has_graphical_representation():
-            return
+
         x_position = x_offset
-        gr_individual = individual.graphical_representations[0]
         self.min_x_index = min(self.min_x_index, x_position)
-        if child_of_family and child_of_family.has_graphical_representation():
-            gr_child_of_family = child_of_family.graphical_representations[0]
+        if gr_child_of_family:
+            child_of_family = gr_child_of_family.family
         else:
-            gr_child_of_family = None
+            child_of_family = None
 
         # marriages which have been placed over this parent family
         visible_local_marriages = \
@@ -164,7 +162,7 @@ class DescendantChart(BaseSVGChart):
             for gr_child in gr_marriage.visible_children:
                 child = gr_child.individual
                 self.place_selected_individuals(
-                    child, marriage, x_position,
+                    gr_child, gr_marriage, x_position,
                     discovery_cache=discovery_cache)
                 width = gr_child.get_descendant_width(
                     gr_marriage)
@@ -248,6 +246,7 @@ class DescendantChart(BaseSVGChart):
                 generations = settings['generations']
                 root_individual = self._instances[(
                     'i', root_individual_id)]
+                gr_root_individual = root_individual.graphical_representations[0]
                 cof_family_id = None
                 if root_individual.child_of_family_id:
                     cof_family_id = root_individual.child_of_family_id[0]
@@ -256,9 +255,9 @@ class DescendantChart(BaseSVGChart):
                 if cof_family:
                     gr_cof_family = cof_family.graphical_representations[0]
                 self.place_selected_individuals(
-                    root_individual, cof_family, x_pos)
+                    gr_root_individual, gr_cof_family, x_pos)
 
-                x_pos += root_individual.graphical_representations[0].get_descendant_width(gr_cof_family)
+                x_pos += gr_root_individual.get_descendant_width(gr_cof_family)
 
             for settings in self._chart_configuration['root_individuals']:
                 root_individual_id = settings['individual_id']
