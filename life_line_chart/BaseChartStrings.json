@@ -154,11 +154,16 @@
                 }
             }
         },
-        "positioning": {},
+        "positioning": {
+            "unique_graphical_representation": {
+                "short_description": "Show pedigree collapse",
+                "long_description": "Due to pedigree collapse one individual might appear several times in a simple ancestor chart. If this is active, then every individual only appears once."
+            }
+        },
         "chart_configuration_root_individual": {
             "generations": {
                 "short_description": "Maximum number of generations",
-                "long_description": "When this number of generations has been reached, the algorithm doesn't go any deeper"
+                "long_description": "if this number of generations has been reached, the algorithm doesn't go any deeper"
             }
         }
     },
@@ -317,7 +322,12 @@
                 }
             }
         },
-        "positioning": {},
+        "positioning": {
+            "unique_graphical_representation": {
+                "short_description": "Ahnenschwund darstellen",
+                "long_description": "Aufgrund des Ahnenschwundes könnte eine Person mehrmals in einem einfachen Vorfahren Diagramm gezeigt werden. Wenn dieses Flag aktiv ist, dann erscheint jede Person nur einmal."
+            }
+        },
         "chart_configuration_root_individual": {
             "generations": {
                 "short_description": "Maximale Anzahl an Generationen",

@@ -54,6 +54,7 @@ class BaseChart():
         'coloring_of_individuals': 'unique'
     }
     DEFAULT_POSITIONING = {
+        'unique_graphical_representation': False
     }
     DEFAULT_CHART_CONFIGURATION = {
     }
