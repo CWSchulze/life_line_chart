@@ -256,16 +256,16 @@ class BaseSVGChart(BaseChart):
                         # marriage might be added, while the other is not (due to max generations)
                         # logger.error(gr_marriage_family.family_id + ' has a graphical representation, but was not placed!')
                         continue
-                    spouse_representation = gr_marriage_family.get_spouse(
-                        gr_individual.individual)
+                    gr_spouse = gr_marriage_family.get_gr_spouse(
+                        gr_individual)
                     marriage_x_index = x_pos[gr_marriage_family.g_id][1]
                     new_x_position_after_marriage.append(
                         self._map_x_position(marriage_x_index))
                     new_x_indices_after_marriage.append(marriage_x_index)
 
-                    if spouse_representation and spouse_representation.get_position_vector() and gr_marriage_family.marriage:
+                    if gr_spouse and gr_spouse.get_position_vector() and gr_marriage_family.marriage:
                         # if there is a spouse, choose the middle between them
-                        spouse_x_index = spouse_representation.get_position_vector(
+                        spouse_x_index = gr_spouse.get_position_vector(
                             )[gr_marriage_family.g_id][1]
                         # spouse_x_position = self._map_x_position(spouse_x_index)
                         marriage_ring_positions.append((

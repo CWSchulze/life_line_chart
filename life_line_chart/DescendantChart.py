@@ -58,22 +58,18 @@ class DescendantChart(BaseSVGChart):
         if filter and filter(individual):
             return
 
-        if not individual.has_graphical_representation():
-            gr_individual = self._create_individual_graphical_representation(
-                individual, not self._positioning['unique_graphical_representation'])
+        gr_individual = self._create_individual_graphical_representation(
+            individual, not self._positioning['unique_graphical_representation'])
 
-            if gr_individual is None:
-                return
-        else:
-            logger.warning('why this?')
-            gr_individual = individual.graphical_representations[-1]
+        if gr_individual is None:
+            return
 
         if gr_child_of_family is None and individual.child_of_families:
             gr_child_of_family = self._create_family_graphical_representation(
                  individual.child_of_families[0], not self._positioning['unique_graphical_representation'])
 
         for marriage in individual.marriages:
-            if marriage.has_graphical_representation():
+            if marriage.has_graphical_representation() and self._positioning['unique_graphical_representation']:
                 continue
 
             if generations > 0 or generations < 0:

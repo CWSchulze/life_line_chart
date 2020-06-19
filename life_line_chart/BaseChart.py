@@ -395,12 +395,6 @@ class BaseChart():
 
             for i, value in enumerate(x_pos_vector):
                 x_index = value[1]
-                # if value[3]:
-                #     continue
-                # if x_index < 0:
-                #     if early_raise:
-                #         raise LifeLineChartCollisionDetected(gr_individual)
-                #     collisions.append((gr_individual, None))
                 if x_index not in v:
                     v[x_index] = []
 
@@ -419,12 +413,6 @@ class BaseChart():
                     # happens in ancestor charts if spouse family is None (i.e. the root individual)
                     continue
 
-                # position_to_person_map[x_index].append(
-                #     PositionToPersonMapItem(
-                #     start_y,
-                #     end_y,
-                #     gr_individual
-                # ))
                 if position_to_person_map is not None:
                     position_to_person_map[x_index].append({
                         'start': start_y,
@@ -448,8 +436,6 @@ class BaseChart():
                                 gr_individual_a, gr_individual_b)
                         collisions.append(
                             (gr_individual_a, gr_individual_b))
-        # if len(collisions) > 0:
-        #     raise RuntimeError()
         return collisions, min_x, max_x
 
     def check_unique_x_position(self):
@@ -470,11 +456,6 @@ class BaseChart():
                 x_index = value[1]
                 if value[3]:
                     continue
-                # if not value[2] is None and gr_individual.individual_id not in value[2].children_individual_ids:
-                #     continue
-            #     x_indices.add(x_index)
-            #     index_map[x_index] = value[2]
-            # for x_index in x_indices:
                 if x_index not in v:
                     v[x_index] = gr_individual.individual_id
                 else:
@@ -482,7 +463,6 @@ class BaseChart():
                     # value = index_map[x_index]
                     logger.error(
                         "failed: " + str((x_index, value[2].family_id, gr_individual.individual.plain_name, v[x_index])))
-                    # raise RuntimeError((x_index, key, gr_individual.individual.plain_name))
         full_index_list = list(sorted(v.keys()))
         for i in range(max(full_index_list)):
             if i not in full_index_list:
