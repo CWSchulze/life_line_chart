@@ -373,53 +373,49 @@ class AncestorChart(BaseSVGChart):
             else:
                 direction_factor = original_direction_factor
 
-            vms = gr_individual.visible_marriages
-            if vms:
-                strongly_connected_parent_family = vms[0]
+            this_individual_x_pos = gr_individual.get_x_index(gr_family.g_id)
+            if not gr_individual.has_position_vector(gr_family):
+                continue
+            if this_individual_x_pos and (this_individual_x_pos + direction_factor*1) in blocked_positions:
+                continue
 
-                this_individual_x_pos = gr_individual.get_x_index(strongly_connected_parent_family.g_id)
-                if not gr_individual.has_position_vector(strongly_connected_parent_family):
-                    continue
-                if this_individual_x_pos and (this_individual_x_pos + direction_factor*1) in blocked_positions:
-                    continue
-
-                try:
-                    while i < 50000:
-                        if (i+1)%1000 == 0:
-                            logger.warning(f'i {i} for gr_individual {gr_individual}')
-                        i += 1
-                        self._move_individual_and_ancestors(
-                            gr_individual, strongly_connected_parent_family, direction_factor*1)
-                        self.debug_optimization_compression_steps -= 1
-                        if self.debug_optimization_compression_steps <= 0:
-                            break
-                        self._check_compressed_x_position(True, min_distance=1)
-                except LifeLineChartCollisionDetected as e:
-                    # print(e)
-                    i2 = i
-                    while i2 >= 0:
-                        i2 -= 1
-                        try:
-                            self._move_individual_and_ancestors(
-                                gr_individual, strongly_connected_parent_family, -direction_factor*1)
-                            self._check_compressed_x_position(True)
-                        except:
-                            pass
-                        else:
-                            break
+            try:
+                while i < 50000:
+                    if (i+1)%1000 == 0:
+                        logger.warning(f'i {i} for gr_individual {gr_individual}')
+                    i += 1
+                    self._move_individual_and_ancestors(
+                        gr_individual, gr_family, direction_factor*1)
                     self.debug_optimization_compression_steps -= 1
                     if self.debug_optimization_compression_steps <= 0:
                         break
-                except LifeLineChartCannotMoveIndividual as e:
-                    pass
-                except KeyError as e:
-                    pass
-
+                    self._check_compressed_x_position(True, min_distance=1)
+            except LifeLineChartCollisionDetected as e:
+                print(e)
+                i2 = i
+                while i2 >= 0:
+                    i2 -= 1
+                    try:
+                        self._move_individual_and_ancestors(
+                            gr_individual, gr_family, -direction_factor*1)
+                        self._check_compressed_x_position(True)
+                    except:
+                        pass
+                    else:
+                        break
+                self.debug_optimization_compression_steps -= 1
                 if self.debug_optimization_compression_steps <= 0:
                     break
-                if i2 != 0:
-                    logger.info('moved ' + ' '.join(gr_individual.get_name()) +
-                                ' by ' + str(i2 * direction_factor * 1))
+            except LifeLineChartCannotMoveIndividual as e:
+                pass
+            except KeyError as e:
+                pass
+
+            if self.debug_optimization_compression_steps <= 0:
+                break
+            if i2 != 0:
+                logger.info('moved ' + ' '.join(gr_individual.get_name()) +
+                            ' by ' + str(i2 * direction_factor * 1))
         #for _, gr_individual in sorted(gr_individuals):
             self._move_child_to_center_between_parents(gr_individual)
 
