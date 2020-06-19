@@ -194,11 +194,11 @@ class BaseChart():
         total_distance = 0
         list_of_linked_individuals = {}
         for index, gr_individual in enumerate(self.gr_individuals):
-            x_positions = gr_individual.get_position_vector()
+            position_dict = gr_individual.get_position_dict()
             distance_of_this_individual = 0
-            if x_positions:
-                vector = [p[1] for k, p in x_positions.items()]
-                distance_of_this_individual += max(vector) - min(vector)
+            if position_dict:
+                all_x_indices = [p[1] for k, p in position_dict.items()]
+                distance_of_this_individual += max(all_x_indices) - min(all_x_indices)
             total_distance += distance_of_this_individual
             if distance_of_this_individual > 0:
                 list_of_linked_individuals[(
@@ -217,38 +217,57 @@ class BaseChart():
         Returns:
             dict: position dict of the graphical individual representation
         """
-        x_pos = gr_individual.get_position_vector()
-        positions = sorted(list(x_pos.values()))
+        position_dict = gr_individual.get_position_dict()
         if gr_family is not None:
             g_id = gr_family.g_id
         else:
             g_id = None
 
-        for position in positions:
-            if position[2]:
-                other_g_id = position[2].g_id
-            else:
-                other_g_id = position[2]
-            if g_id == other_g_id:
-                continue
-            if g_id in x_pos and position[1] == x_pos[g_id][1] and (position[3] or x_pos[g_id][3]):
-                x_pos[other_g_id] = (
-                    x_pos[other_g_id][0],
-                    x_pos[other_g_id][1]+x_index_offset,
-                    x_pos[other_g_id][2],
-                    x_pos[other_g_id][3],
+        scpf, scsf = gr_individual.ancestor_chart_parent_family_placement
+
+        keys = list(position_dict.keys())
+        positions = dict([(k, v) for k, v in position_dict.items() if not v[3]])
+        parent_positions = dict([(k, v) for k, v in position_dict.items() if v[3]])
+
+        other_g_id = 42
+        scsf_g_id = scsf.g_id if scsf else None
+        scpf_g_id = scpf.g_id if scpf else None
+        if parent_positions:
+            if scsf or scpf:
+                if g_id == scsf_g_id:
+                    # g_id is the strongyl connected spouse family
+                    other_g_id = scpf_g_id
+                elif g_id == scpf_g_id:
+                    # g_id is the strongly connected parent family
+                    other_g_id = scsf_g_id
+            elif g_id in parent_positions:
+                # g_id is the parent family
+                other_g_id = list(positions.keys())[0]
+            elif g_id == list(positions.keys())[0]:
+                # g_id is the first spouse family and a parent exits
+                other_g_id = list(parent_positions.keys())[0]
+
+        if other_g_id != 42:
+            if g_id in position_dict and other_g_id in position_dict:
+                # pass
+                position_dict[other_g_id] = (
+                    position_dict[other_g_id][0],
+                    position_dict[other_g_id][1]+x_index_offset,
+                    position_dict[other_g_id][2],
+                    position_dict[other_g_id][3],
                 )
-        if g_id in x_pos:
-            x_pos[g_id] = (
-                x_pos[g_id][0],
-                x_pos[g_id][1]+x_index_offset,
-                x_pos[g_id][2],
-                x_pos[g_id][3],
+
+        if g_id in position_dict:
+            position_dict[g_id] = (
+                position_dict[g_id][0],
+                position_dict[g_id][1]+x_index_offset,
+                position_dict[g_id][2],
+                position_dict[g_id][3],
             )
         else:
             raise LifeLineChartCannotMoveIndividual(
                 'This family does not exist')
-        return x_pos
+        return position_dict
 
     def _move_individual_and_ancestors(self, gr_individual, gr_family, x_index_offset):
         """
@@ -261,7 +280,7 @@ class BaseChart():
         """
 
         # move this individual
-        x_pos = self._move_single_individual(
+        self._move_single_individual(
             gr_individual, gr_family, x_index_offset)
 
         gr_cofs = gr_individual.connected_parent_families
@@ -273,11 +292,11 @@ class BaseChart():
         strongly_connected_parent_family, strongly_connected_spouse_family = gr_individual.ancestor_chart_parent_family_placement
         if strongly_connected_parent_family and (strongly_connected_spouse_family == strongly_connected_parent_family or gr_family == strongly_connected_spouse_family or strongly_connected_spouse_family == None):
             if strongly_connected_parent_family.gr_husb:
-                # if cof.gr_husb.get_position_vector() and len(cof.gr_husb.get_position_vector()) == 1:
+                # if cof.gr_husb.get_position_dict() and len(cof.gr_husb.get_position_dict()) == 1:
                     self._move_individual_and_ancestors(
                         strongly_connected_parent_family.gr_husb, strongly_connected_parent_family, x_index_offset)
             if strongly_connected_parent_family.gr_wife:
-                # if cof.gr_wife.get_position_vector() and len(cof.gr_wife.get_position_vector()) == 1:
+                # if cof.gr_wife.get_position_dict() and len(cof.gr_wife.get_position_dict()) == 1:
                     self._move_individual_and_ancestors(
                         strongly_connected_parent_family.gr_wife, strongly_connected_parent_family, x_index_offset)
             # print (gr_individual.get)
@@ -285,7 +304,7 @@ class BaseChart():
                 for gr_child_individual in gr_cof.visible_children:
                     if gr_child_individual == gr_individual:
                         continue
-                    x_pos = self._move_single_individual(
+                    self._move_single_individual(
                         gr_child_individual, gr_cof, x_index_offset)
 
     def _flip_family(self, gr_family):
@@ -301,10 +320,10 @@ class BaseChart():
         def func(gr_family):
             xpos_w = []
             for gr_f, gr_i in gr_family.gr_wife.get_all_ancestors():
-                xpos_w.append(gr_i.get_position_vector(gr_f.family)[1])
+                xpos_w.append(gr_i.get_position_dict(gr_f.family)[1])
             xpos_h = []
             for gr_f, gr_i in gr_family.gr_husb.get_all_ancestors():
-                xpos_h.append(gr_i.get_position_vector(gr_f.family)[1])
+                xpos_h.append(gr_i.get_position_dict(gr_f.family)[1])
             return (max(xpos_w), min(xpos_w), max(xpos_w)- min(xpos_w), gr_family.gr_wife.get_ancestor_range(gr_family)),(max(xpos_h), min(xpos_h), max(xpos_h)- min(xpos_h), gr_family.gr_husb.get_ancestor_range(gr_family))
         if gr_family.gr_husb is None and gr_family.gr_wife is None:
             return
@@ -327,7 +346,7 @@ class BaseChart():
                 return
             children_x_center = (husb_x_pos + wife_x_pos)/2.0
         else:
-            children_x_positions = [gr_child.get_position_vector(gr_family)[1] for gr_child in vcs]
+            children_x_positions = [gr_child.get_position_dict(gr_family)[1] for gr_child in vcs]
             children_x_center = sum(children_x_positions)*1.0/children_width
 
         if wife_x_pos and children_x_center < wife_x_pos or husb_x_pos and husb_x_pos < children_x_center:
@@ -340,7 +359,7 @@ class BaseChart():
             child_x_delta = husb_width - wife_width
 
         for gr_child in vcs:
-            pos = list(gr_child.get_position_vector().values())
+            pos = list(gr_child.get_position_dict().values())
             self._move_single_individual(
                 gr_child, pos[0][2], child_x_delta)
 
@@ -391,9 +410,9 @@ class BaseChart():
 
         # assign the individuals to all x_indices in which they appear
         for gr_individual in self.gr_individuals:
-            x_pos_vector = list(gr_individual.get_position_vector().values())
+            position_vector = list(gr_individual.get_position_dict().values())
 
-            for i, value in enumerate(x_pos_vector):
+            for i, value in enumerate(position_vector):
                 x_index = value[1]
                 if x_index not in v:
                     v[x_index] = []
@@ -403,9 +422,9 @@ class BaseChart():
                 if i == 0:
                     start_y = gr_individual.birth_date_ov
                 else:
-                    start_y = x_pos_vector[i][0]
-                if i < len(x_pos_vector) - 1:
-                    end_y = x_pos_vector[i+1][0]
+                    start_y = position_vector[i][0]
+                if i < len(position_vector) - 1:
+                    end_y = position_vector[i+1][0]
                 else:
                     end_y = gr_individual.death_date_ov
 
@@ -438,46 +457,46 @@ class BaseChart():
                             (gr_individual_a, gr_individual_b))
         return collisions, min_x, max_x
 
-    def check_unique_x_position(self):
-        """
-        check if every individual position has a unique vertical slot
+    # def check_unique_x_position(self):
+    #     """
+    #     check if every individual position has a unique vertical slot
 
-        Raises:
-            RuntimeError: overlap was found
+    #     Raises:
+    #         RuntimeError: overlap was found
 
-        Returns:
-            tuple: (list of failures, min_x_index, max_x_index)
-        """
-        failed = []
-        v = {}
-        for gr_individual in self.gr_individuals:
-            x_pos = gr_individual.get_position_vector()
-            for value in x_pos.values():
-                x_index = value[1]
-                if value[3]:
-                    continue
-                if x_index not in v:
-                    v[x_index] = gr_individual.individual_id
-                else:
-                    failed.append(x_index)
-                    # value = index_map[x_index]
-                    logger.error(
-                        "failed: " + str((x_index, value[2].family_id, gr_individual.individual.plain_name, v[x_index])))
-        full_index_list = list(sorted(v.keys()))
-        for i in range(max(full_index_list)):
-            if i not in full_index_list:
-                if self._formatting['debug_visualize_ambiguous_placement']:
-                    gr_individual.items.append({
-                        'type': 'rect',
-                        'config': {
-                            'insert': (self._map_x_position(i), 0),
-                            'size': (self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'], self._formatting['total_height']),
-                            'fill': 'black',
-                            'fill-opacity': "0.5"
-                        }
-                    })
-                failed.append(('missing', i))
-        return failed, full_index_list[0], full_index_list[-1]
+    #     Returns:
+    #         tuple: (list of failures, min_x_index, max_x_index)
+    #     """
+    #     failed = []
+    #     v = {}
+    #     for gr_individual in self.gr_individuals:
+    #         x_pos = gr_individual.get_position_dict()
+    #         for value in x_pos.values():
+    #             x_index = value[1]
+    #             if value[3]:
+    #                 continue
+    #             if x_index not in v:
+    #                 v[x_index] = gr_individual.individual_id
+    #             else:
+    #                 failed.append(x_index)
+    #                 # value = index_map[x_index]
+    #                 logger.error(
+    #                     "check_unique_x_position failed, index was used more than once: " + str((x_index, value[2].family_id, gr_individual.individual.plain_name, v[x_index])))
+    #     full_index_list = list(sorted(v.keys()))
+    #     for i in range(max(full_index_list)):
+    #         if i not in full_index_list:
+    #             if self._formatting['debug_visualize_ambiguous_placement']:
+    #                 gr_individual.items.append({
+    #                     'type': 'rect',
+    #                     'config': {
+    #                         'insert': (self._map_x_position(i), 0),
+    #                         'size': (self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'], self._formatting['total_height']),
+    #                         'fill': 'black',
+    #                         'fill-opacity': "0.5"
+    #                     }
+    #                 })
+    #             failed.append(('missing', i))
+    #     return failed, full_index_list[0], full_index_list[-1]
 
     def _map_y_position(self, ordinal_value):
         """

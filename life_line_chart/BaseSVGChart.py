@@ -73,7 +73,7 @@ class BaseSVGChart(BaseChart):
         failed = []
         v = {}
         for gr_individual in self.gr_individuals:
-            x_pos = gr_individual.get_position_vector()
+            x_pos = gr_individual.get_position_dict()
             for value in x_pos.values():
                 x_index = value[1]
 
@@ -86,20 +86,21 @@ class BaseSVGChart(BaseChart):
                     failed.append(x_index)
                     # value = index_map[x_index]
                     logger.error(
-                        "failed: " + str((x_index, value[2].family_id, gr_individual.individual.plain_name, v[x_index])))
+                        "check_unique_x_position failed, index was used more than once: " + str((x_index, value[2].family_id, gr_individual.individual.plain_name, v[x_index])))
                     # raise RuntimeError((x_index, key, gr_individual.individual.plain_name))
         full_index_list = list(sorted(v.keys()))
         for i in range(max(full_index_list)):
             if i not in full_index_list:
-                gr_individual.items.append({
-                    'type': 'rect',
-                    'config': {
-                        'insert': (self._map_x_position(i), 0),
-                        'size': (self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'], self._formatting['total_height']),
-                        'fill': 'black',
-                        'fill-opacity': "0.5"
-                    }
-                })
+                if self._formatting['debug_visualize_ambiguous_placement']:
+                    gr_individual.items.append({
+                        'type': 'rect',
+                        'config': {
+                            'insert': (self._map_x_position(i), 0),
+                            'size': (self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'], self._formatting['total_height']),
+                            'fill': 'black',
+                            'fill-opacity': "0.5"
+                        }
+                    })
                 failed.append(('missing', i))
         return failed, full_index_list[0], full_index_list[-1]
 
@@ -185,7 +186,7 @@ class BaseSVGChart(BaseChart):
         min_x_index = 9e99
         max_x_index = -9e99
         for gr_individual in self.gr_individuals:
-            x_positions = gr_individual.get_position_vector()
+            x_positions = gr_individual.get_position_dict()
             if x_positions is None:
                 logger.error(gr_individual.individual.plain_name + ' has a graphical representation, but was not placed!')
                 continue
@@ -206,7 +207,7 @@ class BaseSVGChart(BaseChart):
             death_event = gr_individual.get_death_event()
             individual_name = gr_individual.get_name()
 
-            x_pos = gr_individual.get_position_vector()
+            x_pos = gr_individual.get_position_dict()
             if x_pos is None:
                 # logger.error(gr_individual.individual.plain_name + ' has a graphical representation, but was not placed!')
                 continue
@@ -221,12 +222,12 @@ class BaseSVGChart(BaseChart):
             new_x_indices_after_marriage = []
             marriage_labels = []
             def calculate_ring_position(gr_family):
-                h_pos = gr_family.gr_husb.get_position_vector(gr_family) if gr_family.gr_husb else None
-                w_pos = gr_family.gr_wife.get_position_vector(gr_family) if gr_family.gr_wife else None
+                h_pos = gr_family.gr_husb.get_position_dict(gr_family) if gr_family.gr_husb else None
+                w_pos = gr_family.gr_wife.get_position_dict(gr_family) if gr_family.gr_wife else None
                 if h_pos is None or w_pos is None:
                     vcs = gr_family.visible_children
                     if vcs:
-                        vcs_pos = [vc.get_position_vector(gr_family)[1] for vc in vcs]
+                        vcs_pos = [vc.get_position_dict(gr_family)[1] for vc in vcs]
                         return (
                                 sum(vcs_pos)/len(vcs_pos),
                                 gr_family.marriage['ordinal_value'])
@@ -287,7 +288,7 @@ class BaseSVGChart(BaseChart):
                             new_x, new_y = self._map_position(x, y)
                             return new_x + new_y*1j
                         l_i = gr_individual
-                        x_p_list = list(l_i.get_position_vector().values())
+                        x_p_list = list(l_i.get_position_dict().values())
                         x_p = x_p_list[0][1]
                         new_marriage_ordinal = marriage_ordinal
                         if x_p == marriage_ring_index:

@@ -45,7 +45,8 @@ class AncestorChart(BaseSVGChart):
     DEFAULT_CHART_CONFIGURATION = {
             'root_individuals': [],
             'family_children': [],
-            'discovery_blacklist': []
+            'discovery_blacklist': [],
+            'parent_placement': []
     }
     DEFAULT_CHART_CONFIGURATION.update(BaseSVGChart.DEFAULT_CHART_CONFIGURATION)
 
@@ -194,7 +195,7 @@ class AncestorChart(BaseSVGChart):
                     c_vms = [None]
                 for c_m in c_vms:
                     if gr_child not in root_node_discovery_cache:
-                        if gr_child.get_position_vector() is None:
+                        if gr_child.get_position_dict() is None:
                             self.place_selected_individuals(
                                 gr_child, c_m, gr_spouse_family,
                                 x_position, discovery_cache, root_node_discovery_cache)
@@ -220,11 +221,18 @@ class AncestorChart(BaseSVGChart):
                 int: new x position index
             """
             for gr_local_child_of_family in child_of_families:
-                local_child_of_family = gr_local_child_of_family.family
                 gr_parent = getattr(
                     gr_local_child_of_family, 'gr_' + parent_variable_name)
                 if not gr_parent:
                     continue
+                # if gr_local_child_of_family != gr_parent.visible_marriages[0]:
+                #     if not gr_parent.has_position_vector(gr_local_child_of_family):
+                #         gr_parent.set_position_vector(
+                #             x_position, gr_local_child_of_family)
+                #         x_position += 1
+                #     else:
+                #         print('blub')
+                #     continue
                 if not gr_parent.has_position_vector(gr_local_child_of_family):
                     gr_parent_families = gr_parent.connected_parent_families
                     if gr_parent_families:
@@ -249,21 +257,22 @@ class AncestorChart(BaseSVGChart):
 
         # add the main individual and its visible siblings
         for gr_sibling in siblings:
+            child_of_family_must_be_added = not gr_sibling.has_position_vector(gr_child_of_family)
+            spouse_family_must_be_added = not gr_sibling.has_position_vector(gr_spouse_family)
             sibling = gr_sibling.individual
             if sibling.individual_id == individual.individual_id:
-                if not gr_sibling.has_position_vector(gr_spouse_family):
-                    # add new position of this spouse family
-                    gr_sibling.set_position_vector(
-                        x_position, gr_spouse_family)
-
-                    if not gr_sibling.has_position_vector(gr_child_of_family):
+                if spouse_family_must_be_added:
+                    if child_of_family_must_be_added:
                         # not added yet, so this is the primary cof placement
                         gr_sibling.set_position_vector(
                             x_position, gr_child_of_family, True)
-
+                    # add new position of this spouse family
+                    gr_sibling.set_position_vector(
+                        x_position, gr_spouse_family)
+                #if spouse_family_must_be_added or child_of_family_must_be_added:
                     x_position += 1
 
-            elif not gr_sibling.has_position_vector(gr_child_of_family):
+            elif child_of_family_must_be_added:
                 gr_sibling.set_position_vector(
                     x_position,
                     gr_child_of_family)
@@ -344,7 +353,7 @@ class AncestorChart(BaseSVGChart):
 
         vcs = gr_family.visible_children
         children_width = len(vcs)
-        children_x_positions = [gr_child.get_position_vector(gr_family)[1] for gr_child in vcs]
+        children_x_positions = [gr_child.get_x_index(gr_family.g_id) for gr_child in vcs]
         children_x_center = sum(children_x_positions)*1.0/children_width
         blocked_positions = children_x_positions.copy()
         if x_pos_husb: blocked_positions.append(x_pos_husb)
@@ -533,7 +542,7 @@ class AncestorChart(BaseSVGChart):
                 False, self.position_to_person_map)
             self._move_individual_and_ancestors(
                 gr_root_individual,
-                sorted(list(gr_root_individual.get_position_vector().values()))[0][2],
+                sorted(list(gr_root_individual.get_position_dict().values()))[0][2],
                 -(min_index_x-old_x_min_index)*1)
             keys = sorted(list(self.position_to_person_map.keys()))
             for key in keys:
@@ -598,7 +607,7 @@ class AncestorChart(BaseSVGChart):
                 generations = settings['generations']
                 root_individual = self._instances[(
                     'i', root_individual_id)]
-                if root_individual.has_graphical_representation() and root_individual.graphical_representations[0].get_position_vector() is not None:
+                if root_individual.has_graphical_representation() and root_individual.graphical_representations[0].get_position_dict() is not None:
                     continue
                 gr_root_individual = root_individual.graphical_representations[0]
                 cof_family_id = None
