@@ -697,6 +697,7 @@ class BaseSVGChart(BaseChart):
                 filename += '_fadeIndividualColor'
             filename += '.svg'
         # print(filename)
+        svgwrite.utils.AutoID._nextid = 1
         svg_document = svgwrite.Drawing(filename=filename,
                                         debug=False,
                                         size=(
