@@ -391,7 +391,7 @@ class AncestorChart(BaseSVGChart):
                         break
                     self._check_compressed_x_position(True, min_distance=1)
             except LifeLineChartCollisionDetected as e:
-                print(e)
+                # print(e)
                 i2 = i
                 while i2 >= 0:
                     i2 -= 1
