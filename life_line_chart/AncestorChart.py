@@ -87,16 +87,12 @@ class AncestorChart(BaseSVGChart):
         go_deeper = True
         child_of_families = individual.child_of_families[:1]
         for child_of_family in child_of_families:
-            # if not (generations > 0 or generations < 0):
-            #     continue
-            new_f_gr = not child_of_family.has_graphical_representation()
             gr_child_of_family = self._create_family_graphical_representation(
                 child_of_family, not self._positioning['unique_graphical_representation'])
             gr_child_of_family.add_visible_children(gr_individual)
 
             if generations > 0 or generations < 0:
                 father, mother = child_of_family.get_husband_and_wife()
-                new_gr = new_f_gr and father and not father.has_graphical_representation()
                 if father:
                     gr_father = self.select_individuals(
                         father,
@@ -109,7 +105,6 @@ class AncestorChart(BaseSVGChart):
 
             if generations > 0 or generations < 0:
                 father, mother = child_of_family.get_husband_and_wife()
-                new_gr = new_f_gr and mother and not mother.has_graphical_representation()
                 if mother:
                     gr_mother = self.select_individuals(
                         mother, generations - 1 if go_deeper else 0,
@@ -133,8 +128,10 @@ class AncestorChart(BaseSVGChart):
         for child in gr_family.family.get_children():
             if filter and filter(child):
                 continue
+            if child in [vc.individual for vc in gr_family.visible_children]:
+                continue
 
-            if not child.has_graphical_representation():
+            if not child.has_graphical_representation() or not self._positioning['unique_graphical_representation']:
                 gr_child = self._create_individual_graphical_representation(
                     child, not self._positioning['unique_graphical_representation'])
 
@@ -339,14 +336,10 @@ class AncestorChart(BaseSVGChart):
         if gr_family.gr_husb:
             x_pos_husb = gr_family.gr_husb.get_x_index(gr_family.g_id)
             if gr_family.husb.child_of_families and gr_family.husb.child_of_families[0]:# \
-                    #and (gr_family.husb.child_of_families[0].husb and gr_family.husb.child_of_families[0].husb.has_graphical_representation()) \
-                    #and (gr_family.husb.child_of_families[0].wife and gr_family.husb.child_of_families[0].wife.has_graphical_representation()):
                 gr_individuals.append((1, gr_family.gr_husb))
         if gr_family.gr_wife:
             x_pos_wife = gr_family.gr_wife.get_x_index(gr_family.g_id)
             if gr_family.wife.child_of_families and gr_family.wife.child_of_families[0]:# \
-                    #and (gr_family.wife.child_of_families[0].husb and gr_family.wife.child_of_families[0].husb.has_graphical_representation()) \
-                    #and (gr_family.wife.child_of_families[0].wife and gr_family.wife.child_of_families[0].wife.has_graphical_representation()) \
                 gr_individuals.append((-1, gr_family.gr_wife))
 
         vcs = gr_family.visible_children
