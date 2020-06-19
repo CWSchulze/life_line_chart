@@ -60,7 +60,7 @@ class DescendantChart(BaseSVGChart):
 
         if not individual.has_graphical_representation():
             gr_individual = self._create_individual_graphical_representation(
-                individual, self._positioning['unique_graphical_representation'])
+                individual, not self._positioning['unique_graphical_representation'])
 
             if gr_individual is None:
                 return
@@ -70,7 +70,7 @@ class DescendantChart(BaseSVGChart):
 
         if gr_child_of_family is None and individual.child_of_families:
             gr_child_of_family = self._create_family_graphical_representation(
-                 individual.child_of_families[0], self._positioning['unique_graphical_representation'])
+                 individual.child_of_families[0], not self._positioning['unique_graphical_representation'])
 
         for marriage in individual.marriages:
             if marriage.has_graphical_representation():
@@ -78,7 +78,7 @@ class DescendantChart(BaseSVGChart):
 
             if generations > 0 or generations < 0:
                 gr_marriage = self._create_family_graphical_representation(
-                    marriage, self._positioning['unique_graphical_representation'])
+                    marriage, not self._positioning['unique_graphical_representation'])
 
                 if gr_marriage.husb == individual:
                     gr_marriage.gr_husb = gr_individual
@@ -89,7 +89,7 @@ class DescendantChart(BaseSVGChart):
                 if spouse is not None:
                     if filter is None or filter(spouse) == False:
                         gr_spouse = self._create_individual_graphical_representation(
-                            spouse, self._positioning['unique_graphical_representation'])
+                            spouse, not self._positioning['unique_graphical_representation'])
 
                     if gr_marriage.husb == spouse:
                         gr_marriage.gr_husb = gr_spouse

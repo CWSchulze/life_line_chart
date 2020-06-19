@@ -75,7 +75,7 @@ class AncestorChart(BaseSVGChart):
         needs_instance = not individual.has_graphical_representation()
 
         gr_individual = self._create_individual_graphical_representation(
-            individual, self._positioning['unique_graphical_representation'])
+            individual, not self._positioning['unique_graphical_representation'])
 
         if needs_instance:
             discovery_cache.append(individual.individual_id)
@@ -91,7 +91,7 @@ class AncestorChart(BaseSVGChart):
             #     continue
             new_f_gr = not child_of_family.has_graphical_representation()
             gr_child_of_family = self._create_family_graphical_representation(
-                child_of_family, self._positioning['unique_graphical_representation'])
+                child_of_family, not self._positioning['unique_graphical_representation'])
             gr_child_of_family.add_visible_children(gr_individual)
 
             if generations > 0 or generations < 0:
@@ -136,7 +136,7 @@ class AncestorChart(BaseSVGChart):
 
             if not child.has_graphical_representation():
                 gr_child = self._create_individual_graphical_representation(
-                    child, self._positioning['unique_graphical_representation'])
+                    child, not self._positioning['unique_graphical_representation'])
 
                 if gr_child is None:
                     return
