@@ -416,7 +416,7 @@ class AncestorChart(BaseSVGChart):
             if i2 != 0:
                 logger.info('moved ' + ' '.join(gr_individual.get_name()) +
                             ' by ' + str(i2 * direction_factor * 1))
-        #for _, gr_individual in sorted(gr_individuals):
+
             self._move_child_to_center_between_parents(gr_individual)
 
     def _move_child_to_center_between_parents(self, gr_individual):

@@ -80,11 +80,6 @@ class BaseSVGChart(BaseChart):
                 if always_has_child_of_family and value[3]:
                     continue
 
-                # if not value[2] is None and gr_individual.individual_id not in value[2].children_individual_ids:
-                #     continue
-            #     x_indices.add(x_index)
-            #     index_map[x_index] = value[2]
-            # for x_index in x_indices:
                 if x_index not in v:
                     v[x_index] = gr_individual.individual_id
                 elif (always_has_child_of_family or v[x_index] != gr_individual.individual_id):
@@ -209,18 +204,13 @@ class BaseSVGChart(BaseChart):
             if not birth_date_ov:
                 continue
             death_event = gr_individual.get_death_event()
-
-            # individual_id = gr_individual.individual_id
             individual_name = gr_individual.get_name()
-            # positions[individual_id]
 
-            # individual = self._instances[('i',individual_id)]
             x_pos = gr_individual.get_position_vector()
             if x_pos is None:
                 # logger.error(gr_individual.individual.plain_name + ' has a graphical representation, but was not placed!')
                 continue
-            x_pos_list = sorted([(ov, pos, index, g_id, flag)
-                                 for index, (g_id, (ov, pos, f, flag)) in enumerate(x_pos.items())])
+            x_pos_list = list(x_pos.values())
             birth_label = gr_individual.birth_label
             death_label = gr_individual.death_label
 
@@ -228,7 +218,6 @@ class BaseSVGChart(BaseChart):
             marriage_ordinals = []
             marriage_ring_positions = []
             marriage_id = []
-            new_x_position_after_marriage = []
             new_x_indices_after_marriage = []
             marriage_labels = []
             def calculate_ring_position(gr_family):
@@ -246,56 +235,28 @@ class BaseSVGChart(BaseChart):
                             (h_pos[1] + w_pos[1])/2,
                             gr_family.marriage['ordinal_value'])
                 return None
-            if gr_individual.get_marriages():
-                for gr_marriage_family in gr_individual.visible_marriages:
-                    if gr_marriage_family.marriage is None:
-                        continue
-                    if gr_marriage_family.g_id not in x_pos:
-                        # Maybe not an error. This might also happen, if the first and second marriage of one person
-                        # reunite in later generations. If the number of the generations is not the same, then one
-                        # marriage might be added, while the other is not (due to max generations)
-                        # logger.error(gr_marriage_family.family_id + ' has a graphical representation, but was not placed!')
-                        continue
-                    gr_spouse = gr_marriage_family.get_gr_spouse(
-                        gr_individual)
-                    marriage_x_index = x_pos[gr_marriage_family.g_id][1]
-                    new_x_position_after_marriage.append(
-                        self._map_x_position(marriage_x_index))
-                    new_x_indices_after_marriage.append(marriage_x_index)
+            for gr_marriage_family in gr_individual.visible_marriages:
+                if gr_marriage_family.marriage is None:
+                    logger.warning("Found family without marriage date. The family should not have been instantiated")
+                    continue
+                if gr_marriage_family.g_id not in x_pos:
+                    # Maybe not an error. This might also happen, if the first and second marriage of one person
+                    # reunite in later generations. If the number of the generations is not the same, then one
+                    # marriage might be added, while the other is not (due to max generations)
+                    # logger.error(gr_marriage_family.family_id + ' has a graphical representation, but was not placed!')
+                    continue
+                gr_spouse = gr_marriage_family.get_gr_spouse(
+                    gr_individual)
+                marriage_x_index = x_pos[gr_marriage_family.g_id][1]
+                new_x_indices_after_marriage.append(marriage_x_index)
 
-                    if gr_spouse and gr_spouse.get_position_vector() and gr_marriage_family.marriage:
-                        # if there is a spouse, choose the middle between them
-                        spouse_x_index = gr_spouse.get_position_vector(
-                            )[gr_marriage_family.g_id][1]
-                        # spouse_x_position = self._map_x_position(spouse_x_index)
-                        marriage_ring_positions.append((
-                            (spouse_x_index + marriage_x_index)/2.,
-                            gr_marriage_family.marriage['ordinal_value']))
-                    else:
-                        # if no spouse is visible, place over the children
-                        child_x_indices = []
-                        for visible_child in gr_marriage_family.visible_children:
-                            try:
-                                child_x_indices.append(visible_child.get_x_index(gr_marriage_family.g_id))
-                            except:
-                                logger.error('something went wrong with ' + "".join(visible_child.plain_name) +
-                                             ". The position family 0 is not equal to the placement...")
-                        if len(child_x_indices) > 0:
-                            # calculate the middle over the children
-                            marriage_ring_positions.append((
-                                sum(child_x_indices)/len(child_x_indices),
-                                gr_marriage_family.marriage['ordinal_value']))
-                        else:
-                            # place at the individual line... no spouse, no children, what is this information good for?
-                            marriage_ring_positions.append((
-                                x_pos[gr_marriage_family.g_id][1],
-                                gr_marriage_family.marriage['ordinal_value']))
+                marriage_ring_positions.append(calculate_ring_position(gr_marriage_family))
 
-                    marriage_id.append(gr_marriage_family.family_id)
-                    marriage_ordinals.append(
-                        gr_marriage_family.marriage['ordinal_value'])
-                    marriage_labels.append(
-                        str(gr_marriage_family.marriage_label))
+                marriage_id.append(gr_marriage_family.family_id)
+                marriage_ordinals.append(
+                    gr_marriage_family.marriage['ordinal_value'])
+                marriage_labels.append(
+                    str(gr_marriage_family.marriage_label))
 
 
             if self._formatting['debug_visualize_connections']:
@@ -495,7 +456,6 @@ class BaseSVGChart(BaseChart):
                                         *interp(0, 1)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(0.5, 0.9)),
                                     coordinate_transformation(*interp(1, 1)),
                                 )},
-                                    # ((knots[index][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)-_birth_position[1]), (knots[index+1][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)-_birth_position[1])),
                                     (_birth_position[1], self._map_y_position(
                                         self._formatting['fade_individual_color_black_age']*365+birth_date_ov))
                                 )
@@ -510,7 +470,6 @@ class BaseSVGChart(BaseChart):
                                         *interp(1, 0)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(1, 0.2)),
                                     coordinate_transformation(*interp(1, 1)),
                                 )},
-                                    # ((knots[index][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)-_birth_position[1]), (knots[index+1][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)-_birth_position[1])),
                                     (_birth_position[1], self._map_y_position(
                                         self._formatting['fade_individual_color_black_age']*365+birth_date_ov))
                                 )
@@ -532,7 +491,6 @@ class BaseSVGChart(BaseChart):
                                         coeffs = svg_path.poly()
                                         coeffs2 = (
                                             coeffs[0].imag, coeffs[1].imag, coeffs[2].imag, coeffs[3].imag - self._map_y_position(ov))
-                                        # coeffs2 = (coeffs[0] - self._map_y_position(ov)*1j, coeffs[1], coeffs[2], coeffs[3])
                                         roots = cardano(*coeffs2)
                                         root = [root.real for root in roots if abs(
                                             root.imag) < 1e-5 and root.real >= 0 and root.real <= 1]
