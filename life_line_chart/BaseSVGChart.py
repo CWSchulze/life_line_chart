@@ -287,9 +287,8 @@ class BaseSVGChart(BaseChart):
                             new_x, new_y = self._map_position(x, y)
                             return new_x + new_y*1j
                         l_i = gr_individual
-                        x_p_ = sorted([(ov, pos, index, g_id, flag)
-                                    for index, (g_id, (ov, pos, f, flag)) in enumerate(l_i.get_position_vector().items())])
-                        x_p = x_p_[0][1]
+                        x_p_list = list(l_i.get_position_vector().values())
+                        x_p = x_p_list[0][1]
                         new_marriage_ordinal = marriage_ordinal
                         if x_p == marriage_ring_index:
                             if l_i.birth_date_ov > marriage_ordinal:
@@ -398,7 +397,6 @@ class BaseSVGChart(BaseChart):
                             coordinate_transformation(
                                 knots[0+1][0], knots[0+1][1]),
                         )},
-                            # ((knots[0][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)-_birth_position[1]), (knots[0+1][1]-_birth_position[1])/(self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)-_birth_position[1])),
                             (_birth_position[1], self._map_y_position(
                                 self._formatting['fade_individual_color_black_age']*365+birth_date_ov))
                         )
