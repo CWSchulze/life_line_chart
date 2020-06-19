@@ -417,6 +417,7 @@ class AncestorChart(BaseSVGChart):
                 logger.info('moved ' + ' '.join(gr_individual.get_name()) +
                             ' by ' + str(i2 * direction_factor * 1))
 
+        for _, gr_individual in sorted(gr_individuals):
             self._move_child_to_center_between_parents(gr_individual)
 
     def _move_child_to_center_between_parents(self, gr_individual):
@@ -425,19 +426,23 @@ class AncestorChart(BaseSVGChart):
             husb_x_pos = None
             if gr_cof.gr_husb is not None:
                 husb_x_pos = gr_cof.gr_husb.get_x_index(gr_cof.g_id)
+                middle_x_pos = husb_x_pos
             wife_x_pos = None
             if gr_cof.gr_wife is not None:
                 wife_x_pos = gr_cof.gr_wife.get_x_index(gr_cof.g_id)
-            if husb_x_pos and wife_x_pos and True:
+                middle_x_pos = wife_x_pos
+            if husb_x_pos and wife_x_pos:
                 middle_x_pos = (husb_x_pos + wife_x_pos)/2.0
-                this_individual_x_pos = gr_individual.get_x_index(gr_cof.g_id)
-                nSteps = int(abs(this_individual_x_pos - middle_x_pos))
-                if nSteps > 0:
-                    if nSteps > 1000:
-                        logger.error(f'nSteps {nSteps} for gr_individual {gr_individual}')
-                    direction = -1 if this_individual_x_pos > middle_x_pos else 1
-                    self._compress_single_individual_position(
-                        gr_individual, gr_cof, direction, nSteps)
+            elif husb_x_pos is None and wife_x_pos is None:
+                continue
+            this_individual_x_pos = gr_individual.get_x_index(gr_cof.g_id)
+            nSteps = int(abs(this_individual_x_pos - middle_x_pos))
+            if nSteps > 0:
+                if nSteps > 1000:
+                    logger.error(f'nSteps {nSteps} for gr_individual {gr_individual}')
+                direction = -1 if this_individual_x_pos > middle_x_pos else 1
+                self._compress_single_individual_position(
+                    gr_individual, gr_cof, direction, nSteps)
 
     def modify_layout(self, root_individual_id):
         """
