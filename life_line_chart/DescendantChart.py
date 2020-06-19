@@ -122,7 +122,8 @@ class DescendantChart(BaseSVGChart):
         # marriages which have been placed over this parent family
         visible_local_marriages = \
             [marriage for marriage in gr_individual.visible_marriages \
-                if marriage.descendant_chart_parent_family_placement == gr_child_of_family]
+                if gr_child_of_family is None or \
+                    marriage.descendant_chart_parent_family_placement == gr_child_of_family]
 
         if len(visible_local_marriages) == 0:
             gr_individual.set_position_vector(
@@ -266,8 +267,8 @@ class DescendantChart(BaseSVGChart):
                         if not cofs or not cofs[0].has_graphical_representation():
                             marriages = gir.visible_marriages
                             if marriages:
-                                spouse = marriages[0].get_spouse(gir)
-                                if spouse and spouse.individual.child_of_families and spouse.individual.child_of_families[0].has_graphical_representation():
+                                gr_spouse = marriages[0].get_gr_spouse(gir)
+                                if gr_spouse and gr_spouse.individual.child_of_families and gr_spouse.individual.child_of_families[0].has_graphical_representation():
                                     color = (225,225,225)
                     if color is None:
                         color = self._instances.color_getter(gir)

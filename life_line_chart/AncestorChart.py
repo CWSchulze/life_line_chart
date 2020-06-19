@@ -472,11 +472,6 @@ class AncestorChart(BaseSVGChart):
             has_been_done = []
             for gr_child in candidates:
                 ov = gr_child.birth_date_ov
-                # c_pos = list(gr_child.get_position_vector().values())
-                # c_pos = c_pos[1:]
-
-                # for x_pos in c_pos:
-                #     gr_family = x_pos[2]
                 for gr_family in gr_child.visible_marriages:
                     if gr_family is None:
                         continue
