@@ -247,7 +247,7 @@ class BaseSVGChart(BaseChart):
                             gr_family.marriage['ordinal_value'])
                 return None
             if gr_individual.get_marriages():
-                for gr_marriage_family in gr_individual.visible_marriages:
+                for gr_marriage_family in sorted(gr_individual.visible_marriages):
                     if gr_marriage_family.marriage is None:
                         continue
                     if gr_marriage_family.g_id not in x_pos:
