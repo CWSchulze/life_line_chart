@@ -365,9 +365,11 @@ class BaseChart():
             child_x_delta = husb_width - wife_width
 
         for gr_child in vcs:
-            pos = list(gr_child.get_position_dict().values())
-            self._move_single_individual(
-                gr_child, pos[0][2], child_x_delta)
+            #pos = list(gr_child.get_position_dict().values())
+            #for parent_position in gr_child.get_parent_positions():
+            for gr_parent_family in gr_child.connected_parent_families:
+                self._move_single_individual(
+                    gr_child, gr_parent_family, child_x_delta)
 
         if gr_family.gr_husb:
             self._move_individual_and_ancestors(gr_family.gr_husb, gr_family, husb_x_delta)
