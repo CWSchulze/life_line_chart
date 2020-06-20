@@ -138,7 +138,7 @@ class AncestorChart(BaseSVGChart):
 
                 if gr_child is None:
                     return
-
+                gr_child.qualified_for_placement = False
                 gr_child.color = (0,0,0)
 
                 gr_family.add_visible_children(gr_child)
@@ -198,7 +198,7 @@ class AncestorChart(BaseSVGChart):
             # define where to place the ancestors
             # choose first marriage (if visibly married) of oldest visible sibling
             place_ancestors_here = \
-                gr_individual == siblings[0] and \
+                gr_individual == [s for s in siblings if s.qualified_for_placement][0] and \
                 (not gr_individual.visible_marriages or gr_spouse_family == gr_individual.visible_marriages[0])
 
         # go back to root node

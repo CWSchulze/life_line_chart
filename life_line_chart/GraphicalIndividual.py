@@ -32,6 +32,7 @@ class GraphicalIndividual():
         self.individual.graphical_representations.append(self)
         self.debug_label = ""
         self.g_id = None
+        self.qualified_for_placement = True
 
         self.ancestor_chart_parent_family_placement = None, None
 
