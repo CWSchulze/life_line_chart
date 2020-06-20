@@ -298,11 +298,11 @@ class BaseChart():
             if strongly_connected_parent_family.gr_husb:
                 # if cof.gr_husb.get_position_dict() and len(cof.gr_husb.get_position_dict()) == 1:
                     self._move_individual_and_ancestors(
-                        strongly_connected_parent_family.gr_husb, strongly_connected_parent_family, x_index_offset)
+                        strongly_connected_parent_family.gr_husb, strongly_connected_parent_family, x_index_offset, discovery_cache)
             if strongly_connected_parent_family.gr_wife:
                 # if cof.gr_wife.get_position_dict() and len(cof.gr_wife.get_position_dict()) == 1:
                     self._move_individual_and_ancestors(
-                        strongly_connected_parent_family.gr_wife, strongly_connected_parent_family, x_index_offset)
+                        strongly_connected_parent_family.gr_wife, strongly_connected_parent_family, x_index_offset, discovery_cache)
             # print (gr_individual.get)
             if True or gr_cof and gr_cof.gr_husb is None and gr_cof.gr_wife is None:
                 for gr_child_individual in gr_cof.visible_children:
