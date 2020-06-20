@@ -288,4 +288,4 @@ def test_generate_svg_update_interface_parent_placement():
 # test_generate_svg_file_ancestor_and_children()
 # test_generate_svg_update_interface()
 # test_generate_svg_update_interface_descendant()
-test_generate_svg_update_interface_parent_placement()
+# test_generate_svg_update_interface_parent_placement()
