@@ -186,11 +186,20 @@ class AncestorChart(BaseSVGChart):
         else:
             siblings = [gr_individual]
 
-        # define where to place the ancestors
-        # choose first marriage (if visibly married) of oldest visible sibling
-        place_ancestors_here = \
-            gr_individual == siblings[0] and \
-            (not gr_individual.visible_marriages or gr_spouse_family == gr_individual.visible_marriages[0])
+        gr_spouse_family_g_id = gr_spouse_family.g_id if gr_spouse_family else None
+        gr_child_of_family_g_id = gr_child_of_family.g_id if gr_child_of_family else None
+
+        placement_config = self._chart_configuration['parent_placement'].get(gr_child_of_family_g_id)
+        if placement_config and gr_child_of_family:
+            place_ancestors_here = \
+                (gr_spouse_family_g_id == placement_config[0]) and \
+                (gr_individual.g_id == placement_config[1])
+        else:
+            # define where to place the ancestors
+            # choose first marriage (if visibly married) of oldest visible sibling
+            place_ancestors_here = \
+                gr_individual == siblings[0] and \
+                (not gr_individual.visible_marriages or gr_spouse_family == gr_individual.visible_marriages[0])
 
         # go back to root node
         root_node_discovery_cache += siblings
