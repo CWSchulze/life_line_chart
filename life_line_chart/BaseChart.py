@@ -423,7 +423,8 @@ class BaseChart():
                     position_to_person_map[x_index].append({
                         'start': start_y,
                         'end': end_y,
-                        'individual': gr_individual
+                        'individual': gr_individual,
+                        'family': value[2]
                     })
 
                 v[x_index].append((gr_individual, start_y, end_y))#, gr_individual.birth_date_ov, gr_individual.death_date_ov))
@@ -630,8 +631,8 @@ class BaseChart():
         if possible_matches is not None:
             for possible_match in possible_matches:
                 if possible_match['start'] < ordinal_value and possible_match['end'] > ordinal_value:
-                    return possible_match['individual']
-        return None
+                    return possible_match['individual'], possible_match['family']
+        return None, None
 
     def clear_svg_items(self):
         """
