@@ -376,9 +376,6 @@ class GraphicalIndividual():
         return False
 
     def set_position_vector(self, x_position, gr_family, parent_starting_point=False):
-        if parent_starting_point and gr_family and False:
-            self.__instances.connection_container['i'][self.g_id][gr_family.g_id].append('flag')
-            self.__instances.connection_container['f'][gr_family.g_id][self.g_id].append('flag')
         if gr_family:
             g_id = gr_family.g_id
             if gr_family.marriage:
@@ -402,6 +399,45 @@ class GraphicalIndividual():
         self._x_position = _x_position
 
     x_position = property(get_position_dict, set_position_vector)
+
+    @property
+    def ancestor_placement_marriage(self):
+        """
+        the birth x position can be linked to a specific marriage. Ancestors will be placed above
+        the birth x position.
+
+        Args:
+            gr_marriage_family (GraphicalFamily): marriage where to place the ancestors
+        """
+        if self.g_id not in self.__instances.connection_container['i']:
+            return []
+        gr_marriage_families = []
+        for g_id, connections in self.__instances.connection_container['i'][self.g_id].items():
+            if 'ancestor_placement_marriage' in connections:
+                gr_marriage_families.append(self.__instances[('f', g_id[1])].graphical_representations[g_id[0]])
+        if len(gr_marriage_families) == 1:
+            return gr_marriage_families[0]
+        elif len(gr_marriage_families) > 1:
+            raise LifeLineChartUnknownPlacementError("too many ancestor placement marriages " + str(gr_marriage_families) + " " + str(self))
+        return None
+
+    @ancestor_placement_marriage.setter
+    def ancestor_placement_marriage(self, gr_marriage_family):
+        """
+        the birth x position can be linked to a specific marriage. Ancestors will be placed above
+        the birth x position.
+
+        Args:
+            gr_marriage_family (GraphicalFamily): marriage where to place the ancestors
+        """
+        if gr_marriage_family:
+            g_id = gr_marriage_family.g_id
+        else:
+            return
+            g_id = None
+        self.__instances.connection_container['i'][self.g_id][g_id].append('ancestor_placement_marriage')
+        self.__instances.connection_container['f'][g_id][self.g_id].append('ancestor_placement_marriage')
+
 
     def get_birth_event(self):
         return self.individual.events['birth_or_christening']
