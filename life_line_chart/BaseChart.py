@@ -217,37 +217,16 @@ class BaseChart():
         Returns:
             dict: position dict of the graphical individual representation
         """
+
         position_dict = gr_individual.get_position_dict()
+        other_g_id = gr_individual.get_other_family_connected_to_birth_position(gr_family)
+
         if gr_family is not None:
             g_id = gr_family.g_id
         else:
             g_id = None
 
-        scpf, scsf = gr_individual.ancestor_chart_parent_family_placement
-
-        keys = list(position_dict.keys())
-        positions = dict([(k, v) for k, v in position_dict.items() if not v[3]])
-        parent_positions = dict([(k, v) for k, v in position_dict.items() if v[3]])
-
-        other_g_id = 42
-        scsf_g_id = scsf.g_id if scsf else None
-        scpf_g_id = scpf.g_id if scpf else None
-        if parent_positions:
-            if scsf or scpf:
-                if g_id == scsf_g_id:
-                    # g_id is the strongyl connected spouse family
-                    other_g_id = scpf_g_id
-                elif g_id == scpf_g_id:
-                    # g_id is the strongly connected parent family
-                    other_g_id = scsf_g_id
-            elif g_id in parent_positions:
-                # g_id is the parent family
-                other_g_id = list(positions.keys())[0]
-            elif g_id == list(positions.keys())[0]:
-                # g_id is the first spouse family and a parent exits
-                other_g_id = list(parent_positions.keys())[0]
-
-        if other_g_id != 42:
+        if other_g_id != "there is no connected family":
             if g_id in position_dict and other_g_id in position_dict:
                 # pass
                 position_dict[other_g_id] = (

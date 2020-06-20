@@ -226,33 +226,40 @@ class AncestorChart(BaseSVGChart):
             for gr_local_child_of_family in child_of_families:
                 gr_parent = getattr(
                     gr_local_child_of_family, 'gr_' + parent_variable_name)
-                if not gr_parent:
+#                if gr_parent and recursive_add_parents and gr_individual == siblings[0]:
+                if not gr_parent or not place_ancestors_here:
                     continue
-                # if gr_local_child_of_family != gr_parent.visible_marriages[0]:
-                #     if not gr_parent.has_position_vector(gr_local_child_of_family):
-                #         gr_parent.set_position_vector(
-                #             x_position, gr_local_child_of_family)
-                #         x_position += 1
-                #     else:
-                #         print('blub')
-                #     continue
-                if not gr_parent.has_position_vector(gr_local_child_of_family):
-                    gr_parent_families = gr_parent.connected_parent_families
-                    if gr_parent_families:
-                        gr_parent_family = gr_parent_families[0]
-                    else:
-                        gr_parent_family = None
 
-                    gr_individual.ancestor_chart_parent_family_placement = gr_local_child_of_family, gr_spouse_family
-                    self.place_selected_individuals(
-                        gr_parent, gr_local_child_of_family, gr_parent_family,
-                        x_position, discovery_cache, root_node_discovery_cache)
-                    width = gr_parent.get_ancestor_width(
-                        gr_local_child_of_family)
-                    setattr(gr_local_child_of_family, parent_variable_name + '_width',
-                        lambda gr=gr_parent, cof=gr_local_child_of_family: gr.get_ancestor_width(cof)
-                        )
-                    x_position += width
+                width = None
+                this_is_the_first_marriage = gr_local_child_of_family == gr_parent.visible_marriages[0]
+                if not gr_parent.has_position_vector(gr_local_child_of_family):
+                    if not this_is_the_first_marriage and False:
+                        gr_parent.set_position_vector(
+                            x_position, gr_local_child_of_family)
+                        #x_position += 1
+                        #if recursive_add_parents:
+                        gr_individual.ancestor_chart_parent_family_placement = gr_local_child_of_family, gr_spouse_family
+                        width = 1
+                    else:
+                        gr_parent_families = gr_parent.connected_parent_families
+                        if gr_parent_families:
+                            gr_parent_family = gr_parent_families[0]
+                        else:
+                            gr_parent_family = None
+
+                        gr_individual.ancestor_chart_parent_family_placement = gr_local_child_of_family, gr_spouse_family
+                        self.place_selected_individuals(
+                            gr_parent, gr_local_child_of_family, gr_parent_family,
+                            x_position, discovery_cache, root_node_discovery_cache)
+                        width = gr_parent.get_ancestor_width(
+                            gr_local_child_of_family)
+                    if width:
+                        setattr(gr_local_child_of_family, parent_variable_name + '_width',
+                            lambda gr=gr_parent, cof=gr_local_child_of_family: gr.get_ancestor_width(cof)
+                            )
+                        x_position += width
+                else:
+                    logger.debug('not the first discovery of not the first marriage')
             return x_position
 
         # add the father branch
@@ -260,19 +267,26 @@ class AncestorChart(BaseSVGChart):
 
         # add the main individual and its visible siblings
         for gr_sibling in siblings:
-            child_of_family_must_be_added = not gr_sibling.has_position_vector(gr_child_of_family)
+            # only set x position of cof if this is where it is!
+            # this can be a detached head, or an x position shared with a spouse family
+            child_of_family_must_be_added = not gr_sibling.has_position_vector(gr_child_of_family) and place_ancestors_here
+
+            # spouse family position should be added only if sibling is gr_individual
+            # => So only if we are at the right x position
             spouse_family_must_be_added = not gr_sibling.has_position_vector(gr_spouse_family)
             sibling = gr_sibling.individual
             if sibling.individual_id == individual.individual_id:
+                this_spouse_family_is_first_marriage = not gr_sibling.visible_marriages or gr_spouse_family == gr_sibling.visible_marriages[0]
                 if spouse_family_must_be_added:
                     if child_of_family_must_be_added:
                         # not added yet, so this is the primary cof placement
                         gr_sibling.set_position_vector(
                             x_position, gr_child_of_family, True)
+                        gr_sibling.ancestor_placement_marriage = gr_spouse_family
                     # add new position of this spouse family
                     gr_sibling.set_position_vector(
                         x_position, gr_spouse_family)
-                #if spouse_family_must_be_added or child_of_family_must_be_added:
+
                     x_position += 1
 
             elif child_of_family_must_be_added:
@@ -282,7 +296,7 @@ class AncestorChart(BaseSVGChart):
                 x_position += 1
 
         if gr_child_of_family is not None and gr_child_of_family.gr_husb is None and gr_child_of_family.gr_wife is None:
-            if gr_child_of_family.strongly_connected_children[0] is None:
+            if gr_child_of_family.strongly_connected_children[0] is None and place_ancestors_here:
                 gr_individual.ancestor_chart_parent_family_placement = gr_child_of_family, gr_spouse_family
 
         # add the mother branch
