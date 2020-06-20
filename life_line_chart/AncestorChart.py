@@ -231,24 +231,25 @@ class AncestorChart(BaseSVGChart):
                     gr_local_child_of_family, 'gr_' + parent_variable_name)
 
                 if gr_parent and place_ancestors_here:
-                    gr_parent_families = gr_parent.connected_parent_families
-                    if gr_parent_families:
-                        gr_parent_family = gr_parent_families[0]
-                    else:
-                        gr_parent_family = None
+                    if not gr_parent.has_position_vector(gr_local_child_of_family):
+                        gr_parent_families = gr_parent.connected_parent_families
+                        if gr_parent_families:
+                            gr_parent_family = gr_parent_families[0]
+                        else:
+                            gr_parent_family = None
 
-                    gr_individual.ancestor_chart_parent_family_placement = gr_local_child_of_family, gr_spouse_family
-                    self.place_selected_individuals(
-                        gr_parent, gr_local_child_of_family, gr_parent_family,
-                        x_position, discovery_cache, root_node_discovery_cache)
-                    width = gr_parent.get_ancestor_width(
-                        gr_local_child_of_family)
-                    setattr(gr_local_child_of_family, parent_variable_name + '_width',
-                        lambda gr=gr_parent, cof=gr_local_child_of_family: gr.get_ancestor_width(cof)
-                        )
-                    x_position += width
-                else:
-                    logger.debug('not the first discovery of not the first marriage')
+                        gr_individual.ancestor_chart_parent_family_placement = gr_local_child_of_family, gr_spouse_family
+                        self.place_selected_individuals(
+                            gr_parent, gr_local_child_of_family, gr_parent_family,
+                            x_position, discovery_cache, root_node_discovery_cache)
+                        width = gr_parent.get_ancestor_width(
+                            gr_local_child_of_family)
+                        setattr(gr_local_child_of_family, parent_variable_name + '_width',
+                            lambda gr=gr_parent, cof=gr_local_child_of_family: gr.get_ancestor_width(cof)
+                            )
+                        x_position += width
+                    else:
+                        logger.debug('Second try to add parent! This should not happen. '+str(gr_parent))
             return x_position
 
         # add the father branch
@@ -256,8 +257,8 @@ class AncestorChart(BaseSVGChart):
 
         # add the main individual and its visible siblings
         for gr_sibling in siblings:
-            # only set x position of cof if this is where it is!
-            # this can be a detached head, or an x position shared with a spouse family
+            # only set x position of cof if ancestors shall be placed here and have not been added yet!
+            # this can be a detached head, or an x position shared with a spouse family (-> ancestor_placement_marriage)
             child_of_family_must_be_added = not gr_sibling.has_position_vector(gr_child_of_family) and place_ancestors_here
 
             # spouse family position should be added only if sibling is gr_individual
@@ -270,14 +271,14 @@ class AncestorChart(BaseSVGChart):
                         # not added yet, so this is the primary cof placement
                         gr_sibling.set_position_vector(
                             x_position, gr_child_of_family, True)
+                        # either this has already been set when adding the parent, or it should be added here!
                         gr_sibling.ancestor_placement_marriage = gr_spouse_family
                     # add new position of this spouse family
                     gr_sibling.set_position_vector(
                         x_position, gr_spouse_family)
-
                     x_position += 1
-
             elif child_of_family_must_be_added:
+                # add siblings beside the main sibling
                 gr_sibling.set_position_vector(
                     x_position,
                     gr_child_of_family)
@@ -285,6 +286,11 @@ class AncestorChart(BaseSVGChart):
 
         if gr_child_of_family is not None and gr_child_of_family.gr_husb is None and gr_child_of_family.gr_wife is None:
             if gr_child_of_family.strongly_connected_children[0] is None and place_ancestors_here:
+                # add the strong connection between siblings and their parent family, if
+                # the parents are not visible, but their family has a graphical representation.
+                # -> these are the families where the discovery stops due to the generation limit.
+                #    but since siblings in these families are placed together, they have to share
+                #    the strong connection to the family.
                 gr_individual.ancestor_chart_parent_family_placement = gr_child_of_family, gr_spouse_family
 
         # add the mother branch
@@ -347,14 +353,16 @@ class AncestorChart(BaseSVGChart):
         family_was_flipped = False
         x_pos_husb = None
         x_pos_wife = None
-        if gr_family.gr_husb:
-            x_pos_husb = gr_family.gr_husb.get_x_index(gr_family.g_id)
+        gr_husb = gr_family.gr_husb
+        gr_wife = gr_family.gr_wife
+        if gr_husb:
+            x_pos_husb = gr_husb.get_x_index(gr_family.g_id)
             if gr_family.husb.child_of_families and gr_family.husb.child_of_families[0]:# \
-                gr_individuals.append((1, gr_family.gr_husb))
-        if gr_family.gr_wife:
-            x_pos_wife = gr_family.gr_wife.get_x_index(gr_family.g_id)
+                gr_individuals.append((1, gr_husb))
+        if gr_wife:
+            x_pos_wife = gr_wife.get_x_index(gr_family.g_id)
             if gr_family.wife.child_of_families and gr_family.wife.child_of_families[0]:# \
-                gr_individuals.append((-1, gr_family.gr_wife))
+                gr_individuals.append((-1, gr_wife))
 
         vcs = gr_family.visible_children
         children_width = len(vcs)
@@ -446,12 +454,14 @@ class AncestorChart(BaseSVGChart):
         gr_cofs = gr_individual.connected_parent_families
         for gr_cof in gr_cofs:
             husb_x_pos = None
-            if gr_cof.gr_husb is not None:
-                husb_x_pos = gr_cof.gr_husb.get_x_index(gr_cof.g_id)
+            gr_husb = gr_cof.gr_husb
+            gr_wife = gr_cof.gr_wife
+            if gr_husb is not None:
+                husb_x_pos = gr_husb.get_x_index(gr_cof.g_id)
                 middle_x_pos = husb_x_pos
             wife_x_pos = None
-            if gr_cof.gr_wife is not None:
-                wife_x_pos = gr_cof.gr_wife.get_x_index(gr_cof.g_id)
+            if gr_wife is not None:
+                wife_x_pos = gr_wife.get_x_index(gr_cof.g_id)
                 middle_x_pos = wife_x_pos
             if husb_x_pos and wife_x_pos:
                 middle_x_pos = (husb_x_pos + wife_x_pos)/2.0
