@@ -384,7 +384,7 @@ class AncestorChart(BaseSVGChart):
         if x_pos_husb and children_x_center < x_pos_husb or x_pos_wife and x_pos_wife < children_x_center:
             family_was_flipped = True
 
-        for _, gr_individual in gr_individuals:
+        for _, gr_individual in sorted(gr_individuals):
             gr_cofs = gr_individual.connected_parent_families
             for gr_cof in gr_cofs:
                 try:
@@ -395,7 +395,7 @@ class AncestorChart(BaseSVGChart):
                 break
         if self.debug_optimization_compression_steps <= 0:
             return
-        for original_direction_factor, gr_individual in gr_individuals:
+        for original_direction_factor, gr_individual in sorted(gr_individuals):
             if gr_individual is None:
                 continue
             i = 0
@@ -453,7 +453,7 @@ class AncestorChart(BaseSVGChart):
 
         if self.debug_optimization_compression_steps <= 0:
             return
-        for _, gr_individual in gr_individuals:
+        for _, gr_individual in sorted(gr_individuals):
             self._move_child_to_center_between_parents(gr_individual)
             self.debug_optimization_compression_steps -= 1
             if self.debug_optimization_compression_steps <= 0:
