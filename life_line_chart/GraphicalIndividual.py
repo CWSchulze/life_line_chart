@@ -413,7 +413,7 @@ class GraphicalIndividual():
             return []
         gr_marriage_families = []
         for g_id, connections in self.__instances.connection_container['i'][self.g_id].items():
-            if 'ancestor_placement_marriage' in connections:
+            if 'strong_marriage' in connections:
                 gr_marriage_families.append(self.__instances[('f', g_id[1])].graphical_representations[g_id[0]])
         if len(gr_marriage_families) == 1:
             return gr_marriage_families[0]
@@ -435,8 +435,8 @@ class GraphicalIndividual():
         else:
             return
             g_id = None
-        self.__instances.connection_container['i'][self.g_id][g_id].append('ancestor_placement_marriage')
-        self.__instances.connection_container['f'][g_id][self.g_id].append('ancestor_placement_marriage')
+        self.__instances.connection_container['i'][self.g_id][g_id].append('strong_marriage')
+        self.__instances.connection_container['f'][g_id][self.g_id].append('strong_marriage')
 
 
     def get_birth_event(self):

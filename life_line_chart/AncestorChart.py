@@ -186,8 +186,11 @@ class AncestorChart(BaseSVGChart):
         else:
             siblings = [gr_individual]
 
-        # define where to place the ancestors:
-        place_ancestors_here = gr_individual == siblings[0]
+        # define where to place the ancestors
+        # choose first marriage (if visibly married) of oldest visible sibling
+        place_ancestors_here = \
+            gr_individual == siblings[0] and \
+            (not gr_individual.visible_marriages or gr_spouse_family == gr_individual.visible_marriages[0])
 
         # go back to root node
         root_node_discovery_cache += siblings
@@ -226,38 +229,24 @@ class AncestorChart(BaseSVGChart):
             for gr_local_child_of_family in child_of_families:
                 gr_parent = getattr(
                     gr_local_child_of_family, 'gr_' + parent_variable_name)
-#                if gr_parent and recursive_add_parents and gr_individual == siblings[0]:
-                if not gr_parent or not place_ancestors_here:
-                    continue
 
-                width = None
-                this_is_the_first_marriage = gr_local_child_of_family == gr_parent.visible_marriages[0]
-                if not gr_parent.has_position_vector(gr_local_child_of_family):
-                    if not this_is_the_first_marriage and False:
-                        gr_parent.set_position_vector(
-                            x_position, gr_local_child_of_family)
-                        #x_position += 1
-                        #if recursive_add_parents:
-                        gr_individual.ancestor_chart_parent_family_placement = gr_local_child_of_family, gr_spouse_family
-                        width = 1
+                if gr_parent and place_ancestors_here:
+                    gr_parent_families = gr_parent.connected_parent_families
+                    if gr_parent_families:
+                        gr_parent_family = gr_parent_families[0]
                     else:
-                        gr_parent_families = gr_parent.connected_parent_families
-                        if gr_parent_families:
-                            gr_parent_family = gr_parent_families[0]
-                        else:
-                            gr_parent_family = None
+                        gr_parent_family = None
 
-                        gr_individual.ancestor_chart_parent_family_placement = gr_local_child_of_family, gr_spouse_family
-                        self.place_selected_individuals(
-                            gr_parent, gr_local_child_of_family, gr_parent_family,
-                            x_position, discovery_cache, root_node_discovery_cache)
-                        width = gr_parent.get_ancestor_width(
-                            gr_local_child_of_family)
-                    if width:
-                        setattr(gr_local_child_of_family, parent_variable_name + '_width',
-                            lambda gr=gr_parent, cof=gr_local_child_of_family: gr.get_ancestor_width(cof)
-                            )
-                        x_position += width
+                    gr_individual.ancestor_chart_parent_family_placement = gr_local_child_of_family, gr_spouse_family
+                    self.place_selected_individuals(
+                        gr_parent, gr_local_child_of_family, gr_parent_family,
+                        x_position, discovery_cache, root_node_discovery_cache)
+                    width = gr_parent.get_ancestor_width(
+                        gr_local_child_of_family)
+                    setattr(gr_local_child_of_family, parent_variable_name + '_width',
+                        lambda gr=gr_parent, cof=gr_local_child_of_family: gr.get_ancestor_width(cof)
+                        )
+                    x_position += width
                 else:
                     logger.debug('not the first discovery of not the first marriage')
             return x_position
@@ -276,7 +265,6 @@ class AncestorChart(BaseSVGChart):
             spouse_family_must_be_added = not gr_sibling.has_position_vector(gr_spouse_family)
             sibling = gr_sibling.individual
             if sibling.individual_id == individual.individual_id:
-                this_spouse_family_is_first_marriage = not gr_sibling.visible_marriages or gr_spouse_family == gr_sibling.visible_marriages[0]
                 if spouse_family_must_be_added:
                     if child_of_family_must_be_added:
                         # not added yet, so this is the primary cof placement
