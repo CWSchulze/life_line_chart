@@ -269,7 +269,7 @@ class BaseChart():
                 'This family does not exist')
         return position_dict
 
-    def _move_individual_and_ancestors(self, gr_individual, gr_family, x_index_offset):
+    def _move_individual_and_ancestors(self, gr_individual, gr_family, x_index_offset, discovery_cache = None):
         """
         move an individual and its ancestors vertically. Only ancestors are moved, which are strongly coupled with the individual.
 
@@ -278,6 +278,9 @@ class BaseChart():
             gr_family (GraphicalFamily): family instance
             x_index_offset (int): vertical offset
         """
+        if discovery_cache is None:
+            discovery_cache = []
+        discovery_cache.append(gr_individual)
 
         # move this individual
         self._move_single_individual(
@@ -285,6 +288,7 @@ class BaseChart():
 
         gr_cofs = gr_individual.connected_parent_families
         if len(gr_cofs) == 0:
+            discovery_cache.pop()
             return
         gr_cof = gr_cofs[0]
 
@@ -306,6 +310,7 @@ class BaseChart():
                         continue
                     self._move_single_individual(
                         gr_child_individual, gr_cof, x_index_offset)
+        discovery_cache.pop()
 
     def _flip_family(self, gr_family):
         """
@@ -317,6 +322,7 @@ class BaseChart():
         Args:
             gr_family (GraphicalFamily): family instance
         """
+        # logger.debug(f"flipping {gr_family}")
         def func(gr_family):
             xpos_w = []
             for gr_f, gr_i in gr_family.gr_wife.get_all_ancestors():
