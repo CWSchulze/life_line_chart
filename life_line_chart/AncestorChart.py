@@ -362,7 +362,7 @@ class AncestorChart(BaseSVGChart):
         if x_pos_husb and children_x_center < x_pos_husb or x_pos_wife and x_pos_wife < children_x_center:
             family_was_flipped = True
 
-        for _, gr_individual in sorted(gr_individuals):
+        for _, gr_individual in gr_individuals:
             gr_cofs = gr_individual.connected_parent_families
             for gr_cof in gr_cofs:
                 try:
@@ -373,7 +373,7 @@ class AncestorChart(BaseSVGChart):
                 break
         if self.debug_optimization_compression_steps <= 0:
             return
-        for original_direction_factor, gr_individual in sorted(gr_individuals):
+        for original_direction_factor, gr_individual in gr_individuals:
             if gr_individual is None:
                 continue
             i = 0
@@ -407,6 +407,9 @@ class AncestorChart(BaseSVGChart):
                     try:
                         self._move_individual_and_ancestors(
                             gr_individual, gr_family, -direction_factor*1)
+                        self.debug_optimization_compression_steps -= 1
+                        if self.debug_optimization_compression_steps <= 0:
+                            break
                         self._check_compressed_x_position(True)
                     except:
                         pass
@@ -426,8 +429,13 @@ class AncestorChart(BaseSVGChart):
                 logger.info('moved ' + ' '.join(gr_individual.get_name()) +
                             ' by ' + str(i2 * direction_factor * 1))
 
-        for _, gr_individual in sorted(gr_individuals):
+        if self.debug_optimization_compression_steps <= 0:
+            return
+        for _, gr_individual in gr_individuals:
             self._move_child_to_center_between_parents(gr_individual)
+            self.debug_optimization_compression_steps -= 1
+            if self.debug_optimization_compression_steps <= 0:
+                break
 
     def _move_child_to_center_between_parents(self, gr_individual):
         gr_cofs = gr_individual.connected_parent_families
@@ -460,7 +468,7 @@ class AncestorChart(BaseSVGChart):
         Args:
             root_individual_id (str): root individual id used as root node for compression
         """
-        self.check_unique_x_position()
+        failed, _, _ = self.check_unique_x_position()
 
         candidates = []
         if self._positioning['flip_to_optimize']:
@@ -507,6 +515,7 @@ class AncestorChart(BaseSVGChart):
                             logger.error("failed flipping " +
                                         str((gr_family, gr_family.family_id, ov)) + str(nSteps))
                             break
+
                         new_width, _ = self._calculate_sum_of_distances()
                         # print (f'step={nSteps} new_width={new_width} width_difference={new_width-old_width} algorithm_failed={len(failed) > 0} better={new_width < width}')
                         if new_width >= width:
@@ -520,7 +529,7 @@ class AncestorChart(BaseSVGChart):
                     break
 
             logger.info(
-                f"flipping reduced the cross connections by {width - old_width} (i.e. from {old_width} to {width})")
+                f"flipping reduced the cross connections by {old_width - width} (i.e. from {old_width} to {width})")
 
         # for gr_family in self.gr_families:
         if self._positioning['compress']:
@@ -535,7 +544,8 @@ class AncestorChart(BaseSVGChart):
                 self.debug_optimization_compression_steps = self._positioning['debug_optimization_compression_steps']
             for gr_family in gr_root_individual.connected_parent_families:
                 self._compress_chart_ancestor_graph(gr_family)
-            self._move_child_to_center_between_parents(gr_root_individual)
+            if self.debug_optimization_compression_steps > 0:
+                self._move_child_to_center_between_parents(gr_root_individual)
 
             # compressed chart should be aligned left
             _, min_index_x, max_index_x = self._check_compressed_x_position(
@@ -552,7 +562,7 @@ class AncestorChart(BaseSVGChart):
             self.min_x_index = 0
             self.max_x_index = width
             logger.info(
-                f"compression reduced the total width by {width - old_width} (i.e. from {old_width} to {width})")
+                f"compression reduced the total width by {old_width - width} (i.e. from {old_width} to {width})")
         else:
             self._check_compressed_x_position(
                 False, self.position_to_person_map)
