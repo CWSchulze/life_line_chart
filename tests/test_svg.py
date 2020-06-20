@@ -268,7 +268,7 @@ def test_generate_svg_update_interface_parent_placement():
         {'individual_id':'@I450@', 'generations':8},
         #{'individual_id':'@I69@', 'generations':2},
         ],
-        'parent_placement': {
+        'ancestor_placement': {
             (0, '@F68@'): ((0, '@F137@'),(0, '@I236@')),
             (0, '@F67@'): ((0, '@F136@'),(0, '@I233@'))
         }

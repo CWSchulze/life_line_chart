@@ -46,7 +46,7 @@ class AncestorChart(BaseSVGChart):
             'root_individuals': [],
             'family_children': [],
             'discovery_blacklist': [],
-            'parent_placement': []
+            'ancestor_placement': {}
     }
     DEFAULT_CHART_CONFIGURATION.update(BaseSVGChart.DEFAULT_CHART_CONFIGURATION)
 
@@ -189,7 +189,7 @@ class AncestorChart(BaseSVGChart):
         gr_spouse_family_g_id = gr_spouse_family.g_id if gr_spouse_family else None
         gr_child_of_family_g_id = gr_child_of_family.g_id if gr_child_of_family else None
 
-        placement_config = self._chart_configuration['parent_placement'].get(gr_child_of_family_g_id)
+        placement_config = self._chart_configuration['ancestor_placement'].get(gr_child_of_family_g_id)
         if placement_config and gr_child_of_family:
             place_ancestors_here = \
                 (gr_spouse_family_g_id == placement_config[0]) and \
