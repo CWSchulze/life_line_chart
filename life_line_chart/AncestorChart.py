@@ -171,7 +171,7 @@ class AncestorChart(BaseSVGChart):
             # if this individual has already been placed in this marriage family
             return
 
-        logger.info(f"discovering {individual.plain_name}")
+        # logger.debug(f"discovering {individual.plain_name}")
         x_position = x_offset
         self.min_x_index = min(self.min_x_index, x_position)
 
