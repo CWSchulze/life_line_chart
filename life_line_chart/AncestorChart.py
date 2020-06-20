@@ -650,10 +650,10 @@ class AncestorChart(BaseSVGChart):
                     for vm in vms:
                         gr_spouse_family = vm
                         self.place_selected_individuals(
-                            gr_root_individual, gr_spouse_family, gr_cof_family, x_pos, [], [])
+                            gr_root_individual, gr_spouse_family, gr_cof_family, x_pos)
                 else:
                     self.place_selected_individuals(
-                        gr_root_individual, None, gr_cof_family, x_pos, [], [])
+                        gr_root_individual, None, gr_cof_family, x_pos)
 
                 x_pos = max(0, self.max_x_index)
 
