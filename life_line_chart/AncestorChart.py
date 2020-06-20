@@ -186,6 +186,9 @@ class AncestorChart(BaseSVGChart):
         else:
             siblings = [gr_individual]
 
+        # define where to place the ancestors:
+        place_ancestors_here = gr_individual == siblings[0]
+
         # go back to root node
         root_node_discovery_cache += siblings
         if gr_spouse_family:
