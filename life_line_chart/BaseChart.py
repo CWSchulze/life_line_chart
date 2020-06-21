@@ -221,7 +221,7 @@ class BaseChart():
         Args:
             gr_individual (GraphicalIndividual): individual instance
             gr_family (GraphicalFamily): family instance
-            x_index_offset (int): vertical offset
+            x_index_offset (int): horizontal offset
 
         Returns:
             dict: position dict of the graphical individual representation
@@ -264,7 +264,7 @@ class BaseChart():
         Args:
             gr_individual (GraphicalIndividual): gr_individual instance
             gr_family (GraphicalFamily): family instance
-            x_index_offset (int): vertical offset
+            x_index_offset (int): horizontal offset
         """
         if discovery_cache is None:
             discovery_cache = []
@@ -419,7 +419,7 @@ class BaseChart():
         Map vertical index to x axis.
 
         Args:
-            x_index (float or int): vertical index
+            x_index (float or int): horizontal index
 
         Returns:
             float: x position
@@ -428,11 +428,11 @@ class BaseChart():
 
     def _map_position(self, x_index, ov):
         """
-        Map date information and vertical index to x and y axis. This function also supports
+        Map date information and horizontal index to x and y axis. This function also supports
         warping of the whole chart.
 
         Args:
-            x_index (float or int): vertical index
+            x_index (float or int): horizontal index
             ov (float or int): ordinal value of the datetime
 
         Returns:
@@ -456,10 +456,10 @@ class BaseChart():
 
     def _inverse_map_position(self, pos_x, pos_y):
         """
-        Map x and y axis to date information and vertical index. This function also supports warping of the whole chart.
+        Map x and y axis to date information and horizontal index. This function also supports warping of the whole chart.
 
         Args:
-            pos_x (float or int): vertical index
+            pos_x (float or int): horizontal index
             pos_y (float or int): ordinal value of the datetime
 
         Returns:
@@ -489,7 +489,7 @@ class BaseChart():
         is used for the rotation of text.
 
         Args:
-            pos_x (float or int): vertical index
+            pos_x (float or int): horizontal index
             pos_y (float or int): ordinal value of the datetime
 
         Returns:
