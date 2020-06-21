@@ -24,7 +24,7 @@ class BaseChart():
         'vertical_step_size': 40,
         'relative_line_thickness': 0.4,
         'total_height': 1500,
-        'display_factor': -1,
+        'flip_vertically': False,
         'font_size_description': 0.7,
         'font_description_letter_offset': [str(30 / 12.0)],
         'font_name': 'Arial',
@@ -502,12 +502,11 @@ class BaseChart():
         Returns:
             float: y position
         """
+        display_factor = 1 if self._formatting['flip_vertically'] else -1
         return (
             + (ordinal_value - self.chart_min_ordinal)/(self.chart_max_ordinal-self.chart_min_ordinal) *
-            self._formatting['total_height'] *
-            self._formatting['display_factor']
-            - self._formatting['total_height'] *
-            (self._formatting['display_factor']-1)/2
+            self._formatting['total_height'] * display_factor
+            - self._formatting['total_height'] * (display_factor-1)/2
         )
 
     def _map_x_position(self, x_index):
@@ -610,7 +609,8 @@ class BaseChart():
         Returns:
             float: difference of ordinal value
         """
-        return delta_y / (self._formatting['total_height'] * self._formatting['display_factor']) * (self.max_ordinal-self.min_ordinal)
+        display_factor = 1 if self._formatting['flip_vertically'] else -1
+        return delta_y / (self._formatting['total_height'] * display_factor) * (self.max_ordinal-self.min_ordinal)
 
     def _inverse_y_position(self, pos_y):
         """
@@ -622,14 +622,12 @@ class BaseChart():
         Returns:
             float: ordinal value
         """
+        display_factor = 1 if self._formatting['flip_vertically'] else -1
         return (
             pos_y
             + self._formatting['total_height'] *
-            (self._formatting['display_factor']-1)/2
-        ) / (self._formatting['total_height'] * self._formatting['display_factor']) * (self.chart_max_ordinal-self.chart_min_ordinal) + self.chart_min_ordinal
-
-    # def _inverse_x_position(self, pos_x):
-    #     return int(round((pos_x - self._formatting['margin_left'])/self._formatting['vertical_step_size']))
+            (display_factor-1)/2
+        ) / (self._formatting['total_height'] * display_factor) * (self.chart_max_ordinal-self.chart_min_ordinal) + self.chart_min_ordinal
 
     def _inverse_x_position_float(self, pos_x):
         return (pos_x - self._formatting['margin_left'])/self._formatting['vertical_step_size']

@@ -152,6 +152,10 @@
                     "unique": "Unique",
                     "surname": "Based on surname"
                 }
+            },
+            "flip_vertically": {
+                "short_description": "Flip vertically",
+                "long_description": "If active, the chart is flipped vertically."
             }
         },
         "positioning": {
@@ -320,12 +324,16 @@
                     "unique": "Einzigartig",
                     "surname": "Basierend auf dem Nachnamen"
                 }
+            },
+            "flip_vertically": {
+                "short_description": "Vertikal spiegeln",
+                "long_description": "Falls aktiv, wird das Diagramm vertikal gespiegelt."
             }
         },
         "positioning": {
             "unique_graphical_representation": {
                 "short_description": "Ahnenschwund darstellen",
-                "long_description": "Aufgrund des Ahnenschwundes könnte eine Person mehrmals in einem einfachen Vorfahren Diagramm gezeigt werden. Wenn dieses Flag aktiv ist, dann erscheint jede Person nur einmal."
+                "long_description": "Aufgrund des Ahnenschwundes k\u00f6nnte eine Person mehrmals in einem einfachen Vorfahren Diagramm gezeigt werden. Wenn dieses Flag aktiv ist, dann erscheint jede Person nur einmal."
             }
         },
         "chart_configuration_root_individual": {
