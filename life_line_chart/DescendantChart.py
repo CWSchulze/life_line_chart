@@ -87,10 +87,10 @@ class DescendantChart(BaseSVGChart):
                         gr_spouse = self._create_individual_graphical_representation(
                             spouse, not self._positioning['unique_graphical_representation'])
 
-                    if gr_marriage.husb == spouse:
-                        gr_marriage.gr_husb = gr_spouse
-                    else:
-                        gr_marriage.gr_wife = gr_spouse
+                        if gr_marriage.husb == spouse:
+                            gr_marriage.gr_husb = gr_spouse
+                        else:
+                            gr_marriage.gr_wife = gr_spouse
 
                 for child in marriage.children:
                     gr_child = self.select_descendants(
