@@ -448,9 +448,9 @@ class GraphicalIndividual():
             if gr_family_pos_a[1] != gr_family_pos_b[1]:
                 return True
             return False
-        return False
         # this happens in descendant charts. spouses dont have a visible parent family.
         #raise LifeLineChartUnknownPlacementError("individual was not placed in requested family")
+        return False
 
     def get_birth_event(self):
         return self.individual.events['birth_or_christening']
