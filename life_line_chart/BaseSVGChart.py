@@ -218,7 +218,9 @@ class BaseSVGChart(BaseChart):
             # collect information about marriages
             marriage_ordinals = []
             marriage_ring_positions = []
-            marriage_id = []
+            marriage_families = []
+            # ring is only added to one spouse
+            marriage_has_ring = []
             new_x_indices_after_marriage = []
             marriage_labels = []
             def calculate_ring_position(gr_family):
@@ -253,7 +255,10 @@ class BaseSVGChart(BaseChart):
 
                 marriage_ring_positions.append(calculate_ring_position(gr_marriage_family))
 
-                marriage_id.append(gr_marriage_family.family_id)
+                marriage_families.append(gr_marriage_family)
+                #gr_marriage_family_gr_husb = gr_marriage_family.gr_husb
+                #gr_marriage_family_gr_wife = gr_marriage_family.gr_wife
+                marriage_has_ring.append(True)#gr_marriage_family.gr_husb == gr_individual or gr_marriage_family.gr_husb is None)
                 marriage_ordinals.append(
                     gr_marriage_family.marriage['ordinal_value'])
                 marriage_labels.append(
@@ -320,8 +325,8 @@ class BaseSVGChart(BaseChart):
             _death_position = self._map_position(*_death_original_location)
             knots.append((x_pos_list[0][1], birth_date_ov))
             images = []
-            for index, ((marriage_ring_index, marriage_ordinal), new_x_index_after_marriage, label, family_id) in enumerate(zip(marriage_ring_positions, new_x_indices_after_marriage, marriage_labels, marriage_id)):
-                if not self._formatting['no_ring']:
+            for index, ((marriage_ring_index, marriage_ordinal), new_x_index_after_marriage, label, gr_family, has_ring) in enumerate(zip(marriage_ring_positions, new_x_indices_after_marriage, marriage_labels, marriage_families, marriage_has_ring)):
+                if not self._formatting['no_ring'] and has_ring:
                     ring_position = self._map_position(
                         marriage_ring_index, marriage_ordinal)
                     images.append(
@@ -338,7 +343,9 @@ class BaseSVGChart(BaseChart):
                                     self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*2),
                             },
                             'filename': os.path.join(os.path.dirname(__file__), "ringe.png"),
-                            'size': (119,75)
+                            'size': (119,75),
+                            'gir':gr_individual,
+                            'gfr':gr_family
                         }
                     )
                 if self._formatting['marriage_label_active']:
@@ -520,7 +527,8 @@ class BaseSVGChart(BaseChart):
                     'config': path,
                     'color': gr_individual.color,
                     'color_pos': color_pos,
-                    'stroke_width': self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']
+                    'stroke_width': self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'],
+                    'gir':gr_individual
                 })
             if self._formatting['birth_label_active']:
                 if self._formatting['birth_label_along_path']:
