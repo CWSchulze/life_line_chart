@@ -42,7 +42,7 @@ def test_generate_svg_file():
     chart.modify_layout(individual_id)
 
     chart.define_svg_items()
-    chart.paint_and_save(individual_id, os.path.join(
+    chart.paint_and_save(os.path.join(
         os.path.dirname(__file__), 'output', 'test_svg.svg'))
 
 
@@ -101,7 +101,7 @@ def test_generate_svg_file_with_two_roots():
     x_position += x_max - x_min + 1
 
     chart.define_svg_items()
-    chart.paint_and_save(individual_id, os.path.join(
+    chart.paint_and_save(os.path.join(
         os.path.dirname(__file__), 'output', 'test_svg_two_roots.svg'))
 
 
@@ -152,7 +152,7 @@ def test_generate_svg_file_ancestor_and_children():
     x_position += x_max - x_min + 1
 
     chart.define_svg_items()
-    chart.paint_and_save(individual_id, os.path.join(
+    chart.paint_and_save(os.path.join(
         os.path.dirname(__file__), 'output', 'test_svg_ancestor_and_children.svg'))
 
 
@@ -222,7 +222,7 @@ def test_photos_in_chart():
     chart.modify_layout(individual_id)
 
     chart.define_svg_items()
-    chart.paint_and_save(individual_id, os.path.join(
+    chart.paint_and_save(os.path.join(
         os.path.dirname(__file__), 'output', 'test_svg_photos.svg'))
 
 
@@ -239,7 +239,7 @@ def test_generate_svg_update_interface():
         ]})
     chart.update_chart()
 
-    chart.paint_and_save('@I25@', os.path.join(
+    chart.paint_and_save(os.path.join(
         os.path.dirname(__file__), 'output', 'test_svg_ancestor_configuration.svg'))
 
 
@@ -254,7 +254,7 @@ def test_generate_svg_update_interface_descendant():
         ]})
     chart.update_chart()
 
-    chart.paint_and_save('@I25@', os.path.join(
+    chart.paint_and_save(os.path.join(
         os.path.dirname(__file__), 'output', 'test_svg_descendant_configuration.svg'))
 
 
@@ -275,7 +275,7 @@ def test_generate_svg_update_interface_parent_placement():
     })
     chart.update_chart()
 
-    chart.paint_and_save('@I25@', os.path.join(
+    chart.paint_and_save(os.path.join(
         os.path.dirname(__file__), 'output', 'test_svg_ancestor_configuration_parent_placement.svg'))
 
 

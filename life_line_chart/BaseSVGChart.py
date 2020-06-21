@@ -676,31 +676,16 @@ class BaseSVGChart(BaseChart):
                                 ))
 
 
-    def paint_and_save(self, individual_id, filename=None):
+    def paint_and_save(self, filename):
         """
         Setup svg file and save it.
 
         Args:
-            individual_id (str): root person used for filename
-            filename (str, optional): user defined filename. Defaults to None.
+            filename (str): user defined filename.
         """
 
         logger.debug('start creating document')
 
-        if filename is None:
-            filename = 'ancestors_of_' + \
-                "".join(self._instances[('i', individual_id)].get_name()).replace(
-                    ' ', '')
-            if self._positioning['flip_to_optimize']:
-                filename += '_flipped'
-            if self._positioning['compress']:
-                filename += '_compressed'
-            if self._positioning['fathers_have_the_same_color']:
-                filename += '_fathersSameColor'
-            if self._formatting['fade_individual_color']:
-                filename += '_fadeIndividualColor'
-            filename += '.svg'
-        # print(filename)
         svgwrite.utils.AutoID._nextid = 1
         svg_document = svgwrite.Drawing(filename=filename,
                                         debug=False,
