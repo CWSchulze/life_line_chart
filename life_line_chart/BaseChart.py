@@ -78,7 +78,6 @@ class BaseChart():
         self._instances[('i', None)] = None
         self.gr_individuals = []
         self.gr_families = []
-        # strong graphical connections which must not be broken by optimization algorithms
 
         self.additional_graphical_items = {}
         logger.debug('finished creating instances')
@@ -100,13 +99,13 @@ class BaseChart():
 
     def instantiate_all(self):
         """
-        instantiate all families and individuals
+        Instantiate all families and individuals
         """
         self._instances.instantiate_all(self=self._instances)
 
     def set_formatting(self, formatting):
         """
-        set the formatting configuration of the chart
+        Set the formatting configuration of the chart
 
         Args:
             formatting (dict): formatting dict
@@ -115,7 +114,7 @@ class BaseChart():
 
     def set_positioning(self, positioning):
         """
-        set the positioning configuration of the chart
+        Set the positioning configuration of the chart
 
         Args:
             positioning (dict): positioning dict
@@ -124,7 +123,7 @@ class BaseChart():
 
     def set_chart_configuration(self, chart_configuration):
         """
-        set the chart configuration of the chart
+        Set the chart configuration of the chart
 
         Args:
             chart_configuration (dict): chart configuration dict
@@ -133,7 +132,7 @@ class BaseChart():
 
     def get_chart_configuration(self):
         """
-        get the chart configuration
+        Get the chart configuration
 
         Returns:
             dict: chart configuration dict
@@ -142,15 +141,17 @@ class BaseChart():
 
     def _create_individual_graphical_representation(self, individual, always_instantiate_new = False):
         """
-        create a graphical representation for an individual
+        Create a graphical representation for an individual
 
         Args:
             individual (BaseIndividual): individual
+            always_instantiate_new (bool): create separate representations for each appearance
 
         Returns:
-            ancestor_chart_inidividual: created instance
+            ancestor_chart_inidividual: created or reused instance
         """
         if not individual.graphical_representations or always_instantiate_new:
+            # create new instance
             new_instance = self._graphical_individual_class(
                 self._instances, individual.individual_id)
             if new_instance.birth_date is None or new_instance.death_date is None:
@@ -160,33 +161,38 @@ class BaseChart():
             new_instance.color = (0,0,0)
             self.gr_individuals.append(new_instance)
         else:
+            # reuse instance
             new_instance = individual.graphical_representations[-1]
 
         return new_instance
 
     def _create_family_graphical_representation(self, family, always_instantiate_new = False):
         """
-        create a graphical representation for a family
+        Create a graphical representation for a family
 
         Args:
             family (BaseFamily): family
+            always_instantiate_new (bool): create separate representations for each appearance
 
         Returns:
-            GraphicalFamily: created instance
+            GraphicalFamily: created or reused instance
         """
         if not family.graphical_representations or always_instantiate_new:
+            # create new instance
             new_instance = self._graphical_family_class(
                 self._instances, family.family_id)
             new_instance.g_id = (len(family.graphical_representations) - 1, family.family_id)
             self.gr_families.append(new_instance)
         else:
+            # reuse instance
             new_instance = family.graphical_representations[-1]
-            # print('the family was added twice:'+family.family_id)
+            # logger.debug('the family was added twice:'+family.family_id)
         return new_instance
 
     def _calculate_sum_of_distances(self):
         """
-        sum of distances between different families of one individual
+        Sum of distances between different families of one individual. This refers
+        to connections across the chart due to pedigree collapse.
 
         Returns:
             tuple: (total_distance, list_of_linked_individuals)
@@ -207,7 +213,10 @@ class BaseChart():
 
     def _move_single_individual(self, gr_individual, gr_family, x_index_offset):
         """
-        move a single individual vertically
+        Move an x-position of an individual in a family.
+        The parent family in an ancestor chart can be placed (and strongly connected)
+        to one marriage. If the gr_family is one of the connected pair, then both
+        are moved.
 
         Args:
             gr_individual (GraphicalIndividual): individual instance
@@ -228,7 +237,6 @@ class BaseChart():
 
         if other_g_id != "there is no connected family":
             if g_id in position_dict and other_g_id in position_dict:
-                # pass
                 position_dict[other_g_id] = (
                     position_dict[other_g_id][0],
                     position_dict[other_g_id][1]+x_index_offset,
@@ -250,7 +258,8 @@ class BaseChart():
 
     def _move_individual_and_ancestors(self, gr_individual, gr_family, x_index_offset, discovery_cache = None):
         """
-        move an individual and its ancestors vertically. Only ancestors are moved, which are strongly coupled with the individual.
+        Move an individual and its ancestors horizontally. Only ancestors are moved,
+        which are strongly coupled with the individual.
 
         Args:
             gr_individual (GraphicalIndividual): gr_individual instance
@@ -291,81 +300,18 @@ class BaseChart():
                         gr_child_individual, gr_cof, x_index_offset)
         discovery_cache.pop()
 
-    def _flip_family(self, gr_family):
-        """
-        Flip family. The three sections change order
-        - father and ancestors
-        - individual + siblings
-        - mother and ancestors
-
-        Args:
-            gr_family (GraphicalFamily): family instance
-        """
-        # logger.debug(f"flipping {gr_family}")
-        def func(gr_family):
-            xpos_w = []
-            for gr_f, gr_i in gr_family.gr_wife.get_all_ancestors():
-                xpos_w.append(gr_i.get_position_dict(gr_f.family)[1])
-            xpos_h = []
-            for gr_f, gr_i in gr_family.gr_husb.get_all_ancestors():
-                xpos_h.append(gr_i.get_position_dict(gr_f.family)[1])
-            return (max(xpos_w), min(xpos_w), max(xpos_w)- min(xpos_w), gr_family.gr_wife.get_ancestor_range(gr_family)),(max(xpos_h), min(xpos_h), max(xpos_h)- min(xpos_h), gr_family.gr_husb.get_ancestor_range(gr_family))
-        if gr_family.gr_husb is None and gr_family.gr_wife is None:
-            return
-        if gr_family.gr_husb is not None:
-            husb_x_pos = gr_family.gr_husb.get_x_index(gr_family.g_id)
-            husb_width = gr_family.husb_width()
-        else:
-            husb_x_pos = None
-            husb_width = 0
-        if gr_family.gr_wife is not None:
-            wife_x_pos = gr_family.gr_wife.get_x_index(gr_family.g_id)
-            wife_width = gr_family.wife_width()
-        else:
-            wife_x_pos = None
-            wife_width = 0
-        vcs = gr_family.visible_children
-        children_width = len(vcs)
-        if children_width == 0:
-            if gr_family.gr_husb is None or gr_family.gr_wife is None:
-                return
-            children_x_center = (husb_x_pos + wife_x_pos)/2.0
-        else:
-            children_x_positions = [gr_child.get_position_dict(gr_family)[1] for gr_child in vcs]
-            children_x_center = sum(children_x_positions)*1.0/children_width
-
-        if wife_x_pos and children_x_center < wife_x_pos or husb_x_pos and husb_x_pos < children_x_center:
-            husb_x_delta = wife_width + children_width
-            wife_x_delta = -husb_width - children_width
-            child_x_delta = wife_width - husb_width
-        else:
-            husb_x_delta = -wife_width - children_width
-            wife_x_delta = husb_width + children_width
-            child_x_delta = husb_width - wife_width
-
-        for gr_child in vcs:
-            for gr_parent_family in gr_child.connected_parent_families:
-                self._move_single_individual(
-                    gr_child, gr_parent_family, child_x_delta)
-
-        if gr_family.gr_husb:
-            self._move_individual_and_ancestors(gr_family.gr_husb, gr_family, husb_x_delta)
-        if gr_family.gr_wife:
-            self._move_individual_and_ancestors(gr_family.gr_wife, gr_family, wife_x_delta)
-        self._instances.ancestor_width_cache.clear()
-
     def _check_compressed_x_position(self, early_raise, position_to_person_map=None, min_distance=15):
         """
-        check the compressed chart for overlapping individuals
+        Check the compressed chart for overlapping individuals. Overlapping is allowed if the minimum
+        distance between the individual family sections is greater than min_distance years.
 
         Args:
             early_raise (bool): raise an exception if the first individual overlap was found
+            position_to_person_map (dict): if required, they position map can be obtained. Defaults to None.
+            min_distance (float): if the distance falls below this value, the exception is thrown.
 
         Raises:
             LifeLineChartCollisionDetected: overlapping found
-
-        Returns:
-            [type]: [description]
         """
         self._debug_check_collision_counter += 1
         v = {}
@@ -451,50 +397,9 @@ class BaseChart():
                             (gr_individual_a, gr_individual_b))
         return collisions, min_x, max_x
 
-    # def check_unique_x_position(self):
-    #     """
-    #     check if every individual position has a unique vertical slot
-
-    #     Raises:
-    #         RuntimeError: overlap was found
-
-    #     Returns:
-    #         tuple: (list of failures, min_x_index, max_x_index)
-    #     """
-    #     failed = []
-    #     v = {}
-    #     for gr_individual in self.gr_individuals:
-    #         x_pos = gr_individual.get_position_dict()
-    #         for value in x_pos.values():
-    #             x_index = value[1]
-    #             if value[3]:
-    #                 continue
-    #             if x_index not in v:
-    #                 v[x_index] = gr_individual.individual_id
-    #             else:
-    #                 failed.append(x_index)
-    #                 # value = index_map[x_index]
-    #                 logger.error(
-    #                     "check_unique_x_position failed, index was used more than once: " + str((x_index, value[2].family_id, gr_individual.individual.plain_name, v[x_index])))
-    #     full_index_list = list(sorted(v.keys()))
-    #     for i in range(max(full_index_list)):
-    #         if i not in full_index_list:
-    #             if self._formatting['debug_visualize_ambiguous_placement']:
-    #                 gr_individual.items.append({
-    #                     'type': 'rect',
-    #                     'config': {
-    #                         'insert': (self._map_x_position(i), 0),
-    #                         'size': (self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'], self._formatting['total_height']),
-    #                         'fill': 'black',
-    #                         'fill-opacity': "0.5"
-    #                     }
-    #                 })
-    #             failed.append(('missing', i))
-    #     return failed, full_index_list[0], full_index_list[-1]
-
     def _map_y_position(self, ordinal_value):
         """
-        map date information to y axis
+        Map date information to y axis.
 
         Args:
             ordinal_value (float or int): ordinal value of the datetime
@@ -511,7 +416,7 @@ class BaseChart():
 
     def _map_x_position(self, x_index):
         """
-        map vertical index to x axis
+        Map vertical index to x axis.
 
         Args:
             x_index (float or int): vertical index
@@ -523,7 +428,8 @@ class BaseChart():
 
     def _map_position(self, x_index, ov):
         """
-        map date information and vertical index to x and y axis. This function also supports warping of the whole chart.
+        Map date information and vertical index to x and y axis. This function also supports
+        warping of the whole chart.
 
         Args:
             x_index (float or int): vertical index
@@ -550,7 +456,7 @@ class BaseChart():
 
     def _inverse_map_position(self, pos_x, pos_y):
         """
-        map date information and vertical index to x and y axis. This function also supports warping of the whole chart.
+        Map x and y axis to date information and vertical index. This function also supports warping of the whole chart.
 
         Args:
             pos_x (float or int): vertical index
@@ -579,7 +485,8 @@ class BaseChart():
 
     def _orientation_angle(self, pos_x, pos_y):
         """
-        get the rotation of the lines which is caused by the warping of the whole chart
+        Get the rotation of the lines which is caused by the warping of the whole chart. This
+        is used for the rotation of text.
 
         Args:
             pos_x (float or int): vertical index
@@ -601,7 +508,7 @@ class BaseChart():
 
     def _inverse_y_delta(self, delta_y):
         """
-        map back a delta display size to the delta ordinal value
+        Map back a delta display size to the delta ordinal value
 
         Args:
             delta_y (float): difference of display size
@@ -614,7 +521,7 @@ class BaseChart():
 
     def _inverse_y_position(self, pos_y):
         """
-        map back a display position to an ordinal value
+        Map back a display position to an ordinal value
 
         Args:
             pos_y (float): display position
@@ -634,7 +541,7 @@ class BaseChart():
 
     def get_full_width(self):
         """
-        get the full width of the chart including margins
+        Get the full width of the chart including margins
 
         Returns:
             float: chart width
@@ -643,7 +550,7 @@ class BaseChart():
 
     def get_full_height(self):
         """
-        get the full height of the chart including margins
+        Get the full height of the chart including margins
 
         Returns:
             float: chart height
@@ -652,14 +559,14 @@ class BaseChart():
 
     def get_individual_from_position(self, pos_x, pos_y):
         """
-        inverse mapping from chart position to individual instance
+        Inverse mapping from chart position to individual instance
 
         Args:
             pos_x (float or int): x position
             pos_y (float or int): y position
 
         Returns:
-            BaseIndividual: individual instance
+            tuple: graphical individual instance, and graphical family instance
         """
         # x_index = self._inverse_x_position(pos_x)
         # ordinal_value = int(self._inverse_y_position(pos_y))
@@ -673,7 +580,7 @@ class BaseChart():
 
     def clear_svg_items(self):
         """
-        clear all graphical items to render the chart with different settings
+        Clear all graphical items to render the chart with different settings
         """
         self.additional_graphical_items.clear()
         for gr_individual in self.gr_individuals:
@@ -681,7 +588,7 @@ class BaseChart():
 
     def clear_graphical_representations(self):
         """
-        clear all graphical representations to rebuild the chart
+        Clear all graphical representations to rebuild the chart
         """
         self.max_ordinal = None
         self.min_ordinal = None

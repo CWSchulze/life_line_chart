@@ -318,6 +318,69 @@ class AncestorChart(BaseSVGChart):
             self.max_ordinal = death_ordinal_value
         discovery_cache.append((gr_individual, gr_spouse_family))
 
+    def _flip_family(self, gr_family):
+        """
+        Flip family. The three sections change order
+        - father and ancestors
+        - individual + siblings
+        - mother and ancestors
+
+        Args:
+            gr_family (GraphicalFamily): family instance
+        """
+        # logger.debug(f"flipping {gr_family}")
+        def func(gr_family):
+            xpos_w = []
+            for gr_f, gr_i in gr_family.gr_wife.get_all_ancestors():
+                xpos_w.append(gr_i.get_position_dict(gr_f.family)[1])
+            xpos_h = []
+            for gr_f, gr_i in gr_family.gr_husb.get_all_ancestors():
+                xpos_h.append(gr_i.get_position_dict(gr_f.family)[1])
+            return (max(xpos_w), min(xpos_w), max(xpos_w)- min(xpos_w), gr_family.gr_wife.get_ancestor_range(gr_family)),(max(xpos_h), min(xpos_h), max(xpos_h)- min(xpos_h), gr_family.gr_husb.get_ancestor_range(gr_family))
+        if gr_family.gr_husb is None and gr_family.gr_wife is None:
+            return
+        if gr_family.gr_husb is not None:
+            husb_x_pos = gr_family.gr_husb.get_x_index(gr_family.g_id)
+            husb_width = gr_family.husb_width()
+        else:
+            husb_x_pos = None
+            husb_width = 0
+        if gr_family.gr_wife is not None:
+            wife_x_pos = gr_family.gr_wife.get_x_index(gr_family.g_id)
+            wife_width = gr_family.wife_width()
+        else:
+            wife_x_pos = None
+            wife_width = 0
+        vcs = gr_family.visible_children
+        children_width = len(vcs)
+        if children_width == 0:
+            if gr_family.gr_husb is None or gr_family.gr_wife is None:
+                return
+            children_x_center = (husb_x_pos + wife_x_pos)/2.0
+        else:
+            children_x_positions = [gr_child.get_position_dict(gr_family)[1] for gr_child in vcs]
+            children_x_center = sum(children_x_positions)*1.0/children_width
+
+        if wife_x_pos and children_x_center < wife_x_pos or husb_x_pos and husb_x_pos < children_x_center:
+            husb_x_delta = wife_width + children_width
+            wife_x_delta = -husb_width - children_width
+            child_x_delta = wife_width - husb_width
+        else:
+            husb_x_delta = -wife_width - children_width
+            wife_x_delta = husb_width + children_width
+            child_x_delta = husb_width - wife_width
+
+        for gr_child in vcs:
+            for gr_parent_family in gr_child.connected_parent_families:
+                self._move_single_individual(
+                    gr_child, gr_parent_family, child_x_delta)
+
+        if gr_family.gr_husb:
+            self._move_individual_and_ancestors(gr_family.gr_husb, gr_family, husb_x_delta)
+        if gr_family.gr_wife:
+            self._move_individual_and_ancestors(gr_family.gr_wife, gr_family, wife_x_delta)
+        self._instances.ancestor_width_cache.clear()
+
     def _compress_single_individual_position(self, gr_individual, gr_cof, direction, nSteps=50000):
         """
         move single gr_individual until it collides
