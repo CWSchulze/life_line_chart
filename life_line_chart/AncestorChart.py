@@ -399,6 +399,7 @@ class AncestorChart(BaseSVGChart):
             if gr_individual is None:
                 continue
             i = 0
+            i2 = 0
             if family_was_flipped:
                 direction_factor = - original_direction_factor
             else:
