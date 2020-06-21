@@ -50,6 +50,17 @@ def cardano(a,b,c,d):
         cardano_instance = Cardano()
     return cardano_instance.solve(a,b,c,d)
 
+def intersection_polynomial(coeffs, y_pos):
+    coeffs2 = (
+        coeffs[0].imag, coeffs[1].imag, coeffs[2].imag, coeffs[3].imag - y_pos)
+    roots = cardano(*coeffs2)
+    root = [root.real for root in roots if abs(
+        root.imag) < 1e-5 and root.real >= 0 and root.real <= 1]
+    if len(root) > 0:
+        return root[0]
+    else:
+        return roots[1]
+    return xpos
 
 class BaseSVGChart(BaseChart):
     """
@@ -438,15 +449,9 @@ class BaseSVGChart(BaseChart):
                                         self._map_y_position(ov)*1j
                                 else:
                                     coeffs = svg_path.poly()
-                                    coeffs2 = (
-                                        coeffs[0].imag, coeffs[1].imag, coeffs[2].imag, coeffs[3].imag - self._map_y_position(ov))
-                                    roots = cardano(*coeffs2)
-                                    root = [root.real for root in roots if abs(
-                                        root.imag) < 1e-5 and root.real >= 0 and root.real <= 1]
-                                    if len(root) > 0:
-                                        xpos = svg_path.point(root[0])
-                                    else:
-                                        xpos = svg_path.point(roots[1])
+                                    root = intersection_polynomial(coeffs, self._map_y_position(ov))
+                                    xpos = svg_path.point(root)
+
                                 images.append(((4, 'layer_photos'), {
                                         'type': 'image',
                                         'config': {
@@ -511,15 +516,8 @@ class BaseSVGChart(BaseChart):
                                             self._map_y_position(ov)*1j
                                     else:
                                         coeffs = svg_path.poly()
-                                        coeffs2 = (
-                                            coeffs[0].imag, coeffs[1].imag, coeffs[2].imag, coeffs[3].imag - self._map_y_position(ov))
-                                        roots = cardano(*coeffs2)
-                                        root = [root.real for root in roots if abs(
-                                            root.imag) < 1e-5 and root.real >= 0 and root.real <= 1]
-                                        if len(root) > 0:
-                                            xpos = svg_path.point(root[0])
-                                        else:
-                                            xpos = svg_path.point(roots[1])
+                                        root = intersection_polynomial(coeffs, self._map_y_position(ov))
+                                        xpos = svg_path.point(root)
                                     images.append(((4, 'layer_photos'), {
                                             'type': 'image',
                                             'config': {
