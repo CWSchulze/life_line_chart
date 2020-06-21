@@ -367,7 +367,7 @@ class GraphicalIndividual():
             return True
         return False
 
-    def set_position_vector(self, x_position, gr_family, parent_starting_point=False):
+    def set_position_vector(self, x_position, gr_family, this_is_the_parent_family=False):
         if gr_family:
             g_id = gr_family.g_id
             if gr_family.marriage:
@@ -381,7 +381,7 @@ class GraphicalIndividual():
             self._x_position = {}
         if g_id not in self._x_position:
             self._x_position[g_id] = (
-                (ov, x_position, gr_family, parent_starting_point))
+                (ov, x_position, gr_family, this_is_the_parent_family))
         _x_position = {}
         _x_position.update(dict(sorted(self._x_position.items(), key=lambda t: t[1])))
         self._x_position = _x_position

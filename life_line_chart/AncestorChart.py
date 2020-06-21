@@ -290,7 +290,7 @@ class AncestorChart(BaseSVGChart):
                 # add siblings beside the main sibling
                 gr_sibling.set_position_vector(
                     x_position,
-                    gr_child_of_family)
+                    gr_child_of_family, True)
                 x_position += 1
 
         if gr_child_of_family is not None and gr_child_of_family.gr_husb is None and gr_child_of_family.gr_wife is None:
