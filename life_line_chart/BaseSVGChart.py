@@ -60,7 +60,6 @@ def intersection_polynomial(coeffs, y_pos):
         return root[0]
     else:
         return roots[1]
-    return xpos
 
 class BaseSVGChart(BaseChart):
     """
