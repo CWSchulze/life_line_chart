@@ -254,6 +254,10 @@ class BaseSVGChart(BaseChart):
                     # logger.error(gr_marriage_family.family_id + ' has a graphical representation, but was not placed!')
                     continue
 
+                ring_pos = calculate_ring_position(gr_marriage_family)
+                if ring_pos is None:
+                    continue
+
                 marriage_is_crossconnected.append(gr_individual.is_cross_connection(gr_marriage_family, gr_most_recently_handled_family))
                 gr_most_recently_handled_family = gr_marriage_family
 
@@ -262,7 +266,7 @@ class BaseSVGChart(BaseChart):
                 marriage_x_index = x_pos[gr_marriage_family.g_id][1]
                 new_x_indices_after_marriage.append(marriage_x_index)
 
-                marriage_ring_positions.append(calculate_ring_position(gr_marriage_family))
+                marriage_ring_positions.append(ring_pos)
 
                 marriage_families.append(gr_marriage_family)
                 marriage_has_ring.append(gr_marriage_family.gr_husb == gr_individual or gr_marriage_family.gr_husb is None)
