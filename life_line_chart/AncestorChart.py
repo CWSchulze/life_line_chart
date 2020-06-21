@@ -350,8 +350,6 @@ class AncestorChart(BaseSVGChart):
         """
         compress the chart vertically.
 
-        TODO: compressing fails if siblings are dragged apart which reunite families in later generations (Andreas Adam Lindner)
-
         Args:
             gr_family (GraphicalFamily): graphical family representation instance
         """
