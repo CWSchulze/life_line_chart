@@ -396,10 +396,17 @@ class BaseChart():
         # assign the individuals to all x_indices in which they appear
         for gr_individual in self.gr_individuals:
             position_vector = list(gr_individual.get_position_dict().values())
+            spouse_families = list(gr_individual.get_spouse_positions().values())
+            missing_families = len(position_vector)-len(spouse_families)
+            if missing_families:
+                if spouse_families:
+                    spouse_families = [spouse_families[0]] * missing_families + spouse_families
+                else:
+                    spouse_families = [(None, None, None, None)] * missing_families
 
             for i, value in enumerate(position_vector):
                 x_index = value[1]
-                marriage = value[2]
+                marriage = spouse_families[i][2]
                 if x_index not in v:
                     v[x_index] = []
 
@@ -407,7 +414,6 @@ class BaseChart():
                         position_to_person_map[x_index] = []
                 if i == 0:
                     start_y = gr_individual.birth_date_ov
-                    marriage = position_vector[1][2]
                 else:
                     start_y = position_vector[i][0]
                 if i < len(position_vector) - 1:
