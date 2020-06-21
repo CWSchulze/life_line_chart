@@ -339,30 +339,21 @@ class GraphicalIndividual():
 
         scpf, scsf = self.ancestor_chart_parent_family_placement
 
-        positions = self.get_spouse_positions()
-        parent_positions = self.get_parent_positions()
-        ancestor_placement_family = self.ancestor_placement_marriage
+        # ancestor_placement_family = self.ancestor_placement_marriage
 
-        if scsf is None and scpf is None and ancestor_placement_family is not None:
-            scsf = ancestor_placement_family
+        # if scsf is None and scpf is None and ancestor_placement_family is not None:
+        #     scsf = ancestor_placement_family
 
         other_g_id = "there is no connected family"
         scsf_g_id = scsf.g_id if scsf else None
         scpf_g_id = scpf.g_id if scpf else None
-        if parent_positions:
-            if scsf or scpf:
-                if g_id == scsf_g_id:
-                    # g_id is the strongyl connected spouse family
-                    other_g_id = scpf_g_id
-                elif g_id == scpf_g_id:
-                    # g_id is the strongly connected parent family
-                    other_g_id = scsf_g_id
-            # elif g_id in parent_positions:
-            #     # g_id is the parent family
-            #     other_g_id = list(positions.keys())[0]
-            # elif g_id == list(positions.keys())[0]:
-            #     # g_id is the first spouse family and a parent exits
-            #     other_g_id = list(parent_positions.keys())[0]
+        if scsf or scpf:
+            if g_id == scsf_g_id:
+                # g_id is the strongyl connected spouse family
+                other_g_id = scpf_g_id
+            elif g_id == scpf_g_id:
+                # g_id is the strongly connected parent family
+                other_g_id = scsf_g_id
 
         return other_g_id
 
