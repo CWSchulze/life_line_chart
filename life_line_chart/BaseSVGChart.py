@@ -86,6 +86,7 @@ def intersection_polynomial(coeffs, y_pos):
     else:
         return roots[1]
 
+
 class BaseSVGChart(BaseChart):
     """
     Base SVG Chart
