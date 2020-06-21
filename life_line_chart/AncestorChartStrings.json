@@ -16,12 +16,12 @@
                 "long_description": "Debugging of the flipping algorithm. Abort after x steps."
             },
             "compress": {
-                "short_description": "Compress the chart vertically",
-                "long_description": "By default every individual has a unique vertical slot. This can be inefficient with many generations. This algorithm lets several people share a vertical slot, if they do not overlap."
+                "short_description": "Compress the chart horizontally",
+                "long_description": "By default every individual has a unique horizontal slot. This can be inefficient with many generations. This algorithm lets several people share a horizontal slot, if they do not overlap."
             },
             "flip_to_optimize": {
-                "short_description": "Flip families to reduce vertical connections",
-                "long_description": "Switch the position of mother and father in a family, to reduce the overall vertical cross connections in larger graphs. This is happens if one person is shown in more than one family or it is caused by pedigree collapse."
+                "short_description": "Flip families to reduce horizontal connections",
+                "long_description": "Switch the position of mother and father in a family, to reduce the overall horizontal cross connections in larger graphs. This is happens if one person is shown in more than one family or it is caused by pedigree collapse."
             }
         },
         "chart_configuration_root_individual": {}
@@ -43,8 +43,8 @@
                 "long_description": "Debuggen des Flipping-Algorithmus. Abbruch nach x Schritten."
             },
             "compress": {
-                "short_description": "Vertikal komprimieren",
-                "long_description": "Normalerweise werden Personen auf einem Raster verteilt. Die vertikale Position kann nur einer Person zugewiesen sein kann. Bei gr\u00f6\u00dferen Diagrammen f\u00fchrt dies dazu, dass die Diagramme un\u00fcbersichtlich werden. Dieser Algorithmus erlaubt es, dass Personen \u00fcbereinander erscheinen k\u00f6nnen. Dies f\u00fchrt jedoch nicht zu \u00dcberlappungen."
+                "short_description": "Horizontal komprimieren",
+                "long_description": "Normalerweise werden Personen auf einem Raster verteilt. Die horizontale Position kann nur einer Person zugewiesen sein kann. Bei gr\u00f6\u00dferen Diagrammen f\u00fchrt dies dazu, dass die Diagramme un\u00fcbersichtlich werden. Dieser Algorithmus erlaubt es, dass Personen \u00fcbereinander erscheinen k\u00f6nnen. Dies f\u00fchrt jedoch nicht zu \u00dcberlappungen."
             },
             "flip_to_optimize": {
                 "short_description": "Spiegeln von Familien zur Verk\u00fcrzung von Querverbindungen",
