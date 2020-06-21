@@ -76,11 +76,13 @@ class BaseSVGChart(BaseChart):
         v = {}
         for gr_individual in self.gr_individuals:
             x_pos = gr_individual.get_position_dict()
+            x_index = None
             for value in x_pos.values():
-                x_index = value[1]
 
-                if always_has_child_of_family and value[3]:
+                if x_index == value[1]:
+                    # ignore if x doesnt change
                     continue
+                x_index = value[1]
 
                 if x_index not in v:
                     v[x_index] = gr_individual.individual_id
