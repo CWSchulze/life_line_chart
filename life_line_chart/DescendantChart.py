@@ -48,7 +48,7 @@ class DescendantChart(BaseSVGChart):
 
     def select_descendants(self, individual, gr_child_of_family, generations=None, filter=None):
         """
-        create graphical representations for all descendants.
+        Create graphical representations for all descendants.
 
         Args:
             individual (BaseIndividual): parent individual
@@ -183,7 +183,7 @@ class DescendantChart(BaseSVGChart):
 
     def modify_layout(self, root_individual_id):
         """
-        improvement of individual placement.
+        Improvement of individual placement.
 
         Args:
             root_individual_id (str): root individual id used as root node for compression

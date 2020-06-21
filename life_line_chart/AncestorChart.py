@@ -226,7 +226,7 @@ class AncestorChart(BaseSVGChart):
 
         def add_parent(parent_variable_name, x_position):
             """
-            add mother or father to the chart
+            Add mother or father to the chart
 
             Args:
                 parent_variable_name (str): 'husb' or 'wife'
@@ -383,7 +383,7 @@ class AncestorChart(BaseSVGChart):
 
     def _compress_single_individual_position(self, gr_individual, gr_cof, direction, nSteps=50000):
         """
-        move single gr_individual until it collides
+        Move single gr_individual until it collides.
         """
         if nSteps <= 0:
             return
@@ -411,7 +411,7 @@ class AncestorChart(BaseSVGChart):
 
     def _compress_chart_ancestor_graph(self, gr_family):
         """
-        compress the chart vertically.
+        Compress the chart horizontally.
 
         Args:
             gr_family (GraphicalFamily): graphical family representation instance
@@ -549,7 +549,7 @@ class AncestorChart(BaseSVGChart):
 
     def modify_layout(self, root_individual_id):
         """
-        improvement of individual placement.
+        Improvement of individual placement.
 
         Args:
             root_individual_id (str): root individual id used as root node for compression
