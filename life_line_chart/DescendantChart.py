@@ -52,6 +52,7 @@ class DescendantChart(BaseSVGChart):
 
         Args:
             individual (BaseIndividual): parent individual
+            gr_child_of_family (GraphicalFamily): parent family
             generations (int, optional): number of generations to go deeper. Defaults to None.
             filter (lambda, optional): filter for individuals. Defaults to None.
         """
@@ -106,11 +107,13 @@ class DescendantChart(BaseSVGChart):
 
     def place_selected_individuals(self, gr_individual, gr_child_of_family, x_offset=0, discovery_cache=[]):
         """
-        Place the graphical representations in direction of x
+        Place the graphical representations in direction of x.
 
         Args:
             gr_individual (GraphicalIndividual): individual
             gr_child_of_family (GraphicalFamily): child-of-family of this individual
+            x_offset (int): starting position
+            discovery_cache (list): list of discovered individuals
         """
         individual = gr_individual.individual
         discovery_cache.append(individual.plain_name)

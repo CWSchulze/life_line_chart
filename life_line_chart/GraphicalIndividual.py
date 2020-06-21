@@ -71,7 +71,7 @@ class GraphicalIndividual():
 
     def get_ancestor_width(self, gr_family):
         """
-        width of the ancestor individuals which are strongly connected
+        Width of the ancestor individuals which are strongly connected.
         (only tested with ancestor chart)
 
         Args:
@@ -86,7 +86,7 @@ class GraphicalIndividual():
 
     def get_ancestor_range(self, gr_family):
         """
-        get the x range from min to max
+        Get the x range from min to max.
         (only tested with ancestor chart)
 
         Args:
@@ -137,7 +137,7 @@ class GraphicalIndividual():
 
     def get_descendant_width(self, gr_family):
         """
-        width of the descendant individuals which are strongly connected
+        Width of the descendant individuals which are strongly connected.
         (only tested with descendant chart)
 
         Args:
@@ -152,7 +152,7 @@ class GraphicalIndividual():
 
     def get_descendant_range(self, gr_family):
         """
-        get the x range from min to max
+        Get the x range from min to max.
         (only tested with descendant chart)
 
         Args:
@@ -222,7 +222,7 @@ class GraphicalIndividual():
     @property
     def visible_marriages(self):
         """
-        list of marriages which have a graphical representation
+        List of marriages which have a graphical representation.
 
         Returns:
             list: list of visible marriages
@@ -241,7 +241,7 @@ class GraphicalIndividual():
     @property
     def connected_parent_families(self):
         """
-        child of families where this individual appears
+        Child of families where this individual appears.
 
         Returns:
             list: list of parent families
@@ -391,11 +391,8 @@ class GraphicalIndividual():
     @property
     def ancestor_placement_marriage(self):
         """
-        the birth x position can be linked to a specific marriage. Ancestors will be placed above
+        The birth x position can be linked to a specific marriage. Ancestors will be placed above
         the birth x position.
-
-        Args:
-            gr_marriage_family (GraphicalFamily): marriage where to place the ancestors
         """
         if self.g_id not in self.__instances.connection_container['i']:
             return []
@@ -412,7 +409,7 @@ class GraphicalIndividual():
     @ancestor_placement_marriage.setter
     def ancestor_placement_marriage(self, gr_marriage_family):
         """
-        the birth x position can be linked to a specific marriage. Ancestors will be placed above
+        The birth x position can be linked to a specific marriage. Ancestors will be placed above
         the birth x position.
 
         Args:
@@ -427,6 +424,16 @@ class GraphicalIndividual():
         self.__instances.connection_container['f'][g_id][self.g_id].append('strong_marriage')
 
     def is_cross_connection(self, gr_family_a, gr_family_b):
+        """
+        Returns true, if the two families do not share the same x position.
+
+        Args:
+            gr_family_a (GraphicalFamily): family a
+            gr_family_b (GraphicalFamily): family b
+
+        Returns:
+            bool: is cross-connection
+        """
         gr_family_g_id_a = gr_family_a.g_id if gr_family_a else None
         gr_family_g_id_b = gr_family_b.g_id if gr_family_b else None
         gr_family_pos_a = self._x_position.get(gr_family_g_id_a)
@@ -448,7 +455,7 @@ class GraphicalIndividual():
     @property
     def birth_date_ov(self):
         """
-        get the ordinal value of the birth (or christening or baptism) date
+        Get the ordinal value of the birth (or christening or baptism) date.
 
         Returns:
             float: ordinal value of birth date
@@ -462,7 +469,7 @@ class GraphicalIndividual():
     @property
     def death_date_ov(self):
         """
-        get the ordinal value of the death (or burial) date
+        Get the ordinal value of the death (or burial) date.
 
         Returns:
             float: ordinal value of death date
@@ -491,7 +498,7 @@ class GraphicalIndividual():
     @property
     def visible_children(self):
         """
-        get the all visible children of this individual (all visible marriages)
+        Get the all visible children of this individual (all visible marriages).
 
         Returns:
             list: list of children individuals

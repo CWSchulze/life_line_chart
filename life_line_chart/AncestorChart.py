@@ -66,6 +66,7 @@ class AncestorChart(BaseSVGChart):
             individual (BaseIndividual): starting point for selection
             generations (int): number of generations to search for ancestors.
             filter (lambda, optional): lambda(BaseIndividual) : return Boolean. Defaults to None.
+            discovery_cache (list): list of discovered individuals
         """
 
         if filter and filter(individual):
@@ -152,6 +153,9 @@ class AncestorChart(BaseSVGChart):
             gr_individual (GraphicalIndividual): individual
             gr_spouse_family (GraphicalFamily): Spouse family of this individual
             gr_child_of_family (GraphicalFamily): child-of-family of this individual
+            x_offset (int): starting position
+            discovery_cache (list): list of discovered individuals
+            root_node_discovery_cache (list): list of discovered individuals
         """
         if discovery_cache is None:
             discovery_cache = []
@@ -522,6 +526,12 @@ class AncestorChart(BaseSVGChart):
                 break
 
     def _move_child_to_center_between_parents(self, gr_individual):
+        """
+        Move an individual to the center between its parents.
+
+        Args:
+            gr_individual (GraphicalIndividual): individual
+        """
         gr_cofs = gr_individual.connected_parent_families
         for gr_cof in gr_cofs:
             husb_x_pos = None
