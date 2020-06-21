@@ -49,8 +49,8 @@ class BaseChart():
         'family_shape': 0,
         'individual_photo_active': False,
         'individual_photo_relative_size': 2.5,
-        'debug_visualize_connections': True,
-        'debug_visualize_ambiguous_placement': True,
+        'debug_visualize_connections': False,
+        'debug_visualize_ambiguous_placement': False,
         'coloring_of_individuals': 'unique'
     }
     DEFAULT_POSITIONING = {
