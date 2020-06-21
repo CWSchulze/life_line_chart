@@ -439,6 +439,18 @@ class GraphicalIndividual():
         self.__instances.connection_container['i'][self.g_id][g_id].append('strong_marriage')
         self.__instances.connection_container['f'][g_id][self.g_id].append('strong_marriage')
 
+    def is_cross_connection(self, gr_family_a, gr_family_b):
+        gr_family_g_id_a = gr_family_a.g_id if gr_family_a else None
+        gr_family_g_id_b = gr_family_b.g_id if gr_family_b else None
+        gr_family_pos_a = self._x_position.get(gr_family_g_id_a)
+        gr_family_pos_b = self._x_position.get(gr_family_g_id_b)
+        if gr_family_pos_a and gr_family_pos_b:
+            if gr_family_pos_a[1] != gr_family_pos_b[1]:
+                return True
+            return False
+        return False
+        # this happens in descendant charts. spouses dont have a visible parent family.
+        #raise LifeLineChartUnknownPlacementError("individual was not placed in requested family")
 
     def get_birth_event(self):
         return self.individual.events['birth_or_christening']

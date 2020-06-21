@@ -401,6 +401,7 @@ class BaseChart():
 
             for i, value in enumerate(position_vector):
                 x_index = value[1]
+                marriage = value[2]
                 if x_index not in v:
                     v[x_index] = []
 
@@ -408,6 +409,7 @@ class BaseChart():
                         position_to_person_map[x_index] = []
                 if i == 0:
                     start_y = gr_individual.birth_date_ov
+                    marriage = position_vector[1][2]
                 else:
                     start_y = position_vector[i][0]
                 if i < len(position_vector) - 1:
@@ -424,7 +426,7 @@ class BaseChart():
                         'start': start_y,
                         'end': end_y,
                         'individual': gr_individual,
-                        'family': value[2]
+                        'family': marriage
                     })
 
                 v[x_index].append((gr_individual, start_y, end_y))#, gr_individual.birth_date_ov, gr_individual.death_date_ov))
@@ -516,7 +518,34 @@ class BaseChart():
         """
         return self._formatting['margin_left'] + x_index*self._formatting['vertical_step_size']
 
-    def _map_position(self, pos_x, pos_y):
+    def _map_position(self, x_index, ov):
+        """
+        map date information and vertical index to x and y axis. This function also supports warping of the whole chart.
+
+        Args:
+            x_index (float or int): vertical index
+            ov (float or int): ordinal value of the datetime
+
+        Returns:
+            tuple: (x position, y position)
+        """
+        from math import pi, sin
+        if self._formatting['warp_shape'] == 'sine':
+            y_rel = (1-sin((1-(ov - self.min_ordinal) /
+                            (self.max_ordinal - self.min_ordinal))*pi/2))*0.5
+            x_av = (self.max_x_index + self.min_x_index)/2
+            warped_x_index = x_index*(1-y_rel) + y_rel*x_av
+            return self._map_x_position(warped_x_index), self._map_y_position(ov)
+        elif self._formatting['warp_shape'] == 'triangle':
+            y_rel = (ov - self.min_ordinal) / \
+                (self.max_ordinal - self.min_ordinal)*0.8
+            x_av = (self.max_x_index + self.min_x_index)/2
+            warped_x_index = x_index*(1-y_rel) + y_rel*x_av
+            return self._map_x_position(warped_x_index), self._map_y_position(ov)
+        else:
+            return int(round(self._map_x_position(x_index))), self._map_y_position(ov)
+
+    def _inverse_map_position(self, pos_x, pos_y):
         """
         map date information and vertical index to x and y axis. This function also supports warping of the whole chart.
 
@@ -529,19 +558,21 @@ class BaseChart():
         """
         from math import pi, sin
         if self._formatting['warp_shape'] == 'sine':
-            y_rel = (1-sin((1-(pos_y - self.min_ordinal) /
+            warped_x_index, ov = self._inverse_x_position_float(pos_x), self._inverse_y_position(pos_y)
+            y_rel = (1-sin((1-(ov - self.min_ordinal) /
                             (self.max_ordinal - self.min_ordinal))*pi/2))*0.5
             x_av = (self.max_x_index + self.min_x_index)/2
-
-            return self._map_x_position(pos_x*(1-y_rel) + y_rel*x_av), self._map_y_position(pos_y)
+            x_index = (warped_x_index - y_rel*x_av)/(1-y_rel)
+            return int(round(x_index)), ov
         elif self._formatting['warp_shape'] == 'triangle':
-            y_rel = (pos_y - self.min_ordinal) / \
+            warped_x_index, ov = self._inverse_x_position_float(pos_x), self._inverse_y_position(pos_y)
+            y_rel = (ov - self.min_ordinal) / \
                 (self.max_ordinal - self.min_ordinal)*0.8
             x_av = (self.max_x_index + self.min_x_index)/2
-
-            return self._map_x_position(pos_x*(1-y_rel) + y_rel*x_av), self._map_y_position(pos_y)
+            x_index = (warped_x_index - y_rel*x_av)/(1-y_rel)
+            return int(round(x_index)), ov
         else:
-            return self._map_x_position(pos_x), self._map_y_position(pos_y)
+            return int(round(self._inverse_x_position_float(pos_x))), self._inverse_y_position(pos_y)
 
     def _orientation_angle(self, pos_x, pos_y):
         """
@@ -593,8 +624,11 @@ class BaseChart():
             (self._formatting['display_factor']-1)/2
         ) / (self._formatting['total_height'] * self._formatting['display_factor']) * (self.chart_max_ordinal-self.chart_min_ordinal) + self.chart_min_ordinal
 
-    def _inverse_x_position(self, pos_x):
-        return int(round((pos_x - self._formatting['margin_left'])/self._formatting['vertical_step_size']))
+    # def _inverse_x_position(self, pos_x):
+    #     return int(round((pos_x - self._formatting['margin_left'])/self._formatting['vertical_step_size']))
+
+    def _inverse_x_position_float(self, pos_x):
+        return (pos_x - self._formatting['margin_left'])/self._formatting['vertical_step_size']
 
     def get_full_width(self):
         """
@@ -625,8 +659,9 @@ class BaseChart():
         Returns:
             BaseIndividual: individual instance
         """
-        x_index = self._inverse_x_position(pos_x)
-        ordinal_value = int(self._inverse_y_position(pos_y))
+        # x_index = self._inverse_x_position(pos_x)
+        # ordinal_value = int(self._inverse_y_position(pos_y))
+        x_index, ordinal_value = self._inverse_map_position(pos_x, pos_y)
         possible_matches = self.position_to_person_map.get(x_index)
         if possible_matches is not None:
             for possible_match in possible_matches:

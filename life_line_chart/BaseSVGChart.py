@@ -1,11 +1,13 @@
 import os
-from .SimpleSVGItems import Line, Path, CubicBezier
 import logging
 import datetime
 import svgwrite
 from copy import deepcopy
-from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
+from collections import defaultdict
 from math import floor, ceil, pi, e
+
+from .SimpleSVGItems import Line, Path, CubicBezier
+from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 from .BaseChart import BaseChart
 
 logger = logging.getLogger("life_line_chart")
@@ -92,7 +94,7 @@ class BaseSVGChart(BaseChart):
         for i in range(max(full_index_list)):
             if i not in full_index_list:
                 if self._formatting['debug_visualize_ambiguous_placement']:
-                    gr_individual.items.append({
+                    gr_individual.items.append(((99, 'layer_debug'),{
                         'type': 'rect',
                         'config': {
                             'insert': (self._map_x_position(i), 0),
@@ -100,7 +102,7 @@ class BaseSVGChart(BaseChart):
                             'fill': 'black',
                             'fill-opacity': "0.5"
                         }
-                    })
+                    }))
                 failed.append(('missing', i))
         return failed, full_index_list[0], full_index_list[-1]
 
@@ -221,6 +223,7 @@ class BaseSVGChart(BaseChart):
             marriage_families = []
             # ring is only added to one spouse
             marriage_has_ring = []
+            marriage_is_crossconnected = []
             new_x_indices_after_marriage = []
             marriage_labels = []
             def calculate_ring_position(gr_family):
@@ -238,6 +241,8 @@ class BaseSVGChart(BaseChart):
                             (h_pos[1] + w_pos[1])/2,
                             gr_family.marriage['ordinal_value'])
                 return None
+            gr_cof = gr_individual.connected_parent_families[0] if gr_individual.connected_parent_families else None
+            gr_most_recently_handled_family = gr_cof
             for gr_marriage_family in gr_individual.visible_marriages:
                 if gr_marriage_family.marriage is None:
                     logger.warning("Found family without marriage date. The family should not have been instantiated")
@@ -248,6 +253,10 @@ class BaseSVGChart(BaseChart):
                     # marriage might be added, while the other is not (due to max generations)
                     # logger.error(gr_marriage_family.family_id + ' has a graphical representation, but was not placed!')
                     continue
+
+                marriage_is_crossconnected.append(gr_individual.is_cross_connection(gr_marriage_family, gr_most_recently_handled_family))
+                gr_most_recently_handled_family = gr_marriage_family
+
                 gr_spouse = gr_marriage_family.get_gr_spouse(
                     gr_individual)
                 marriage_x_index = x_pos[gr_marriage_family.g_id][1]
@@ -256,9 +265,7 @@ class BaseSVGChart(BaseChart):
                 marriage_ring_positions.append(calculate_ring_position(gr_marriage_family))
 
                 marriage_families.append(gr_marriage_family)
-                #gr_marriage_family_gr_husb = gr_marriage_family.gr_husb
-                #gr_marriage_family_gr_wife = gr_marriage_family.gr_wife
-                marriage_has_ring.append(True)#gr_marriage_family.gr_husb == gr_individual or gr_marriage_family.gr_husb is None)
+                marriage_has_ring.append(gr_marriage_family.gr_husb == gr_individual or gr_marriage_family.gr_husb is None)
                 marriage_ordinals.append(
                     gr_marriage_family.marriage['ordinal_value'])
                 marriage_labels.append(
@@ -301,7 +308,7 @@ class BaseSVGChart(BaseChart):
                                 new_marriage_ordinal = min(l_i.birth_date_ov-5*365, marriage_ordinal)
                             else:
                                 new_marriage_ordinal = max(l_i.birth_date_ov, marriage_ordinal+5*365)
-                        debug_items.append(
+                        debug_items.append(((99, 'layer_debug'),
                                 {
                                 'type': 'path',
                                 'config': {'type': 'Line', 'arguments': (
@@ -313,7 +320,7 @@ class BaseSVGChart(BaseChart):
                                 'color': color,
                                 'stroke_width': thickness
                                 }
-                            )
+                            ))
 
             # generate event node information
             knots = []
@@ -323,14 +330,13 @@ class BaseSVGChart(BaseChart):
                 x_pos_list[-1][1], death_event['ordinal_value'])
             _birth_position = self._map_position(*_birth_original_location)
             _death_position = self._map_position(*_death_original_location)
-            knots.append((x_pos_list[0][1], birth_date_ov))
+            knots.append((x_pos_list[0][1], birth_date_ov, None))
             images = []
-            for index, ((marriage_ring_index, marriage_ordinal), new_x_index_after_marriage, label, gr_family, has_ring) in enumerate(zip(marriage_ring_positions, new_x_indices_after_marriage, marriage_labels, marriage_families, marriage_has_ring)):
+            for index, ((marriage_ring_index, marriage_ordinal), new_x_index_after_marriage, label, gr_family, has_ring, is_cross_connected) in enumerate(zip(marriage_ring_positions, new_x_indices_after_marriage, marriage_labels, marriage_families, marriage_has_ring, marriage_is_crossconnected)):
                 if not self._formatting['no_ring'] and has_ring:
                     ring_position = self._map_position(
                         marriage_ring_index, marriage_ordinal)
-                    images.append(
-                        {
+                    images.append(((2, 'layer_ring_image'), {
                             'type': 'image',
                             'config': {
                                 'insert': (
@@ -347,7 +353,7 @@ class BaseSVGChart(BaseChart):
                             'gir':gr_individual,
                             'gfr':gr_family
                         }
-                    )
+                    ))
                 if self._formatting['marriage_label_active']:
                     dy_line = self._inverse_y_position(
                         self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']) - self._inverse_y_position(0)
@@ -356,7 +362,7 @@ class BaseSVGChart(BaseChart):
                             marriage_ring_index, marriage_ordinal + dy_line)
                         position = (position[0], position[1] +
                                     (index2 + 0.2) * font_size * 1.2)
-                        images.append({
+                        images.append(((5, 'layer_marriage_label'), {
                             'type': 'text',
                             'config': {
                                     'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
@@ -367,13 +373,13 @@ class BaseSVGChart(BaseChart):
                             },
                             'font_size': font_size,
                             'font_name': self._formatting['font_name'],
-                        })
-                knots.append((marriage_ring_index, marriage_ordinal))
-                if len(marriage_ordinals) > index + 1:
+                        }))
+                knots.append((marriage_ring_index, marriage_ordinal, is_cross_connected))
+                if index + 1 < len(marriage_ordinals):
                     # zwischenpunkt zur ursprungsposition
                     knots.append(
-                        (new_x_index_after_marriage, marriage_ordinals[index]/2+marriage_ordinals[index+1]/2))
-            knots.append((x_pos_list[-1][1], death_event['ordinal_value']))
+                        (new_x_index_after_marriage, marriage_ordinals[index]/2+marriage_ordinals[index+1]/2, False))
+            knots.append((x_pos_list[-1][1], death_event['ordinal_value'], False))
 
             Path_types = {
                 'Line': Line,
@@ -406,7 +412,8 @@ class BaseSVGChart(BaseChart):
                                 knots[0+1][0], knots[0+1][1]),
                         )},
                             (_birth_position[1], self._map_y_position(
-                                self._formatting['fade_individual_color_black_age']*365+birth_date_ov))
+                                self._formatting['fade_individual_color_black_age']*365+birth_date_ov)),
+                        False # not cross connected
                         )
                     )
                     if self._formatting['individual_photo_active'] and len(gr_individual.individual.images) > 0:
@@ -434,8 +441,7 @@ class BaseSVGChart(BaseChart):
                                         xpos = svg_path.point(root[0])
                                     else:
                                         xpos = svg_path.point(roots[1])
-                                images.append(
-                                    {
+                                images.append(((4, 'layer_photos'), {
                                         'type': 'image',
                                         'config': {
                                                 'insert': (
@@ -446,7 +452,7 @@ class BaseSVGChart(BaseChart):
                                         'filename': image_filename,
                                         'size': image_size
                                     }
-                                )
+                                ))
                 else:
                     for index in range(len(knots)-1):
                         def interp(*val):
@@ -463,7 +469,9 @@ class BaseSVGChart(BaseChart):
                                     coordinate_transformation(*interp(1, 1)),
                                 )},
                                     (_birth_position[1], self._map_y_position(
-                                        self._formatting['fade_individual_color_black_age']*365+birth_date_ov))
+                                        self._formatting['fade_individual_color_black_age']*365+birth_date_ov)),
+                                # connection to this knot is relevant
+                                knots[index+1][2]# and index + 1 < len(knots) or knots[index + 1][2]
                                 )
                             )
                         else:
@@ -477,7 +485,9 @@ class BaseSVGChart(BaseChart):
                                     coordinate_transformation(*interp(1, 1)),
                                 )},
                                     (_birth_position[1], self._map_y_position(
-                                        self._formatting['fade_individual_color_black_age']*365+birth_date_ov))
+                                        self._formatting['fade_individual_color_black_age']*365+birth_date_ov)),
+                                # connection to this knot is relevant
+                                knots[index+1][2]# and index + 1 < len(knots) or knots[index + 1][2]
                                 )
                             )
                         if self._formatting['individual_photo_active'] and len(gr_individual.individual.images) > 0:
@@ -504,8 +514,7 @@ class BaseSVGChart(BaseChart):
                                             xpos = svg_path.point(root[0])
                                         else:
                                             xpos = svg_path.point(roots[1])
-                                    images.append(
-                                        {
+                                    images.append(((4, 'layer_photos'), {
                                             'type': 'image',
                                             'config': {
                                                     'insert': (
@@ -516,23 +525,27 @@ class BaseSVGChart(BaseChart):
                                             'filename': image_filename,
                                             'size': image_size
                                         }
-                                    )
+                                    ))
             life_line_bezier_paths = []
             marriage_bezier(images, life_line_bezier_paths, knots)
 
             # create item setup
-            for path, color_pos in life_line_bezier_paths:
-                gr_individual.items.append({
+            for path, color_pos, is_cross_connection in life_line_bezier_paths:
+                if True:
+                    priority = 0 if is_cross_connection else 1
+                else:
+                    priority = 3 if is_cross_connection else 0
+                gr_individual.items.append(((priority, 'layer_life_lines'),{
                     'type': 'path',
                     'config': path,
                     'color': gr_individual.color,
                     'color_pos': color_pos,
                     'stroke_width': self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'],
                     'gir':gr_individual
-                })
+                }))
             if self._formatting['birth_label_active']:
                 if self._formatting['birth_label_along_path']:
-                    gr_individual.items.append(
+                    gr_individual.items.append(((5, 'layer_birth_label'),
                         {
                             'type': 'textPath',
                             'config': {
@@ -552,13 +565,12 @@ class BaseSVGChart(BaseChart):
                             'path': life_line_bezier_paths[0][0],
                             'font_size': font_size,
                             'font_name': self._formatting['font_name'],
-                        })
+                        }))
                 else:
                     birth_label_text = " ".join(individual_name + [birth_label])
                     if self._formatting['birth_label_wrapping_active']:
                         birth_label_text = birth_label_text.strip().replace(' ', '\n')
-                    gr_individual.items.append(
-                        {
+                    gr_individual.items.append(((5, 'layer_birth_label'),{
                             'type': 'text',
                             'config': {
                                 'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
@@ -571,12 +583,11 @@ class BaseSVGChart(BaseChart):
                             },
                             'font_size': font_size,
                             'font_name': self._formatting['font_name'],
-                        })
+                        }))
             if self._formatting['death_label_active']:
                 if self._formatting['death_label_wrapping_active']:
                     death_label = death_label.strip().replace(' ', '\n')
-                gr_individual.items.append(
-                    {
+                gr_individual.items.append(((5, 'layer_death_label'), {
                         'type': 'text',
                         'config': {
                             'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
@@ -591,7 +602,7 @@ class BaseSVGChart(BaseChart):
                         'font_name': self._formatting['font_name'],
 
                     }
-                )
+                ))
             gr_individual.items += images
             gr_individual.items += debug_items
         if self._formatting['debug_visualize_connections']:
@@ -624,7 +635,7 @@ class BaseSVGChart(BaseChart):
                                 new_x, new_y = self._map_position(x, y)
                                 return new_x + new_y*1j
 
-                            gr_spouse.items.append(
+                            gr_spouse.items.append(((99, 'layer_debug'),
                                     {
                                     'type': 'path',
                                     'config': {'type': 'Line', 'arguments': (
@@ -634,7 +645,7 @@ class BaseSVGChart(BaseChart):
                                     'color': color,
                                     'stroke_width': thickness
                                     }
-                                )
+                                ))
 
 
     def paint_and_save(self, individual_id, filename=None):
@@ -678,11 +689,15 @@ class BaseSVGChart(BaseChart):
         sorted_individuals = [(gr.birth_date_ov, index, gr)
                               for index, gr in enumerate(self.gr_individuals)]
         sorted_individuals.sort()
-        sorted_individual_items = []
+        sorted_individual_dict = defaultdict(list)
         for _, _, gr_individual in sorted_individuals:
-            sorted_individual_items += gr_individual.items
+            for key, item in gr_individual.items:
+                sorted_individual_dict[key].append(item)
+        sorted_individual_flat_item_list = []
+        for key in sorted(sorted_individual_dict.keys()):
+            sorted_individual_flat_item_list += sorted_individual_dict[key]
 
-        for item in additional_items + sorted_individual_items:
+        for item in additional_items + sorted_individual_flat_item_list:
                 if item['type'] == 'text':
                     if '\n' in item['config']['text']:
                         font_size = item['font_size']
