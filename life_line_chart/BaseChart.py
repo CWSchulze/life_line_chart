@@ -204,7 +204,7 @@ class BaseChart():
             distance_of_this_individual = 0
             if position_dict:
                 all_x_indices = [p[1] for k, p in position_dict.items()]
-                distance_of_this_individual += max(all_x_indices) - min(all_x_indices)
+                distance_of_this_individual += sum([abs(a-b) for a, b in zip(all_x_indices[:-1],all_x_indices[1:])])
             total_distance += distance_of_this_individual
             if distance_of_this_individual > 0:
                 list_of_linked_individuals[(
