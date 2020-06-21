@@ -21,7 +21,7 @@ class BaseChart():
         'margin_right': 50,
         'margin_year_max': 5,
         'margin_year_min': 10,
-        'vertical_step_size': 40,
+        'horizontal_step_size': 40,
         'relative_line_thickness': 0.4,
         'total_height': 1500,
         'flip_vertically': False,
@@ -424,7 +424,7 @@ class BaseChart():
         Returns:
             float: x position
         """
-        return self._formatting['margin_left'] + x_index*self._formatting['vertical_step_size']
+        return self._formatting['margin_left'] + x_index*self._formatting['horizontal_step_size']
 
     def _map_position(self, x_index, ov):
         """
@@ -537,7 +537,7 @@ class BaseChart():
         ) / (self._formatting['total_height'] * display_factor) * (self.chart_max_ordinal-self.chart_min_ordinal) + self.chart_min_ordinal
 
     def _inverse_x_position_float(self, pos_x):
-        return (pos_x - self._formatting['margin_left'])/self._formatting['vertical_step_size']
+        return (pos_x - self._formatting['margin_left'])/self._formatting['horizontal_step_size']
 
     def get_full_width(self):
         """

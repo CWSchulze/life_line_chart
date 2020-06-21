@@ -24,10 +24,10 @@
             },
             "relative_line_thickness": {
                 "short_description": "Relative line thickness",
-                "long_description": "The line thickness of an individual is given relatively to the vertical step size."
+                "long_description": "The line thickness of an individual is given relatively to the horizontal step size."
             },
-            "vertical_step_size": {
-                "short_description": "Vertical step size",
+            "horizontal_step_size": {
+                "short_description": "Horizontal step size",
                 "long_description": "This is the distance from one line to another. This value is also used for scaling of other items."
             },
             "birth_label_active": {
@@ -196,10 +196,10 @@
             },
             "relative_line_thickness": {
                 "short_description": "Relative Linienbreite",
-                "long_description": "Die Breite eine Lebenslinie wird relativ zur vertikalen Schrittweite angegeben."
+                "long_description": "Die Breite eine Lebenslinie wird relativ zur horizontalen Schrittweite angegeben."
             },
-            "vertical_step_size": {
-                "short_description": "Vertikale Schrittweite",
+            "horizontal_step_size": {
+                "short_description": "Horizontale Schrittweite",
                 "long_description": "Dies ist der Abstand zwischen zwei Lebenslinien. Dieser Wert wird h\u00e4ufig zur Skalierung anderer Objekte verwendet."
             },
             "birth_label_active": {

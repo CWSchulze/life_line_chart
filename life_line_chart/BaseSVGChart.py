@@ -16,6 +16,9 @@ cardano_instance = None
 
 
 class Cardano:
+    """
+    Cardano Singleton
+    """
     J = None
     Jc = None
     def __init__(self):
@@ -45,12 +48,34 @@ class Cardano:
         return u+v-z0, u*self.J+v*self.Jc-z0, u*self.Jc+v*self.J-z0
 
 def cardano(a,b,c,d):
+    """
+    Use cardano class with singleton.
+
+    Args:
+        a (float): a
+        b (float): b
+        c (float): c
+        d (float): d
+
+    Returns:
+        list: list of roots
+    """
     global cardano_instance
     if cardano_instance == None:
         cardano_instance = Cardano()
     return cardano_instance.solve(a,b,c,d)
 
 def intersection_polynomial(coeffs, y_pos):
+    """
+    calculate the intersection of the polynomial
+
+    Args:
+        coeffs (list): List of coefficients for polynomial. I don't remember the order.
+        y_pos (float): y_position in the chart
+
+    Returns:
+        float: relative root position
+    """
     coeffs2 = (
         coeffs[0].imag, coeffs[1].imag, coeffs[2].imag, coeffs[3].imag - y_pos)
     roots = cardano(*coeffs2)
@@ -66,7 +91,7 @@ class BaseSVGChart(BaseChart):
     Base SVG Chart
     ==============
 
-    Class which provides basic methods to generate and handle svg items.
+    Class which provides basic methods to generate and handle svg items and save the file.
     """
 
     def __init__(self, positioning=None, formatting=None, instance_container=None):
@@ -74,7 +99,7 @@ class BaseSVGChart(BaseChart):
 
     def check_unique_x_position(self, always_has_child_of_family=True):
         """
-        check if every individual position has a unique vertical slot
+        Check if every individual position has a unique horizontal slot.
 
         Raises:
             RuntimeError: overlap was found
@@ -110,7 +135,7 @@ class BaseSVGChart(BaseChart):
                         'type': 'rect',
                         'config': {
                             'insert': (self._map_x_position(i), 0),
-                            'size': (self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'], self._formatting['total_height']),
+                            'size': (self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size'], self._formatting['total_height']),
                             'fill': 'black',
                             'fill-opacity': "0.5"
                         }
@@ -120,7 +145,7 @@ class BaseSVGChart(BaseChart):
 
     def clear_graphical_representations(self):
         """
-        clear all graphical representations to rebuild the chart
+        Clear all graphical representations to rebuild the chart.
         """
         self.min_x_index = 0
         self.max_x_index = 0
@@ -130,7 +155,7 @@ class BaseSVGChart(BaseChart):
 
     def define_svg_items(self):
         """
-        generate graphical item information used for rendering the image.
+        Generate graphical item information used for rendering the image.
         """
         logger.debug('start creating graphical items')
 
@@ -138,7 +163,7 @@ class BaseSVGChart(BaseChart):
 
         font_size = self._formatting['font_size_description'] * \
             self._formatting['relative_line_thickness'] * \
-            self._formatting['vertical_step_size']
+            self._formatting['horizontal_step_size']
 
         if len(self.gr_individuals) == 0:
             # settings for empty graphs
@@ -181,7 +206,7 @@ class BaseSVGChart(BaseChart):
                                 'text': str(year),
                                 'text-anchor': 'end',
                                 # 'align' : 'center',
-                                'insert': (self.get_full_width() - self._formatting['vertical_step_size']*0.01, year_pos),
+                                'insert': (self.get_full_width() - self._formatting['horizontal_step_size']*0.01, year_pos),
                             },
                     'font_size': font_size,
                     'font_name': self._formatting['font_name'],
@@ -295,22 +320,22 @@ class BaseSVGChart(BaseChart):
                     marriage_ring_index, marriage_ordinal = calculate_ring_position(self._instances[('f',f_g_id[1])].graphical_representations[f_g_id[0]])
                     for connection in connections:
                         if connection == 'weak_child':
-                            thickness = 0.5*self._formatting['vertical_step_size']*0.1
+                            thickness = 0.5*self._formatting['horizontal_step_size']*0.1
                             color = (175, 225, 175)
                         elif connection == 'strong_child':
-                            thickness = 0.5*self._formatting['vertical_step_size']*0.3
+                            thickness = 0.5*self._formatting['horizontal_step_size']*0.3
                             color = (25, 25, 25)
                         elif connection == 'gr_wife':
-                            thickness = 0.5*self._formatting['vertical_step_size']*0.2
+                            thickness = 0.5*self._formatting['horizontal_step_size']*0.2
                             color = (225, 25, 25)
                         elif connection == 'gr_husb':
-                            thickness = 0.5*self._formatting['vertical_step_size']*0.2
+                            thickness = 0.5*self._formatting['horizontal_step_size']*0.2
                             color = (25, 25, 225)
                         elif connection == 'strong_marriage':
-                            thickness = 0.5*self._formatting['vertical_step_size']*0.3
+                            thickness = 0.5*self._formatting['horizontal_step_size']*0.3
                             color = (25, 225, 25)
                         else:
-                            thickness = 0.5*self._formatting['vertical_step_size']*1
+                            thickness = 0.5*self._formatting['horizontal_step_size']*1
                             color = (25, 25, 25)
                         def coordinate_transformation(x, y):
                             new_x, new_y = self._map_position(x, y)
@@ -357,12 +382,12 @@ class BaseSVGChart(BaseChart):
                             'config': {
                                 'insert': (
                                     ring_position[0] - self._formatting['relative_line_thickness'] *
-                                    self._formatting['vertical_step_size']*1,
-                                    ring_position[1] - self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*1),
+                                    self._formatting['horizontal_step_size']*1,
+                                    ring_position[1] - self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size']*1),
                                 'size': (
                                     self._formatting['relative_line_thickness'] *
-                                    self._formatting['vertical_step_size']*2,
-                                    self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']*2),
+                                    self._formatting['horizontal_step_size']*2,
+                                    self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size']*2),
                             },
                             'filename': os.path.join(os.path.dirname(__file__), "ringe.png"),
                             'size': (119,75),
@@ -372,7 +397,7 @@ class BaseSVGChart(BaseChart):
                     ))
                 if self._formatting['marriage_label_active']:
                     dy_line = self._inverse_y_position(
-                        self._formatting['relative_line_thickness']*self._formatting['vertical_step_size']) - self._inverse_y_position(0)
+                        self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size']) - self._inverse_y_position(0)
                     for index2, line in enumerate(label.split('\n')):
                         position = self._map_position(
                             marriage_ring_index, marriage_ordinal + dy_line)
@@ -405,7 +430,7 @@ class BaseSVGChart(BaseChart):
             # generate spline paths
             def marriage_bezier(images, data, knots, flip=False):
                 """
-                tranlate event information to bezier splines
+                Tranlate event information to bezier splines.
 
                 Args:
                     data (list): data container to place the data
@@ -442,7 +467,7 @@ class BaseSVGChart(BaseChart):
                             if ov >= knots[index][1] and ov <= knots[index + 1][1]:
                                 photo_size = self._formatting['individual_photo_relative_size'] * \
                                     self._formatting['relative_line_thickness'] * \
-                                    self._formatting['vertical_step_size']
+                                    self._formatting['horizontal_step_size']
                                 if type(svg_path) == Line:
                                     xpos = svg_path.start.real + \
                                         self._map_y_position(ov)*1j
@@ -509,7 +534,7 @@ class BaseSVGChart(BaseChart):
                                 if ov > knots[index][1] and ov < knots[index + 1][1]:
                                     photo_size = self._formatting['individual_photo_relative_size'] * \
                                         self._formatting['relative_line_thickness'] * \
-                                        self._formatting['vertical_step_size']
+                                        self._formatting['horizontal_step_size']
                                     if type(svg_path) == Line:
                                         xpos = svg_path.start.real + \
                                             self._map_y_position(ov)*1j
@@ -543,7 +568,7 @@ class BaseSVGChart(BaseChart):
                     'config': path,
                     'color': gr_individual.color,
                     'color_pos': color_pos,
-                    'stroke_width': self._formatting['relative_line_thickness']*self._formatting['vertical_step_size'],
+                    'stroke_width': self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size'],
                     'gir':gr_individual
                 }))
             if self._formatting['birth_label_active']:
@@ -621,11 +646,11 @@ class BaseSVGChart(BaseChart):
                     for f_g_id, connections in individual_connections.items():
                         for connection in connections:
                             if connection == 'gr_strong_parent_family':
-                                thickness = 0.5*self._formatting['vertical_step_size']*0.3
+                                thickness = 0.5*self._formatting['horizontal_step_size']*0.3
                                 color = (175, 225, 255)
                             else:
                                 continue
-                                thickness = 0.5*self._formatting['vertical_step_size']*1
+                                thickness = 0.5*self._formatting['horizontal_step_size']*1
                                 color = (25, 25, 25)
                             gr_other_family = self._instances[('f',f_g_id[1])].graphical_representations[f_g_id[0]]
                             if gr_other_family is None:
@@ -653,7 +678,7 @@ class BaseSVGChart(BaseChart):
 
     def paint_and_save(self, individual_id, filename=None):
         """
-        setup svg file and save it.
+        Setup svg file and save it.
 
         Args:
             individual_id (str): root person used for filename
