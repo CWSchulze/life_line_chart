@@ -52,7 +52,6 @@ graph.paint_and_save(individual_id, 'example_2.svg')
 
 Then you will need the following modules:
 - svgwrite (i.e. pyparsing)
-- cmath
 - pillow (for tests with photos)
 
 ```
