@@ -53,7 +53,7 @@ setup(
     data_files=[('life_line_chart', [
         'life_line_chart/ringe.png',
         'life_line_chart/AncestorChartStrings.json',
-        'life_line_chart/DescendantChartStrings.json'
+        'life_line_chart/DescendantChartStrings.json',
         'life_line_chart/BaseChartStrings.json'
         ])],
     include_package_data=True,
