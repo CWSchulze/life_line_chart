@@ -509,6 +509,12 @@ class GraphicalIndividual():
         return gr_children
 
     def get_all_ancestors(self):
+        """
+        get all ancestors places over this individual
+
+        Returns:
+            list: list of ancestors
+        """
         gr_ancestors = []
         strongly_connected_parent_family, strongly_connected_spouse_family = self.ancestor_chart_parent_family_placement
         if strongly_connected_parent_family:
@@ -520,3 +526,12 @@ class GraphicalIndividual():
                 gr_ancestors += [(strongly_connected_parent_family, strongly_connected_parent_family.gr_wife)]
                 gr_ancestors += strongly_connected_parent_family.gr_wife.get_all_ancestors()
         return gr_ancestors
+
+    def get_all_descendants(self):
+        gr_descendants = []
+        for vm in self.visible_marriages:
+            for vc in vm.visible_children:
+                if vm.descendant_chart_parent_family_placement == self.connected_parent_families[0]:
+                    gr_descendants += [(vm, vc)]
+                    gr_descendants += vc.get_all_descendants()
+        return gr_descendants
