@@ -23,6 +23,7 @@ class GraphicalIndividual():
     __birth_date_ov = None
     # ordinal value of the death date
     __death_date_ov = None
+    weight = 1
 
     def __init__(self, instances, individual_id):
         self.items = []

@@ -569,7 +569,7 @@ class BaseSVGChart(BaseChart):
                     'config': path,
                     'color': gr_individual.color,
                     'color_pos': color_pos,
-                    'stroke_width': self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size'],
+                    'stroke_width': self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size']*gr_individual.weight,
                     'gir':gr_individual
                 }))
             if self._formatting['birth_label_active']:
