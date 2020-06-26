@@ -339,6 +339,12 @@ class DescendantChart(BaseSVGChart):
             update_view = True
         self._instances.color_getter = self._instances.color_getters[self._formatting['coloring_of_individuals']]
 
+        def weighting_lambda(gr_individual):
+            if self._formatting['line_weighting'] == 'number_of_descendants':
+                if 'number_of_descendants' in gir.special_properties:
+                    return 1.5 - 1/(gir.special_properties['number_of_descendants']+1)
+            return 1
+
         if rebuild_all:
             self.clear_graphical_representations()
             for settings in self._chart_configuration['root_individuals']:
@@ -380,8 +386,7 @@ class DescendantChart(BaseSVGChart):
                     pass
 
             for gir in self.gr_individuals:
-                if self._formatting['line_weighting'] == 'number_of_descendants':
-                    gir.weight = 1.5 - 1/(gir.special_properties['number_of_descendants']+1)
+                gir.weight = weighting_lambda(gir)
                 color = None
                 if color_lambda:
                     color = color_lambda(gir)
@@ -409,8 +414,7 @@ class DescendantChart(BaseSVGChart):
             self.clear_svg_items()
 
             for gir in self.gr_individuals:
-                if self._formatting['line_weighting'] == 'number_of_descendants':
-                    gir.weight = 1.5 - 1/(gir.special_properties['number_of_descendants']+1)
+                gir.weight = weighting_lambda(gir)
                 color = None
                 if color_lambda:
                     color = color_lambda(gir)
