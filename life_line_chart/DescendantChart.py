@@ -32,6 +32,11 @@ class DescendantChart(BaseSVGChart):
     }
     DEFAULT_FORMATTING.update(BaseSVGChart.DEFAULT_FORMATTING)
 
+    DEFAULT_POSITIONING = {
+        'chart_layout': 'cactus',
+    }
+    DEFAULT_POSITIONING.update(BaseSVGChart.DEFAULT_POSITIONING)
+
     DEFAULT_CHART_CONFIGURATION = {
             'root_individuals': [],
             'discovery_blacklist': []
@@ -82,16 +87,17 @@ class DescendantChart(BaseSVGChart):
                 else:
                     gr_marriage.gr_wife = gr_individual
 
-                spouse = marriage.get_spouse(individual.individual_id)
-                if spouse is not None:
-                    if filter is None or filter(spouse) == False:
-                        gr_spouse = self._create_individual_graphical_representation(
-                            spouse, not self._positioning['unique_graphical_representation'])
+                if self._positioning['chart_layout'] == 'enclosing':
+                    spouse = marriage.get_spouse(individual.individual_id)
+                    if spouse is not None:
+                        if filter is None or filter(spouse) == False:
+                            gr_spouse = self._create_individual_graphical_representation(
+                                spouse, not self._positioning['unique_graphical_representation'])
 
-                        if gr_marriage.husb == spouse:
-                            gr_marriage.gr_husb = gr_spouse
-                        else:
-                            gr_marriage.gr_wife = gr_spouse
+                            if gr_marriage.husb == spouse:
+                                gr_marriage.gr_husb = gr_spouse
+                            else:
+                                gr_marriage.gr_wife = gr_spouse
 
                 for child in marriage.children:
                     gr_child = self.select_descendants(
@@ -105,7 +111,116 @@ class DescendantChart(BaseSVGChart):
                     gr_marriage.visual_placement_parent_family = gr_child_of_family
         return gr_individual
 
-    def place_selected_individuals(self, gr_individual, gr_child_of_family, x_offset=0, discovery_cache=[]):
+    def place_selected_individuals_cactus(self, gr_individual, gr_child_of_family, x_offset=0, x_offset_root=None, discovery_cache=None):
+        """
+        Place the graphical representations in direction of x.
+
+        Args:
+            gr_individual (GraphicalIndividual): individual
+            gr_child_of_family (GraphicalFamily): child-of-family of this individual
+            x_offset (int): starting position
+            discovery_cache (list): list of discovered individuals
+        """
+        if discovery_cache is None:
+            discovery_cache = []
+        individual = gr_individual.individual
+        discovery_cache.append(gr_individual)
+        logger.info(f"discovering {individual.plain_name}")
+
+        x_position = x_offset
+        self.min_x_index = min(self.min_x_index, x_position)
+
+        # marriages which have been placed over this parent family
+        visible_local_marriages = \
+            [marriage for marriage in gr_individual.visible_marriages \
+                if gr_child_of_family is None or \
+                    marriage.descendant_chart_parent_family_placement == gr_child_of_family]
+
+        # get childrens widths
+        child_widths = {}
+        total_number_of_descendants = 0
+        for marriage_index, gr_marriage in enumerate(reversed(visible_local_marriages)):
+            for gr_child in gr_marriage.visible_children:
+                gr_child_descendants = gr_child.get_all_descendants()
+                child_widths[gr_child.g_id] = gr_child_descendants
+                total_number_of_descendants += len(gr_child_descendants) + 1
+
+        gr_individual.weight = 1.5 - 1/(total_number_of_descendants+1)
+
+        # get root position
+        number_of_placed_descendants = 0
+        split_children = [{},{}]
+        for marriage_index, gr_marriage in enumerate(reversed(visible_local_marriages)):
+            split_children[0][marriage_index] = []
+            split_children[1][marriage_index] = []
+            vcs = gr_marriage.visible_children
+            sorted_vcs = sorted(vcs, key=lambda t: len(child_widths[t.g_id]))
+            for child_index, gr_child in enumerate(sorted_vcs):
+                this_step = len(child_widths[gr_child.g_id]) + 1
+                if total_number_of_descendants / 2 <= number_of_placed_descendants + this_step:
+                    split_children[1][marriage_index].append(gr_child)
+                else:
+                    number_of_placed_descendants += this_step
+                    split_children[0][marriage_index].append(gr_child)
+
+        root_individual_position = x_position + number_of_placed_descendants
+
+        individual_has_been_placed = False
+        number_of_placed_descendants = 0
+        for split_index in range(2):
+            for marriage_index, gr_marriage in enumerate(reversed(visible_local_marriages)):
+                vcs = split_children[split_index][marriage_index].copy()
+                sorted_vcs = sorted(vcs, key=lambda t: t.birth_date_ov if split_index == 0 else - t.birth_date_ov)
+                for gr_child in sorted_vcs:
+                    self.place_selected_individuals_cactus(
+                        gr_child, gr_marriage, x_position, root_individual_position,
+                        discovery_cache=discovery_cache)
+                    width = len(child_widths[gr_child.g_id]) + 1
+                    # width = gr_child.get_descendant_width(
+                    #     gr_marriage)
+                    x_position += width
+                    number_of_placed_descendants += width
+            if not individual_has_been_placed and len(visible_local_marriages):
+                individual_has_been_placed = True
+                if not gr_individual.has_position_vector(gr_child_of_family):
+                    #x_offset_root = x_offset
+                    if x_offset_root is None:
+                        x_offset_root = root_individual_position
+                    gr_individual.set_position_vector(
+                        x_offset_root, gr_child_of_family, True)
+                    for marriage_index, gr_marriage in enumerate(reversed(visible_local_marriages)):
+                        if not gr_individual.has_position_vector(gr_marriage):
+                            gr_individual.set_position_vector(
+                                x_position, gr_marriage)
+                    x_position += 1
+
+        if not individual_has_been_placed:
+            #x_offset_root = x_offset
+            if x_offset_root is None:
+                x_offset_root = root_individual_position
+            gr_individual.set_position_vector(
+                    x_offset_root, gr_child_of_family, True)
+            for gr_marriage in visible_local_marriages:
+                gr_individual.set_position_vector(
+                        x_position, gr_marriage)
+            if not visible_local_marriages:
+                gr_individual.set_position_vector(
+                        x_position, None)
+            x_position += 1
+
+        self.max_x_index = max(self.max_x_index, x_position)
+
+        # recalculate
+        birth_ordinal_value = gr_individual.birth_date_ov
+        death_ordinal_value = gr_individual.death_date_ov
+        if self.min_ordinal is not None and self.max_ordinal is not None:
+            self.min_ordinal = min(self.min_ordinal, birth_ordinal_value)
+            self.max_ordinal = max(self.max_ordinal, death_ordinal_value)
+        elif death_ordinal_value and birth_ordinal_value:
+            self.min_ordinal = birth_ordinal_value
+            self.max_ordinal = death_ordinal_value
+
+    def place_selected_individuals_enclosing(self, gr_individual, gr_child_of_family, x_offset=0, discovery_cache=[]):
         """
         Place the graphical representations in direction of x.
 
@@ -154,7 +269,7 @@ class DescendantChart(BaseSVGChart):
                     x_position += 1
 
             for gr_child in gr_marriage.visible_children:
-                self.place_selected_individuals(
+                self.place_selected_individuals_enclosing(
                     gr_child, gr_marriage, x_position,
                     discovery_cache=discovery_cache)
                 width = gr_child.get_descendant_width(
@@ -247,8 +362,12 @@ class DescendantChart(BaseSVGChart):
                 gr_cof_family = None
                 if cof_family:
                     gr_cof_family = cof_family.graphical_representations[0]
-                self.place_selected_individuals(
-                    gr_root_individual, gr_cof_family, x_pos)
+                if self._positioning['chart_layout'] == 'cactus':
+                    self.place_selected_individuals_cactus(
+                        gr_root_individual, gr_cof_family, x_pos)
+                else:
+                    self.place_selected_individuals_enclosing(
+                        gr_root_individual, gr_cof_family, x_pos)
 
                 x_pos += gr_root_individual.get_descendant_width(gr_cof_family)
 

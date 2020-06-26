@@ -267,6 +267,13 @@ class BaseSVGChart(BaseChart):
             def calculate_ring_position(gr_family):
                 h_pos = gr_family.gr_husb.get_position_dict(gr_family) if gr_family.gr_husb else None
                 w_pos = gr_family.gr_wife.get_position_dict(gr_family) if gr_family.gr_wife else None
+                if 'chart_layout' in self._positioning and self._positioning['chart_layout'] == 'cactus':
+                    if h_pos:
+                        return (h_pos[1],
+                            gr_family.marriage['ordinal_value'])
+                    if w_pos:
+                        return (w_pos[1],
+                            gr_family.marriage['ordinal_value'])
                 if h_pos is None or w_pos is None:
                     vcs = gr_family.visible_children
                     if vcs:
@@ -445,7 +452,7 @@ class BaseSVGChart(BaseChart):
                     t = 1
                 else:
                     t = 0
-                if len(knots) == 2:
+                if len(knots) == 2 and ('chart_layout' not in self._positioning or self._positioning['chart_layout'] != 'cactus'):
                     data.append(
                         ({'type': 'Line', 'arguments': (
                             coordinate_transformation(
@@ -492,40 +499,33 @@ class BaseSVGChart(BaseChart):
                 else:
                     for index in range(len(knots)-1):
                         def interp(*val):
+                            if (index + t) % 2 == 0:
+                                val = [val[1], val[0]]
                             return (knots[index][0]*(1-val[0]) + knots[index+1][0]*val[0],
                                     knots[index][1]*(1-val[1]) + knots[index+1][1]*val[1])
-                        if (index + t) % 2 == 0:
-                            data.append(
-                                ({'type': 'CubicBezier', 'arguments': (
-                                    coordinate_transformation(*interp(0, 0)),
-                                    coordinate_transformation(
-                                        *interp(0, 1)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(0.0, 0.7)),
-                                    coordinate_transformation(
-                                        *interp(0, 1)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(0.5, 0.9)),
-                                    coordinate_transformation(*interp(1, 1)),
-                                )},
-                                    (_birth_position[1], self._map_y_position(
-                                        self._formatting['fade_individual_color_black_age']*365+birth_date_ov)),
-                                # connection to this knot is relevant
-                                knots[index+1][2]# and index + 1 < len(knots) or knots[index + 1][2]
-                                )
+                        def interp_trans(*val):
+                            return coordinate_transformation(*interp(*val))
+                        if self._formatting['family_shape'] == 0:
+                            relative_spline_handles = [(0, 0), (0, 1), (0, 1), (1, 1)]
+                        elif self._formatting['family_shape'] == 1:
+                            relative_spline_handles = [(0, 0), (0, 0.7), (0.5, 0.9), (1, 1)]
+                        else:#if self._formatting['family_shape'] == 2:
+                            relative_spline_handles = [(0, 0), (0.1, 0.3), (0.3, 1), (1, 1)]
+
+                        data.append(
+                            ({'type': 'CubicBezier', 'arguments': (
+                                interp_trans(*relative_spline_handles[0]),
+                                interp_trans(*relative_spline_handles[1]),
+                                interp_trans(*relative_spline_handles[2]),
+                                interp_trans(*relative_spline_handles[3]),
+                            )},
+                                (_birth_position[1], self._map_y_position(
+                                    self._formatting['fade_individual_color_black_age']*365+birth_date_ov)),
+                            # connection to this knot is relevant
+                            knots[index+1][2]# and index + 1 < len(knots) or knots[index + 1][2]
                             )
-                        else:
-                            data.append(
-                                ({'type': 'CubicBezier', 'arguments': (
-                                    coordinate_transformation(*interp(0, 0)),
-                                    coordinate_transformation(
-                                        *interp(1, 0)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(0.8, 0)),
-                                    coordinate_transformation(
-                                        *interp(1, 0)) if self._formatting['family_shape'] == 0 else coordinate_transformation(*interp(1, 0.2)),
-                                    coordinate_transformation(*interp(1, 1)),
-                                )},
-                                    (_birth_position[1], self._map_y_position(
-                                        self._formatting['fade_individual_color_black_age']*365+birth_date_ov)),
-                                # connection to this knot is relevant
-                                knots[index+1][2]# and index + 1 < len(knots) or knots[index + 1][2]
-                                )
-                            )
+                        )
+
                         if self._formatting['individual_photo_active'] and len(gr_individual.individual.images) > 0:
                             svg_path = Path_types[data[-1][0]
                                                   ['type']](*data[-1][0]['arguments'])
