@@ -33,7 +33,12 @@ class GraphicalIndividual():
         self.individual.graphical_representations.append(self)
         self.debug_label = ""
         self.g_id = None
+
+        # in ancestor charts children can be added, which are strongly connected, but
+        # since they are a dead end, not a root, they cannot be used for placement
         self.qualified_for_placement = True
+
+        self.special_properties = {}
 
         self.ancestor_chart_parent_family_placement = None, None
 

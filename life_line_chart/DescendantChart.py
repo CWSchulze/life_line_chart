@@ -145,7 +145,7 @@ class DescendantChart(BaseSVGChart):
                 child_widths[gr_child.g_id] = gr_child_descendants
                 total_number_of_descendants += len(gr_child_descendants) + 1
 
-        gr_individual.weight = 1.5 - 1/(total_number_of_descendants+1)
+        gr_individual.special_properties['number_of_descendants'] = total_number_of_descendants
 
         # get root position
         number_of_placed_descendants = 0
@@ -187,7 +187,7 @@ class DescendantChart(BaseSVGChart):
                     if x_offset_root is None:
                         x_offset_root = root_individual_position
                     gr_individual.set_position_vector(
-                        x_offset_root, gr_child_of_family, True)
+                        x_offset_root, gr_child_of_family, True, overrule_ov = 1)
                     for marriage_index, gr_marriage in enumerate(reversed(visible_local_marriages)):
                         if not gr_individual.has_position_vector(gr_marriage):
                             gr_individual.set_position_vector(
@@ -199,7 +199,7 @@ class DescendantChart(BaseSVGChart):
             if x_offset_root is None:
                 x_offset_root = root_individual_position
             gr_individual.set_position_vector(
-                    x_offset_root, gr_child_of_family, True)
+                    x_offset_root, gr_child_of_family, True, overrule_ov = 1)
             for gr_marriage in visible_local_marriages:
                 gr_individual.set_position_vector(
                         x_position, gr_marriage)
@@ -380,6 +380,8 @@ class DescendantChart(BaseSVGChart):
                     pass
 
             for gir in self.gr_individuals:
+                if self._formatting['line_weighting'] == 'number_of_descendants':
+                    gir.weight = 1.5 - 1/(gir.special_properties['number_of_descendants']+1)
                 color = None
                 if color_lambda:
                     color = color_lambda(gir)
@@ -407,6 +409,8 @@ class DescendantChart(BaseSVGChart):
             self.clear_svg_items()
 
             for gir in self.gr_individuals:
+                if self._formatting['line_weighting'] == 'number_of_descendants':
+                    gir.weight = 1.5 - 1/(gir.special_properties['number_of_descendants']+1)
                 color = None
                 if color_lambda:
                     color = color_lambda(gir)
