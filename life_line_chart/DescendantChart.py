@@ -248,6 +248,9 @@ class DescendantChart(BaseSVGChart):
                     x_position, gr_child_of_family, True)
             x_position += 1
 
+        total_number_of_descendants = len(gr_individual.get_all_descendants())
+        gr_individual.special_properties['number_of_descendants'] = total_number_of_descendants
+
         for marriage_index, gr_marriage in enumerate(reversed(visible_local_marriages)):
             gr_spouse = gr_marriage.get_gr_spouse(gr_individual)
 
