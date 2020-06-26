@@ -239,6 +239,8 @@ class BaseSVGChart(BaseChart):
         self.min_x_index = min_x_index  # -1000
         self.max_x_index = max_x_index + 1  # +200
 
+        line_bend_orientation = 0 if (str(type(self)) == "<class 'life_line_chart.DescendantChart.DescendantChart'>" and self._positioning['chart_layout'] == 'cactus') else 1
+
         for gr_individual in self.gr_individuals:
             debug_items = []
             birth_date_ov = gr_individual.birth_date_ov
@@ -267,7 +269,7 @@ class BaseSVGChart(BaseChart):
             def calculate_ring_position(gr_family):
                 h_pos = gr_family.gr_husb.get_position_dict(gr_family) if gr_family.gr_husb else None
                 w_pos = gr_family.gr_wife.get_position_dict(gr_family) if gr_family.gr_wife else None
-                if 'chart_layout' in self._positioning and self._positioning['chart_layout'] == 'cactus':
+                if (str(type(self)) == "<class 'life_line_chart.DescendantChart.DescendantChart'>" and self._positioning['chart_layout'] == 'cactus'):
                     if h_pos:
                         return (h_pos[1],
                             gr_family.marriage['ordinal_value'])
@@ -497,9 +499,10 @@ class BaseSVGChart(BaseChart):
                                     }
                                 ))
                 else:
+                    # self._formatting['family_shape'] = 2
                     for index in range(len(knots)-1):
                         def interp(*val):
-                            if (index + t) % 2 == 0:
+                            if (index + t) % 2 == line_bend_orientation:
                                 val = [val[1], val[0]]
                             return (knots[index][0]*(1-val[0]) + knots[index+1][0]*val[0],
                                     knots[index][1]*(1-val[1]) + knots[index+1][1]*val[1])
