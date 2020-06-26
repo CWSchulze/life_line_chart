@@ -156,6 +156,13 @@
             "flip_vertically": {
                 "short_description": "Flip vertically",
                 "long_description": "If active, the chart is flipped vertically."
+            },
+            "line_weighting": {
+                "short_description": "Line weighting",
+                "long_description": "The line width can be configured.",
+                "choices": {
+                    "none": "none"
+                }
             }
         },
         "positioning": {
@@ -328,6 +335,13 @@
             "flip_vertically": {
                 "short_description": "Vertikal spiegeln",
                 "long_description": "Falls aktiv, wird das Diagramm vertikal gespiegelt."
+            },
+            "line_weighting": {
+                "short_description": "Liniengewichtung",
+                "long_description": "Die Linienbreite kann konfiguriert werden.",
+                "choices": {
+                    "none": "keine"
+                }
             }
         },
         "positioning": {
