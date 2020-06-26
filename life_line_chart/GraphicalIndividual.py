@@ -368,7 +368,7 @@ class GraphicalIndividual():
             return True
         return False
 
-    def set_position_vector(self, x_position, gr_family, this_is_the_parent_family=False):
+    def set_position_vector(self, x_position, gr_family, this_is_the_parent_family=False, overrule_ov=None):
         if gr_family:
             g_id = gr_family.g_id
             if gr_family.marriage:
@@ -378,6 +378,8 @@ class GraphicalIndividual():
         else:
             g_id = None
             ov = self.birth_date_ov
+        if overrule_ov:
+            ov = overrule_ov
         if not self._x_position:
             self._x_position = {}
         if g_id not in self._x_position:
