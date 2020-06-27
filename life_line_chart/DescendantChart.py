@@ -345,7 +345,7 @@ class DescendantChart(BaseSVGChart):
         def weighting_lambda(gr_individual):
             if self._formatting['line_weighting'] == 'number_of_descendants':
                 if 'number_of_descendants' in gir.special_properties:
-                    return 1.5 - 1/(gir.special_properties['number_of_descendants']+1)
+                    return 1.5 - 1/(0.3*gir.special_properties['number_of_descendants']+1)
             return 1
 
         if rebuild_all:
