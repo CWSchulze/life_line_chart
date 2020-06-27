@@ -275,10 +275,10 @@ class BaseSVGChart(BaseChart):
                 h_pos = gr_family.gr_husb.get_position_dict(gr_family) if gr_family.gr_husb else None
                 w_pos = gr_family.gr_wife.get_position_dict(gr_family) if gr_family.gr_wife else None
                 if (str(type(self)) == "<class 'life_line_chart.DescendantChart.DescendantChart'>" and self._positioning['chart_layout'] == 'cactus'):
-                    if h_pos:
+                    if h_pos and not w_pos:
                         return (h_pos[1],
                             gr_family.marriage['ordinal_value'])
-                    if w_pos:
+                    if w_pos and not h_pos:
                         return (w_pos[1],
                             gr_family.marriage['ordinal_value'])
                 if h_pos is None or w_pos is None:
@@ -385,7 +385,32 @@ class BaseSVGChart(BaseChart):
             _death_position = self._map_position(*_death_original_location)
             knots.append((x_pos_list[0][1], birth_date_ov, None))
             images = []
+            # def image_item(pos_x, pos_y, size_x, size_y, filename, original_size):
+
             for index, ((marriage_ring_index, marriage_ordinal), new_x_index_after_marriage, label, gr_family, has_ring, is_cross_connected) in enumerate(zip(marriage_ring_positions, new_x_indices_after_marriage, marriage_labels, marriage_families, marriage_has_ring, marriage_is_crossconnected)):
+                if cactus_chart:
+                    spouse_index =  (new_x_index_after_marriage-marriage_ring_index)*(-1) + marriage_ring_index
+                    marriage_ring_index = new_x_index_after_marriage
+                    if spouse_index != marriage_ring_index:
+                        stroke_width = self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size']*0.1
+                        if has_ring:
+                            images.append(
+                                ((0, 'layer_marriage_connections'),{
+                                    'type': 'path',
+                                    'config': {
+                                        'type': 'Line', 'arguments': (
+                                            coordinate_transformation(
+                                                spouse_index, marriage_ordinal),
+                                            coordinate_transformation(
+                                                marriage_ring_index, marriage_ordinal),
+                                        ),
+                                    },
+                                    'stroke_dasharray':f"{stroke_width*5},{stroke_width*5}",
+                                    'color': [0,0,0],
+                                    'stroke_width': stroke_width,
+                                })
+                            )
+                        has_ring = True
                 if not self._formatting['no_ring'] and has_ring:
                     ring_position = self._map_position(
                         marriage_ring_index, marriage_ordinal)
@@ -427,11 +452,16 @@ class BaseSVGChart(BaseChart):
                             'font_size': font_size,
                             'font_name': self._formatting['font_name'],
                         }))
-                knots.append((marriage_ring_index, marriage_ordinal, is_cross_connected))
-                if index + 1 < len(marriage_ordinals):
-                    # zwischenpunkt zur ursprungsposition
-                    knots.append(
-                        (new_x_index_after_marriage, marriage_ordinals[index]/2+marriage_ordinals[index+1]/2, False))
+
+                if cactus_chart:
+                    if index == 0:
+                        knots.append((new_x_index_after_marriage, marriage_ordinal, False))
+                else:
+                    knots.append((marriage_ring_index, marriage_ordinal, is_cross_connected))
+                    if index + 1 < len(marriage_ordinals):
+                        # zwischenpunkt zur ursprungsposition
+                        knots.append(
+                            (new_x_index_after_marriage, marriage_ordinals[index]/2+marriage_ordinals[index+1]/2, False))
             knots.append((x_pos_list[-1][1], death_event['ordinal_value'], False))
 
             Path_types = {

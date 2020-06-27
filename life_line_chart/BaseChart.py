@@ -340,6 +340,7 @@ class BaseChart():
                     return True
             return False
 
+        line_bend_orientation = 0 if (str(type(self)) == "<class 'life_line_chart.DescendantChart.DescendantChart'>" and self._positioning['chart_layout'] == 'cactus') else 1
         # assign the individuals to all x_indices in which they appear
         for gr_individual in self.gr_individuals:
             position_vector = list(gr_individual.get_position_dict().values())
@@ -352,7 +353,10 @@ class BaseChart():
                     spouse_families = [(None, None, None, None)] * missing_families
 
             for i, value in enumerate(position_vector):
-                x_index = value[1]
+                if line_bend_orientation == 1:
+                    x_index = value[1]
+                else:
+                    x_index = position_vector[1][1]
                 marriage = spouse_families[i][2]
                 if x_index not in v:
                     v[x_index] = []
