@@ -391,7 +391,7 @@ class GraphicalIndividual():
             self._x_position[g_id] = (
                 (ov, x_position, gr_family, this_is_the_parent_family))
         _x_position = {}
-        _x_position.update(dict(sorted(self._x_position.items(), key=lambda t: t[1])))
+        _x_position.update(dict(sorted(self._x_position.items(), key=lambda t: t[1][0])))
         self._x_position = _x_position
 
     x_position = property(get_position_dict, set_position_vector)
