@@ -9,6 +9,11 @@
                 "choices": {
                     "number_of_descendants": "Number of descendants"
                 }
+            },
+            "family_shape": {
+                "choices": {
+                    "2": "Very soft"
+                }
             }
         },
         "positioning": {
@@ -32,6 +37,11 @@
             "line_weighting": {
                 "choices": {
                     "number_of_descendants": "Anzahl der Nachkommen"
+                }
+            },
+            "family_shape": {
+                "choices": {
+                    "2": "Sehr weich"
                 }
             }
         },
