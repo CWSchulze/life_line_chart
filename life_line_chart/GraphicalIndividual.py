@@ -539,7 +539,7 @@ class GraphicalIndividual():
         gr_descendants = []
         for vm in self.visible_marriages:
             for vc in vm.visible_children:
-                if self.connected_parent_families and vm.descendant_chart_parent_family_placement == self.connected_parent_families[0]:
+                if not self.connected_parent_families or vm.descendant_chart_parent_family_placement == self.connected_parent_families[0]:
                     gr_descendants += [(vm, vc)]
                     gr_descendants += vc.get_all_descendants()
         return gr_descendants
