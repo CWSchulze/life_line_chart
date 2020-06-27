@@ -67,6 +67,12 @@ class BaseChart():
             'fade_to_death': (0, 0, 0),
             'grid_line': (210, 210, 210),
             'text_label': (0, 0, 0)
+        },
+        'dark': {
+            'descendant_chart_marriage_lines': (200, 200, 200),
+            'fade_to_death': (255, 255, 255),
+            'grid_line': (20, 20, 20),
+            'text_label': (200, 200, 200)
         }
     }
     _colors = COLOR_CONFIGURATIONS['light']

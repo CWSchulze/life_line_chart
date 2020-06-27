@@ -26,14 +26,11 @@ def new_text_item(self, text, pos_x, pos_y, font_size=None, color="default", tex
             color = None
         else:
             color = self._colors['text_label']
-    elif color:
-        color = "rgb({},{},{})".format(*color)
     data = {
             'type': 'text',
             'config': {
                     'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
                     'text': text,
-                    'fill': color,
                     'text_anchor': text_anchor,
                     # 'align' : 'center',
                     'insert': (
@@ -44,6 +41,11 @@ def new_text_item(self, text, pos_x, pos_y, font_size=None, color="default", tex
             'font_size': font_size,
             'font_name': self._formatting['font_name'],
         }
+    if 'transform' in kwargs and kwargs['transform'] is None:
+        kwargs.pop('transform')
+    if color:
+        data['config']['fill'] = "rgb({},{},{})".format(*color)
+        data['fill'] = color
     data['config'].update(kwargs)
     return data
 
