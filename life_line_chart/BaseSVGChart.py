@@ -740,6 +740,9 @@ class BaseSVGChart(BaseChart):
                         constructor_function = Line
                     elif item['config']['type'] == 'CubicBezier':
                         constructor_function = CubicBezier
+                    stroke_dasharray = None
+                    if 'stroke_dasharray' in item:
+                        stroke_dasharray = item['stroke_dasharray']
                     svg_path = Path(constructor_function(*arguments))
 
                     if self._formatting['fade_individual_color'] and 'color_pos' in item:
@@ -752,12 +755,12 @@ class BaseSVGChart(BaseChart):
                         # fill.add_stop_color(1, "rgb({},{},{})".format(*item['colors'][0]))
                         svg_document.defs.add(fill)
                         svg_document.add(svg_document.path(d=svg_path.d(), stroke=fill.get_paint_server(
-                            default='currentColor'), fill='none', stroke_width=item['stroke_width']))
+                            default='currentColor'), fill='none', stroke_width=item['stroke_width'], stroke_dasharray=stroke_dasharray))
                     else:
                         # arguments['fill'] = fill
                         # gr_individual.color
                         svg_document.add(svg_document.path(d=svg_path.d(), stroke="rgb({},{},{})".format(
-                            *item['color']), fill='none', stroke_width=item['stroke_width']))
+                            *item['color']), fill='none', stroke_width=item['stroke_width'], stroke_dasharray=stroke_dasharray))
                 elif item['type'] == 'textPath':
                     args_path = item['path']
                     args_text = item['config']
