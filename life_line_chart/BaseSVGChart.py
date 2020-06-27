@@ -463,6 +463,10 @@ class BaseSVGChart(BaseChart):
                     t = 1
                 else:
                     t = 0
+
+                if self._formatting['individual_photo_active'] and len(gr_individual.individual.images) > 0:
+                    photo_dict = self.get_filtered_photos(birth_date_ov, gr_individual.individual.images)
+
                 if len(knots) == 2 and ('chart_layout' not in self._positioning or self._positioning['chart_layout'] != 'cactus'):
                     data.append(
                         ({'type': 'Line', 'arguments': (
@@ -480,13 +484,12 @@ class BaseSVGChart(BaseChart):
                         index = 0
                         svg_path = Path_types[data[-1][0]
                                               ['type']](*data[-1][0]['arguments'])
-                        for ov, image_dict in gr_individual.individual.images.items():
+                        for ov, image_dict in photo_dict.items():
                             image_filename = image_dict['filename']
                             image_size = image_dict['size']
                             if ov >= knots[index][1] and ov <= knots[index + 1][1]:
                                 photo_size = self._formatting['individual_photo_relative_size'] * \
-                                    self._formatting['relative_line_thickness'] * \
-                                    self._formatting['horizontal_step_size']
+                                    line_thickness
                                 if type(svg_path) == Line:
                                     xpos = svg_path.start.real + \
                                         self._map_y_position(ov)*1j
@@ -541,13 +544,12 @@ class BaseSVGChart(BaseChart):
                         if self._formatting['individual_photo_active'] and len(gr_individual.individual.images) > 0:
                             svg_path = Path_types[data[-1][0]
                                                   ['type']](*data[-1][0]['arguments'])
-                            for ov, image_dict in gr_individual.individual.images.items():
+                            for ov, image_dict in photo_dict.items():
                                 image_filename = image_dict['filename']
                                 image_size = image_dict['size']
                                 if ov > knots[index][1] and ov < knots[index + 1][1]:
                                     photo_size = self._formatting['individual_photo_relative_size'] * \
-                                        self._formatting['relative_line_thickness'] * \
-                                        self._formatting['horizontal_step_size']
+                                        line_thickness
                                     if type(svg_path) == Line:
                                         xpos = svg_path.start.real + \
                                             self._map_y_position(ov)*1j

@@ -49,6 +49,7 @@ class BaseChart():
         'family_shape': 0,
         'individual_photo_active': False,
         'individual_photo_relative_size': 2.5,
+        'individual_photo_relative_distance': 1.1,
         'debug_visualize_connections': False,
         'debug_visualize_ambiguous_placement': False,
         'coloring_of_individuals': 'unique',
@@ -621,3 +622,59 @@ class BaseChart():
         for _, instance in self._instances.items():
             if instance is not None:
                 instance.graphical_representations.clear()
+
+    def get_filtered_photos(self, birth_ordinal_value, original_images):
+        images = {}
+        photo_width = self._formatting['relative_line_thickness'] * self._formatting['individual_photo_relative_size'] * self._formatting['horizontal_step_size'] # * (1 + self.max_x_index - self.min_x_index)
+        photo_height = photo_width * self._formatting['individual_photo_relative_distance']
+        photo_ov_height = abs(self._inverse_y_delta(photo_height))
+        ov_list = list(original_images.keys())
+        settings_list = list(original_images.values())
+        if len(original_images) > 0:
+            max_ordinal = max(list(original_images.keys()))
+        else:
+            max_ordinal = -1
+        latest_ordinal = birth_ordinal_value - photo_ov_height
+
+        closest_index = -1
+        used_indices_list = []
+        while closest_index < len(ov_list) and latest_ordinal < max_ordinal:
+            offset_ov_list = [(abs(v - latest_ordinal), i) for i, v in enumerate(ov_list) if i not in used_indices_list and v > latest_ordinal]
+            if not offset_ov_list:
+                break
+            offset_ov_list.sort()
+            closest_index = offset_ov_list[0][1]
+            used_indices_list.append(closest_index)
+            settings = settings_list[closest_index]
+            exact_ordinal_value = ov_list[closest_index]
+            relative_photo_height = min(1, settings['size'][1] / settings['size'][0])
+            current_ordinal = max(latest_ordinal + 0.5*photo_ov_height*relative_photo_height, exact_ordinal_value)
+            images[current_ordinal] = settings
+            latest_ordinal = current_ordinal + 0.5*photo_ov_height*relative_photo_height
+        # for ordinal_value, settings in sorted(original_images.items()):
+        #     # filename = settings['filename']
+        #     if len(images) > 0:
+        #         max_ordinal = max(list(images.keys()))
+        #     else:
+        #         max_ordinal = -1
+        #     if round((ordinal_value-birth_ordinal_value)/image_step_size) > round((max_ordinal-birth_ordinal_value)/image_step_size):
+        #         images[birth_ordinal_value + round((ordinal_value-birth_ordinal_value)/image_step_size)
+        #                 * image_step_size] = settings
+        return images
+
+    def get_filtered_photos_raster(self, birth_ordinal_value, original_images):
+        images = {}
+        photo_width = self._formatting['relative_line_thickness'] * self._formatting['individual_photo_relative_size'] * self._formatting['horizontal_step_size'] # * (1 + self.max_x_index - self.min_x_index)
+        photo_height = photo_width * self._formatting['individual_photo_relative_distance']
+        photo_ov_height = abs(self._inverse_y_delta(photo_height))
+        image_step_size = photo_ov_height
+        for ordinal_value, settings in sorted(original_images.items()):
+            # filename = settings['filename']
+            if len(images) > 0:
+                max_ordinal = max(list(images.keys()))
+            else:
+                max_ordinal = -1
+            if round((ordinal_value-birth_ordinal_value)/image_step_size) > round((max_ordinal-birth_ordinal_value)/image_step_size):
+                images[birth_ordinal_value + round((ordinal_value-birth_ordinal_value)/image_step_size)
+                        * image_step_size] = settings
+        return images
