@@ -538,7 +538,7 @@ class BaseChart():
             float: difference of ordinal value
         """
         display_factor = 1 if self._formatting['flip_vertically'] else -1
-        return delta_y / (self._formatting['total_height'] * display_factor) * (self.max_ordinal-self.min_ordinal)
+        return delta_y / (self._formatting['total_height'] * display_factor) * (self.chart_max_ordinal-self.chart_min_ordinal)
 
     def _inverse_y_position(self, pos_y):
         """
