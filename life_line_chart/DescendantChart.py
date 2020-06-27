@@ -33,7 +33,7 @@ class DescendantChart(BaseSVGChart):
     DEFAULT_FORMATTING.update(BaseSVGChart.DEFAULT_FORMATTING)
 
     DEFAULT_POSITIONING = {
-        'chart_layout': 'cactus',
+        'chart_layout': 'enclosing',
     }
     DEFAULT_POSITIONING.update(BaseSVGChart.DEFAULT_POSITIONING)
 
@@ -283,6 +283,10 @@ class DescendantChart(BaseSVGChart):
 
         for marriage_index, gr_marriage in enumerate(reversed(visible_local_marriages)):
             gr_spouse = gr_marriage.get_gr_spouse(gr_individual)
+
+            if gr_spouse:
+                total_number_of_descendants = len(gr_spouse.get_all_descendants())
+                gr_spouse.special_properties['number_of_descendants'] = total_number_of_descendants
 
             # starting x index of gr_individual is first marriage (i.e. last in reversed list)
             if marriage_index == len(visible_local_marriages) - 1:
