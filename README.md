@@ -51,6 +51,7 @@ chart = DescendantChart(
     formatting={
         'total_height': 400,
         'birth_label_active': False,
+        'death_label_letter_y_offset': -3,
         'line_weighting': 'number_of_descendants',
         'horizontal_step_size':70,
         'relative_line_thickness':0.2}
