@@ -305,7 +305,7 @@
                 "long_description": "Die Form der Familien kann variiert werden.",
                 "choices": {
                     "0": "Rechteckig",
-                    "1": "weichere"
+                    "1": "Weicher"
                 }
             },
             "margin_year_max": {
