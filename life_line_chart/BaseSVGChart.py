@@ -693,9 +693,6 @@ class BaseSVGChart(BaseChart):
                             marriage_pos_b = calculate_ring_position(gr_other_family)
                             if marriage_pos_b is None:
                                 continue
-                            def coordinate_transformation(x, y):
-                                new_x, new_y = self._map_position(x, y)
-                                return new_x + new_y*1j
 
                             gr_spouse.items.append(((99, 'layer_debug'),
                                     {
