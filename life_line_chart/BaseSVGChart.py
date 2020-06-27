@@ -162,9 +162,9 @@ class BaseSVGChart(BaseChart):
 
         self.additional_graphical_items.clear()
 
-        font_size = self._formatting['font_size_description'] * \
-            self._formatting['relative_line_thickness'] * \
+        line_thickness = self._formatting['relative_line_thickness'] * \
             self._formatting['horizontal_step_size']
+        font_size = self._formatting['font_size_description'] * line_thickness
 
         if len(self.gr_individuals) == 0:
             # settings for empty graphs
@@ -384,17 +384,26 @@ class BaseSVGChart(BaseChart):
             _birth_position = self._map_position(*_birth_original_location)
             _death_position = self._map_position(*_death_original_location)
             knots.append((x_pos_list[0][1], birth_date_ov, None))
-            images = []
-            # def image_item(pos_x, pos_y, size_x, size_y, filename, original_size):
-
+            def new_image_item(pos_x, pos_y, size_x, size_y, filename, original_size, **kwargs):
+                data = {
+                            'type': 'image',
+                            'config': {
+                                'insert': (pos_x, pos_y),
+                                'size': (size_x, size_y)
+                            },
+                            'filename': filename,
+                            'size': original_size
+                        }
+                data.update(kwargs)
+                return data
             for index, ((marriage_ring_index, marriage_ordinal), new_x_index_after_marriage, label, gr_family, has_ring, is_cross_connected) in enumerate(zip(marriage_ring_positions, new_x_indices_after_marriage, marriage_labels, marriage_families, marriage_has_ring, marriage_is_crossconnected)):
                 if cactus_chart:
                     spouse_index =  (new_x_index_after_marriage-marriage_ring_index)*(-1) + marriage_ring_index
                     marriage_ring_index = new_x_index_after_marriage
                     if spouse_index != marriage_ring_index:
-                        stroke_width = self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size']*0.1
+                        stroke_width = line_thickness*0.1
                         if has_ring:
-                            images.append(
+                            gr_individual.items.append(
                                 ((0, 'layer_marriage_connections'),{
                                     'type': 'path',
                                     'config': {
@@ -414,33 +423,28 @@ class BaseSVGChart(BaseChart):
                 if not self._formatting['no_ring'] and has_ring:
                     ring_position = self._map_position(
                         marriage_ring_index, marriage_ordinal)
-                    images.append(((2, 'layer_ring_image'), {
-                            'type': 'image',
-                            'config': {
-                                'insert': (
-                                    ring_position[0] - self._formatting['relative_line_thickness'] *
-                                    self._formatting['horizontal_step_size']*1,
-                                    ring_position[1] - self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size']*1),
-                                'size': (
-                                    self._formatting['relative_line_thickness'] *
-                                    self._formatting['horizontal_step_size']*2,
-                                    self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size']*2),
-                            },
-                            'filename': os.path.join(os.path.dirname(__file__), "ringe.png"),
-                            'size': (119,75),
-                            'gir':gr_individual,
-                            'gfr':gr_family
-                        }
+                    gr_individual.items.append((
+                        (2, 'layer_ring_image'), 
+                        new_image_item(
+                            pos_x = ring_position[0] - line_thickness*1,
+                            pos_y = ring_position[1] - line_thickness*1,
+                            size_x = line_thickness*2,
+                            size_y = line_thickness*2,
+                            filename = os.path.join(os.path.dirname(__file__), "ringe.png"),
+                            original_size = (119,75),
+                            gir = gr_individual,
+                            gfr = gr_family
+                        )
                     ))
                 if self._formatting['marriage_label_active']:
                     dy_line = self._inverse_y_position(
-                        self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size']) - self._inverse_y_position(0)
+                        line_thickness) - self._inverse_y_position(0)
                     for index2, line in enumerate(label.split('\n')):
                         position = self._map_position(
                             marriage_ring_index, marriage_ordinal + dy_line)
                         position = (position[0], position[1] +
                                     (index2 + 0.2) * font_size * 1.2)
-                        images.append(((5, 'layer_marriage_label'), {
+                        gr_individual.items.append(((5, 'layer_marriage_label'), {
                             'type': 'text',
                             'config': {
                                     'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
@@ -470,7 +474,7 @@ class BaseSVGChart(BaseChart):
             }
 
             # generate spline paths
-            def marriage_bezier(images, data, knots, flip=False):
+            def marriage_bezier(data, knots, flip=False):
                 """
                 Tranlate event information to bezier splines.
 
@@ -515,17 +519,16 @@ class BaseSVGChart(BaseChart):
                                     root = intersection_polynomial(coeffs, self._map_y_position(ov))
                                     xpos = svg_path.point(root)
 
-                                images.append(((4, 'layer_photos'), {
-                                        'type': 'image',
-                                        'config': {
-                                                'insert': (
-                                                    xpos.real - photo_size/2,
-                                                    xpos.imag - photo_size/2),
-                                                'size': (photo_size, photo_size),
-                                        },
-                                        'filename': image_filename,
-                                        'size': image_size
-                                    }
+                                gr_individual.items.append((
+                                    (4, 'layer_photos'), 
+                                    new_image_item(
+                                        pos_x = xpos.real - photo_size/2,
+                                        pos_y = xpos.imag - photo_size/2,
+                                        size_x = photo_size,
+                                        size_y = photo_size,
+                                        filename = image_filename,
+                                        original_size = image_size
+                                    )
                                 ))
                 else:
                     # self._formatting['family_shape'] = 2
@@ -575,20 +578,19 @@ class BaseSVGChart(BaseChart):
                                         coeffs = svg_path.poly()
                                         root = intersection_polynomial(coeffs, self._map_y_position(ov))
                                         xpos = svg_path.point(root)
-                                    images.append(((4, 'layer_photos'), {
-                                            'type': 'image',
-                                            'config': {
-                                                    'insert': (
-                                                        xpos.real - photo_size/2,
-                                                        xpos.imag - photo_size/2),
-                                                    'size': (photo_size, photo_size),
-                                            },
-                                            'filename': image_filename,
-                                            'size': image_size
-                                        }
+                                    gr_individual.items.append((
+                                        (4, 'layer_photos'), 
+                                        new_image_item(
+                                            pos_x = xpos.real - photo_size/2,
+                                            pos_y = xpos.imag - photo_size/2,
+                                            size_x = photo_size,
+                                            size_y = photo_size,
+                                            filename = image_filename,
+                                            original_size = image_size
+                                        )
                                     ))
             life_line_bezier_paths = []
-            marriage_bezier(images, life_line_bezier_paths, knots)
+            marriage_bezier(life_line_bezier_paths, knots)
 
             # create item setup
             for path, color_pos, is_cross_connection in life_line_bezier_paths:
@@ -601,7 +603,7 @@ class BaseSVGChart(BaseChart):
                     'config': path,
                     'color': gr_individual.color,
                     'color_pos': color_pos,
-                    'stroke_width': self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size']*gr_individual.weight,
+                    'stroke_width': line_thickness*gr_individual.weight,
                     'gir':gr_individual
                 }))
             if self._formatting['birth_label_active']:
@@ -664,7 +666,6 @@ class BaseSVGChart(BaseChart):
 
                     }
                 ))
-            gr_individual.items += images
             gr_individual.items += debug_items
         if self._formatting['debug_visualize_connections']:
             for gr_family in self.gr_families:
