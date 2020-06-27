@@ -139,7 +139,7 @@ class DescendantChart(BaseSVGChart):
         # get childrens widths
         child_widths = {}
         total_number_of_descendants = 0
-        for marriage_index, gr_marriage in enumerate(reversed(visible_local_marriages)):
+        for gr_marriage in reversed(visible_local_marriages):
             for gr_child in gr_marriage.visible_children:
                 gr_child_descendants = gr_child.get_all_descendants()
                 child_widths[gr_child.g_id] = gr_child_descendants

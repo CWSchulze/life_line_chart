@@ -239,7 +239,8 @@ class BaseSVGChart(BaseChart):
         self.min_x_index = min_x_index  # -1000
         self.max_x_index = max_x_index + 1  # +200
 
-        line_bend_orientation = 0 if (str(type(self)) == "<class 'life_line_chart.DescendantChart.DescendantChart'>" and self._positioning['chart_layout'] == 'cactus') else 1
+        cactus_chart = (str(type(self)) == "<class 'life_line_chart.DescendantChart.DescendantChart'>" and self._positioning['chart_layout'] == 'cactus')
+        line_bend_orientation = 0 if cactus_chart else 1
 
         for gr_individual in self.gr_individuals:
             debug_items = []
@@ -266,6 +267,10 @@ class BaseSVGChart(BaseChart):
             marriage_is_crossconnected = []
             new_x_indices_after_marriage = []
             marriage_labels = []
+
+            def coordinate_transformation(x, y):
+                new_x, new_y = self._map_position(x, y)
+                return new_x + new_y*1j
             def calculate_ring_position(gr_family):
                 h_pos = gr_family.gr_husb.get_position_dict(gr_family) if gr_family.gr_husb else None
                 w_pos = gr_family.gr_wife.get_position_dict(gr_family) if gr_family.gr_wife else None
@@ -347,9 +352,6 @@ class BaseSVGChart(BaseChart):
                         else:
                             thickness = 0.5*self._formatting['horizontal_step_size']*1
                             color = (25, 25, 25)
-                        def coordinate_transformation(x, y):
-                            new_x, new_y = self._map_position(x, y)
-                            return new_x + new_y*1j
                         l_i = gr_individual
                         x_p_list = list(l_i.get_position_dict().values())
                         x_p = x_p_list[0][1]
@@ -447,9 +449,6 @@ class BaseSVGChart(BaseChart):
                     knots (list): list of event nodes
                     flip (bool, optional): flip shape of the spline. Defaults to False.
                 """
-                def coordinate_transformation(x, y):
-                    new_x, new_y = self._map_position(x, y)
-                    return new_x + new_y*1j
                 if flip:
                     t = 1
                 else:
