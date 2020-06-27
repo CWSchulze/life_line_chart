@@ -61,6 +61,16 @@ class BaseChart():
     }
     SETTINGS_DESCRIPTION = _strings
 
+    COLOR_CONFIGURATIONS = {
+        'light': {
+            'descendant_chart_marriage_lines': (0, 0, 0),
+            'fade_to_death': (0, 0, 0),
+            'grid_line': (210, 210, 210),
+            'text_label': (0, 0, 0)
+        }
+    }
+    _colors = COLOR_CONFIGURATIONS['light']
+
     # TODO: extract base class for other chart types
     _graphical_family_class = GraphicalFamily
     # TODO: extract base class for other chart types

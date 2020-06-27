@@ -9,6 +9,7 @@ from math import floor, ceil, pi, e
 from .SimpleSVGItems import Line, Path, CubicBezier
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 from .BaseChart import BaseChart
+from .IntermediateGraphicalItems import new_text_item, new_image_item
 
 logger = logging.getLogger("life_line_chart")
 
@@ -196,29 +197,26 @@ class BaseSVGChart(BaseChart):
                 self.additional_graphical_items['grid'].append({
                     'type': 'path',
                             'config': {'type': 'Line', 'arguments': (0 + year_pos*1j, self.get_full_width() + year_pos*1j)},
-                            'color': [210]*3,
+                            'color': self._colors['grid_line'],
                             'stroke_width': 1
                 }
                 )
-                self.additional_graphical_items['axis'].append({
-                    'type': 'text',
-                            'config': {
-                                'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
-                                'text': str(year),
-                                'text-anchor': 'end',
-                                # 'align' : 'center',
-                                'insert': (self.get_full_width() - self._formatting['horizontal_step_size']*0.01, year_pos),
-                            },
-                    'font_size': font_size,
-                    'font_name': self._formatting['font_name'],
-                }
+                self.additional_graphical_items['axis'].append(
+                    new_text_item(
+                        self=self,
+                        text=str(year),
+                        pos_x=self.get_full_width() - self._formatting['horizontal_step_size']*0.01,
+                        pos_y=year_pos,
+                        font_size=font_size,
+                        text_anchor='end',
+                    )
                 )
             else:
                 # add thin line
                 self.additional_graphical_items['grid'].append({
                     'type': 'path',
                             'config': {'type': 'Line', 'arguments': (0 + year_pos*1j, self.get_full_width() + year_pos*1j)},
-                            'color': [210]*3,
+                            'color': self._colors['grid_line'],
                             'stroke_width': 0.1
                 }
                 )
@@ -384,18 +382,6 @@ class BaseSVGChart(BaseChart):
             _birth_position = self._map_position(*_birth_original_location)
             _death_position = self._map_position(*_death_original_location)
             knots.append((x_pos_list[0][1], birth_date_ov, None))
-            def new_image_item(pos_x, pos_y, size_x, size_y, filename, original_size, **kwargs):
-                data = {
-                            'type': 'image',
-                            'config': {
-                                'insert': (pos_x, pos_y),
-                                'size': (size_x, size_y)
-                            },
-                            'filename': filename,
-                            'size': original_size
-                        }
-                data.update(kwargs)
-                return data
             for index, ((marriage_ring_index, marriage_ordinal), new_x_index_after_marriage, label, gr_family, has_ring, is_cross_connected) in enumerate(zip(marriage_ring_positions, new_x_indices_after_marriage, marriage_labels, marriage_families, marriage_has_ring, marriage_is_crossconnected)):
                 if cactus_chart:
                     spouse_index =  (new_x_index_after_marriage-marriage_ring_index)*(-1) + marriage_ring_index
@@ -415,7 +401,7 @@ class BaseSVGChart(BaseChart):
                                         ),
                                     },
                                     'stroke_dasharray':f"{stroke_width*5},{stroke_width*5}",
-                                    'color': [0,0,0],
+                                    'color': self._colors['descendant_chart_marriage_lines'],
                                     'stroke_width': stroke_width,
                                 })
                             )
@@ -426,6 +412,7 @@ class BaseSVGChart(BaseChart):
                     gr_individual.items.append((
                         (2, 'layer_ring_image'), 
                         new_image_item(
+                            self=self,
                             pos_x = ring_position[0] - line_thickness*1,
                             pos_y = ring_position[1] - line_thickness*1,
                             size_x = line_thickness*2,
@@ -442,20 +429,17 @@ class BaseSVGChart(BaseChart):
                     for index2, line in enumerate(label.split('\n')):
                         position = self._map_position(
                             marriage_ring_index, marriage_ordinal + dy_line)
-                        position = (position[0], position[1] +
-                                    (index2 + 0.2) * font_size * 1.2)
-                        gr_individual.items.append(((5, 'layer_marriage_label'), {
-                            'type': 'text',
-                            'config': {
-                                    'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
-                                    'text': line,
-                                    'text-anchor': 'middle',
-                                    # 'align' : 'center',
-                                    'insert': position,
-                            },
-                            'font_size': font_size,
-                            'font_name': self._formatting['font_name'],
-                        }))
+                        gr_individual.items.append((
+                            (5, 'layer_marriage_label'),
+                            new_text_item(
+                                self=self,
+                                text=line,
+                                pos_x=position[0],
+                                pos_y=position[1] + (index2 + 0.2)*font_size*1.2,
+                                font_size=font_size,
+                                color=self._colors['text_label']
+                            )
+                        ))
 
                 if cactus_chart:
                     if index == 0:
@@ -522,6 +506,7 @@ class BaseSVGChart(BaseChart):
                                 gr_individual.items.append((
                                     (4, 'layer_photos'), 
                                     new_image_item(
+                                        self=self,
                                         pos_x = xpos.real - photo_size/2,
                                         pos_y = xpos.imag - photo_size/2,
                                         size_x = photo_size,
@@ -581,6 +566,7 @@ class BaseSVGChart(BaseChart):
                                     gr_individual.items.append((
                                         (4, 'layer_photos'), 
                                         new_image_item(
+                                            self=self,
                                             pos_x = xpos.real - photo_size/2,
                                             pos_y = xpos.imag - photo_size/2,
                                             size_x = photo_size,
@@ -633,38 +619,39 @@ class BaseSVGChart(BaseChart):
                     birth_label_text = " ".join(individual_name + [birth_label])
                     if self._formatting['birth_label_wrapping_active']:
                         birth_label_text = birth_label_text.strip().replace(' ', '\n')
-                    gr_individual.items.append(((5, 'layer_birth_label'),{
-                            'type': 'text',
-                            'config': {
-                                'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
-                                'text': birth_label_text,
-                                'text-anchor': self._formatting['birth_label_anchor'],
-                                'transform': 'rotate(%s,%s, %s)' % (self._formatting['birth_label_rotation']+self._orientation_angle(*_birth_original_location), *_birth_position),
-                                'insert': _birth_position,
-                                'dx': [str(font_size*float(self._formatting['birth_label_letter_x_offset']))],
-                                'dy': [str(float(font_size)/2.7 + font_size*float(self._formatting['birth_label_letter_y_offset']))+'px'],
-                            },
-                            'font_size': font_size,
-                            'font_name': self._formatting['font_name'],
-                        }))
+                    gr_individual.items.append((
+                        (5, 'layer_birth_label'),
+                        new_text_item(
+                            self=self,
+                            text=birth_label_text,
+                            pos_x=_birth_position[0],
+                            pos_y=_birth_position[1],
+                            font_size=font_size,
+                            color=self._colors['text_label'],
+                            text_anchor=self._formatting['birth_label_anchor'],
+                            transform='rotate(%s,%s, %s)' % (self._formatting['birth_label_rotation']+self._orientation_angle(*_birth_original_location), *_birth_position),
+                            insert=_birth_position,
+                            dx=[str(font_size*float(self._formatting['birth_label_letter_x_offset']))],
+                            dy=[str(float(font_size)/2.7 + font_size*float(self._formatting['birth_label_letter_y_offset']))+'px'],
+                        )
+                    ))
             if self._formatting['death_label_active']:
                 if self._formatting['death_label_wrapping_active']:
                     death_label = death_label.strip().replace(' ', '\n')
-                gr_individual.items.append(((5, 'layer_death_label'), {
-                        'type': 'text',
-                        'config': {
-                            'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
-                            'text': death_label,
-                            'text-anchor': self._formatting['death_label_anchor'],
-                            'transform': 'rotate(%g,%s, %s)' % (self._formatting['death_label_rotation']+self._orientation_angle(*_death_original_location), *_death_position),
-                            'insert': _death_position,
-                            'dy': [str(float(font_size)/2.7 + font_size*float(self._formatting['death_label_letter_y_offset']))+'px'],
-                            'dx': [str(font_size*float(self._formatting['death_label_letter_x_offset']))],
-                        },
-                        'font_size': font_size,
-                        'font_name': self._formatting['font_name'],
-
-                    }
+                gr_individual.items.append((
+                    (5, 'layer_death_label'),
+                    new_text_item(
+                        self=self,
+                        text=death_label,
+                        pos_x=_death_position[0],
+                        pos_y=_death_position[1],
+                        font_size=font_size,
+                        color=self._colors['text_label'],
+                        text_anchor=self._formatting['death_label_anchor'],
+                        transform='rotate(%g,%s, %s)' % (self._formatting['death_label_rotation']+self._orientation_angle(*_death_original_location), *_death_position),
+                        dy=[str(float(font_size)/2.7 + font_size*float(self._formatting['death_label_letter_y_offset']))+'px'],
+                        dx=[str(font_size*float(self._formatting['death_label_letter_x_offset']))],
+                    )
                 ))
             gr_individual.items += debug_items
         if self._formatting['debug_visualize_connections']:
@@ -778,7 +765,7 @@ class BaseSVGChart(BaseChart):
                             item['color_pos'][0])+""), ("0", str(item['color_pos'][1])+""), gradientUnits='userSpaceOnUse')
                         fill.add_stop_color(
                             0, "rgb({},{},{})".format(*item['color']))
-                        fill.add_stop_color(1, 'black')
+                        fill.add_stop_color(1, "rgb({},{},{})".format(*self._colors['fade_to_death']))
                         # fill.add_stop_color(0, "rgb({},{},{})".format(*item['colors'][1]))
                         # fill.add_stop_color(1, "rgb({},{},{})".format(*item['colors'][0]))
                         svg_document.defs.add(fill)
