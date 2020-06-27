@@ -9,7 +9,7 @@ from math import floor, ceil, pi, e
 from .SimpleSVGItems import Line, Path, CubicBezier
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 from .BaseChart import BaseChart
-from .IntermediateGraphicalItems import new_text_item, new_image_item
+from .IntermediateGraphicalItems import new_text_item, new_image_item, new_path_item
 
 logger = logging.getLogger("life_line_chart")
 
@@ -194,12 +194,12 @@ class BaseSVGChart(BaseChart):
                 datetime.date(year, 1, 1).toordinal())
             if year % 10 == 0:
                 # add bold line and number every 10 years
-                self.additional_graphical_items['grid'].append({
-                    'type': 'path',
-                            'config': {'type': 'Line', 'arguments': (0 + year_pos*1j, self.get_full_width() + year_pos*1j)},
-                            'color': self._colors['grid_line'],
-                            'stroke_width': 1
-                }
+                self.additional_graphical_items['grid'].append(
+                    new_path_item(
+                        self, 'Line',
+                        (0 + year_pos*1j, self.get_full_width() + year_pos*1j),
+                        self._colors['grid_line'], 1
+                    )
                 )
                 self.additional_graphical_items['axis'].append(
                     new_text_item(
@@ -207,18 +207,17 @@ class BaseSVGChart(BaseChart):
                         text=str(year),
                         pos_x=self.get_full_width() - self._formatting['horizontal_step_size']*0.01,
                         pos_y=year_pos,
-                        font_size=font_size,
                         text_anchor='end',
                     )
                 )
             else:
                 # add thin line
-                self.additional_graphical_items['grid'].append({
-                    'type': 'path',
-                            'config': {'type': 'Line', 'arguments': (0 + year_pos*1j, self.get_full_width() + year_pos*1j)},
-                            'color': self._colors['grid_line'],
-                            'stroke_width': 0.1
-                }
+                self.additional_graphical_items['grid'].append(
+                    new_path_item(
+                        self, 'Line',
+                        (0 + year_pos*1j, self.get_full_width() + year_pos*1j),
+                        self._colors['grid_line'], 0.1
+                    )
                 )
 
         min_x_index = 9e99
@@ -359,19 +358,17 @@ class BaseSVGChart(BaseChart):
                                 new_marriage_ordinal = min(l_i.birth_date_ov-5*365, marriage_ordinal)
                             else:
                                 new_marriage_ordinal = max(l_i.birth_date_ov, marriage_ordinal+5*365)
-                        debug_items.append(((99, 'layer_debug'),
-                                {
-                                'type': 'path',
-                                'config': {'type': 'Line', 'arguments': (
-                                        coordinate_transformation(
+                        debug_items.append((
+                            (99, 'layer_debug'),
+                            new_path_item(
+                                self, 'Line',
+                                points=[coordinate_transformation(
                                             marriage_ring_index, new_marriage_ordinal),
                                         coordinate_transformation(
-                                            x_p, l_i.birth_date_ov)
-                                    )},
-                                'color': color,
-                                'stroke_width': thickness
-                                }
-                            ))
+                                            x_p, l_i.birth_date_ov)],
+                                color=color, stroke_width=thickness
+                            )
+                        ))
 
             # generate event node information
             knots = []
@@ -389,28 +386,25 @@ class BaseSVGChart(BaseChart):
                     if spouse_index != marriage_ring_index:
                         stroke_width = line_thickness*0.1
                         if has_ring:
-                            gr_individual.items.append(
-                                ((0, 'layer_marriage_connections'),{
-                                    'type': 'path',
-                                    'config': {
-                                        'type': 'Line', 'arguments': (
-                                            coordinate_transformation(
-                                                spouse_index, marriage_ordinal),
-                                            coordinate_transformation(
-                                                marriage_ring_index, marriage_ordinal),
-                                        ),
-                                    },
-                                    'stroke_dasharray':f"{stroke_width*5},{stroke_width*5}",
-                                    'color': self._colors['descendant_chart_marriage_lines'],
-                                    'stroke_width': stroke_width,
-                                })
-                            )
+                            gr_individual.items.append((
+                                (0, 'layer_marriage_connections'),
+                                new_path_item(
+                                    self, 'Line',
+                                    (coordinate_transformation(
+                                        spouse_index, marriage_ordinal),
+                                    coordinate_transformation(
+                                        marriage_ring_index, marriage_ordinal)),
+                                    self._colors['descendant_chart_marriage_lines'],
+                                    stroke_width,
+                                    stroke_dasharray=f"{stroke_width*5},{stroke_width*5}",
+                                )
+                            ))
                         has_ring = True
                 if not self._formatting['no_ring'] and has_ring:
                     ring_position = self._map_position(
                         marriage_ring_index, marriage_ordinal)
                     gr_individual.items.append((
-                        (2, 'layer_ring_image'), 
+                        (2, 'layer_ring_image'),
                         new_image_item(
                             self=self,
                             pos_x = ring_position[0] - line_thickness*1,
@@ -436,8 +430,6 @@ class BaseSVGChart(BaseChart):
                                 text=line,
                                 pos_x=position[0],
                                 pos_y=position[1] + (index2 + 0.2)*font_size*1.2,
-                                font_size=font_size,
-                                color=self._colors['text_label']
                             )
                         ))
 
@@ -504,7 +496,7 @@ class BaseSVGChart(BaseChart):
                                     xpos = svg_path.point(root)
 
                                 gr_individual.items.append((
-                                    (4, 'layer_photos'), 
+                                    (4, 'layer_photos'),
                                     new_image_item(
                                         self=self,
                                         pos_x = xpos.real - photo_size/2,
@@ -564,7 +556,7 @@ class BaseSVGChart(BaseChart):
                                         root = intersection_polynomial(coeffs, self._map_y_position(ov))
                                         xpos = svg_path.point(root)
                                     gr_individual.items.append((
-                                        (4, 'layer_photos'), 
+                                        (4, 'layer_photos'),
                                         new_image_item(
                                             self=self,
                                             pos_x = xpos.real - photo_size/2,
@@ -594,7 +586,8 @@ class BaseSVGChart(BaseChart):
                 }))
             if self._formatting['birth_label_active']:
                 if self._formatting['birth_label_along_path']:
-                    gr_individual.items.append(((5, 'layer_birth_label'),
+                    gr_individual.items.append((
+                        (5, 'layer_birth_label'),
                         {
                             'type': 'textPath',
                             'config': {
@@ -626,10 +619,10 @@ class BaseSVGChart(BaseChart):
                             text=birth_label_text,
                             pos_x=_birth_position[0],
                             pos_y=_birth_position[1],
-                            font_size=font_size,
-                            color=self._colors['text_label'],
                             text_anchor=self._formatting['birth_label_anchor'],
-                            transform='rotate(%s,%s, %s)' % (self._formatting['birth_label_rotation']+self._orientation_angle(*_birth_original_location), *_birth_position),
+                            transform=
+                                'rotate(%s,%s, %s)' % (self._formatting['birth_label_rotation']+self._orientation_angle(*_birth_original_location), *_birth_position)
+                                if self._formatting['birth_label_rotation'] != 0 else None,
                             insert=_birth_position,
                             dx=[str(font_size*float(self._formatting['birth_label_letter_x_offset']))],
                             dy=[str(float(font_size)/2.7 + font_size*float(self._formatting['birth_label_letter_y_offset']))+'px'],
@@ -645,10 +638,10 @@ class BaseSVGChart(BaseChart):
                         text=death_label,
                         pos_x=_death_position[0],
                         pos_y=_death_position[1],
-                        font_size=font_size,
-                        color=self._colors['text_label'],
                         text_anchor=self._formatting['death_label_anchor'],
-                        transform='rotate(%g,%s, %s)' % (self._formatting['death_label_rotation']+self._orientation_angle(*_death_original_location), *_death_position),
+                        transform=
+                            'rotate(%g,%s, %s)' % (self._formatting['death_label_rotation']+self._orientation_angle(*_death_original_location), *_death_position)
+                            if self._formatting['death_label_rotation'] != 0 else None,
                         dy=[str(float(font_size)/2.7 + font_size*float(self._formatting['death_label_letter_y_offset']))+'px'],
                         dx=[str(font_size*float(self._formatting['death_label_letter_x_offset']))],
                     )
@@ -681,17 +674,15 @@ class BaseSVGChart(BaseChart):
                             if marriage_pos_b is None:
                                 continue
 
-                            gr_spouse.items.append(((99, 'layer_debug'),
-                                    {
-                                    'type': 'path',
-                                    'config': {'type': 'Line', 'arguments': (
-                                            coordinate_transformation(*marriage_pos_a),
-                                            coordinate_transformation(*marriage_pos_b)
-                                        )},
-                                    'color': color,
-                                    'stroke_width': thickness
-                                    }
-                                ))
+                            gr_spouse.items.append((
+                                (99, 'layer_debug'),
+                                new_path_item(
+                                    self, 'Line',
+                                    points=[coordinate_transformation(*marriage_pos_a),
+                                            coordinate_transformation(*marriage_pos_b)],
+                                    color=color, stroke_width=thickness
+                                )
+                            ))
 
 
     def paint_and_save(self, filename):
