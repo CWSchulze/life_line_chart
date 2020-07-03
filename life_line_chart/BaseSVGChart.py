@@ -111,38 +111,40 @@ class BaseSVGChart(BaseChart):
         """
         failed = []
         v = {}
+        full_index_list = []
+        cactus_chart = (str(type(self)) == "<class 'life_line_chart.DescendantChart.DescendantChart'>" and self._positioning['chart_layout'] == 'cactus')
         for gr_individual in self.gr_individuals:
             x_pos = gr_individual.get_position_dict()
             x_index = None
-            for value in x_pos.values():
+            for index, value in enumerate(x_pos.values()):
+                if not cactus_chart or index != 0:
+                    if x_index == value[1]:
+                        # ignore if x doesnt change
+                        continue
+                    x_index = value[1]
 
-                if x_index == value[1]:
-                    # ignore if x doesnt change
-                    continue
-                x_index = value[1]
-
-                if x_index not in v:
-                    v[x_index] = gr_individual.individual_id
-                elif (always_has_child_of_family or v[x_index] != gr_individual.individual_id):
-                    failed.append(x_index)
-                    # value = index_map[x_index]
-                    logger.error(
-                        "check_unique_x_position failed, index was used more than once: " + str((x_index, value[2].family_id, gr_individual.individual.plain_name, v[x_index])))
-                    # raise RuntimeError((x_index, key, gr_individual.individual.plain_name))
-        full_index_list = list(sorted(v.keys()))
-        for i in range(max(full_index_list)):
-            if i not in full_index_list:
-                if self._formatting['debug_visualize_ambiguous_placement']:
-                    gr_individual.items.append(((99, 'layer_debug'),{
-                        'type': 'rect',
-                        'config': {
-                            'insert': (self._map_x_position(i), 0),
-                            'size': (self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size'], self._formatting['total_height']),
-                            'fill': 'black',
-                            'fill-opacity': "0.5"
-                        }
-                    }))
-                failed.append(('missing', i))
+                    if x_index not in v:
+                        v[x_index] = gr_individual.individual_id
+                    elif (always_has_child_of_family or v[x_index] != gr_individual.individual_id):
+                        failed.append(x_index)
+                        # value = index_map[x_index]
+                        logger.error(
+                            "check_unique_x_position failed, index was used more than once: " + str((x_index, value[2].family_id, gr_individual.individual.plain_name, v[x_index])))
+                        # raise RuntimeError((x_index, key, gr_individual.individual.plain_name))
+            full_index_list = list(sorted(v.keys()))
+            for i in range(max(full_index_list)):
+                if i not in full_index_list:
+                    if self._formatting['debug_visualize_ambiguous_placement']:
+                        gr_individual.items.append(((99, 'layer_debug'),{
+                            'type': 'rect',
+                            'config': {
+                                'insert': (self._map_x_position(i), 0),
+                                'size': (self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size'], self._formatting['total_height']),
+                                'fill': 'black',
+                                'fill-opacity': "0.5"
+                            }
+                        }))
+                    failed.append(('missing', i))
         return failed, full_index_list[0], full_index_list[-1]
 
     def clear_graphical_representations(self):
