@@ -76,51 +76,75 @@ def get_date_dict_from_tag(parent_item, tag_name):
             comment = 'After'
         elif date_info.group(1) == 'BEF':
             comment = 'Before'
+        elif date_info.group(1) == 'BET':
+            comment = 'Between'
         elif date_info.group(2) is None and date_info.group(3) is None and date_info.group(4) is not None:
             comment = 'YearPrecision'
 
-        if tag_name in ['BURI', 'DEAT']:
-            # if unknown move to the end of the year
-            month, day = 12, 31
-        else:
-            # if unknown move to the beginning of the year
-            month, day = 1, 1
+        month_max_, day_max_ = 12, 31
+        month_min_, day_min_ = 1, 1
+        year_min, year_max = None, None
+        month_max, day_max = None, None
+        month_min, day_min = None, None
 
-        if date_info.group(1) == 'BET' and tag_name in ['BURI', 'DEAT']:
-            # move to the end of the interval
-            if date_info.group(5):
-                day = int(date_info.group(5))
-                precision += 'd'
-            if date_info.group(6):
-                month = _months.index(date_info.group(6)) + 1
-                precision += 'm'
+        if date_info.group(1) == 'BET':
             if date_info.group(7):
-                year = int(date_info.group(7))
-                precision += 'y'
-        else:
-            if date_info.group(2):
-                day = int(date_info.group(2))
-                precision += 'd'
-            if date_info.group(3):
-                month = _months.index(date_info.group(3)) + 1
-                precision += 'm'
-            if date_info.group(4):
-                year = int(date_info.group(4))
-                precision += 'y'
+                year_max = int(date_info.group(7))
+            if date_info.group(6):
+                month_max = _months.index(date_info.group(6)) + 1
+            if date_info.group(5):
+                day_max = int(date_info.group(5))
 
+        if date_info.group(4):
+            year_min = int(date_info.group(4))
+            if not year_max:
+                year_max = year_min
+            precision = 'y' + precision
+        if date_info.group(3):
+            month_min = _months.index(date_info.group(3)) + 1
+            if not month_max:
+                month_max = month_min
+            precision = 'm' + precision
+        if date_info.group(2):
+            day_min = int(date_info.group(2))
+            if not day_max:
+                day_max = day_min
+            precision = 'd' + precision
+
+        if date_info.group(1) == 'AFT':
+            year_max = year_min + 15
+        elif date_info.group(1) == 'BEF':
+            year_min = year_max - 15
+
+        if not month_max: month_max = month_max_
+        if not month_min: month_min = month_min_
+        if not day_max: day_max = day_max_
+        if not day_min: day_min = day_min_
+
+        day_max = min(_max_days[month_max], day_max)
+
+        date_min = datetime.datetime(year_min, month_min, day_min, 0, 0, 0, 0)
         try:
-            date = datetime.datetime(year, month, min(_max_days[month], day), 0, 0, 0, 0)
+            date_max = datetime.datetime(year_max, month_max, day_max, 0, 0, 0, 0)
         except ValueError as e:
-            if month==2:
-                date = datetime.datetime(year, month, min(_max_days[month]-1, day), 0, 0, 0, 0)
+            if month_max==2:
+                date_max = datetime.datetime(year_max, month_max, day_max, 0, 0, 0, 0)
             else:
                 raise
 
+        if tag_name in ['BURI', 'DEAT']:
+            # if unknown move to the end of the year
+            date = date_max
+        else:
+            # if unknown move to the beginning of the year
+            date = date_min
 
         return {
             'tag_name': tag_name,
             'date': date,
             'ordinal_value': date.toordinal(),
+            'ordinal_value_max': date_max.toordinal(),
+            'ordinal_value_min': date_min.toordinal(),
             'comment': comment,
             'precision' : precision
         }

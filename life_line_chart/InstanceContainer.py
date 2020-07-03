@@ -17,10 +17,9 @@ class InstanceContainer():
     date_label_translation = {
         'Calculated': '{symbol}\xa0berechnet\xa0{date}',
         'Estimated': '{symbol}\xa0geschätzt\xa0{date}',
-        'Estimated (min 25 at marriage)': '{symbol}\xa0geschätzt\xa0{date}',
-        'Estimated (max age 75)': '{symbol}\xa0geschätzt\xa0{date}',
-        'Estimated (max age 100)': '{symbol}\xa0geschätzt\xa0{date}',
-        'Estimated (min 1 after parents marriage)': '{symbol}\xa0geschätzt\xa0{date}',
+        'Estimated (min age at marriage)': '{symbol}\xa0geschätzt\xa0{date}',
+        'Estimated (max age)': '{symbol}\xa0geschätzt\xa0{date}',
+        'Estimated (after parents marriage)': '{symbol}\xa0geschätzt\xa0{date}',
         'Still alive': '',
         'About': '{symbol}\xa0etwa\xa0{date}',
         'Before': '{symbol}\xa0vor\xa0{date}',

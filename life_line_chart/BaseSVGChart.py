@@ -244,7 +244,18 @@ class BaseSVGChart(BaseChart):
             birth_date_ov = gr_individual.birth_date_ov
             if not birth_date_ov:
                 continue
+            birth_event = gr_individual.get_birth_event()
+            birth_date_ov_range = [
+                birth_event['ordinal_value_min'],
+                birth_event['ordinal_value_max']
+                ]
+            birth_date_position_range = [(v, self._map_y_position(v)) for v in birth_date_ov_range]
             death_event = gr_individual.get_death_event()
+            death_date_ov_range = [
+                death_event['ordinal_value_min'],
+                death_event['ordinal_value_max']
+                ]
+            death_date_position_range = [(v, self._map_y_position(v)) for v in death_date_ov_range]
             individual_name = gr_individual.get_name()
 
             x_pos = gr_individual.get_position_dict()
@@ -475,8 +486,12 @@ class BaseSVGChart(BaseChart):
                             coordinate_transformation(
                                 knots[0+1][0], knots[0+1][1]),
                         )},
-                            (_birth_position[1], self._map_y_position(
-                                self._formatting['fade_individual_color_black_age']*365+birth_date_ov)),
+                        (
+                            _birth_position[1],
+                            self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)
+                        ),
+                        birth_date_position_range if not cactus_chart else None,
+                        death_date_position_range,
                         False # not cross connected
                         )
                     )
@@ -527,6 +542,13 @@ class BaseSVGChart(BaseChart):
                         else:#if self._formatting['family_shape'] == 2:
                             relative_spline_handles = [(0, 0), (0.1, 0.3), (0.3, 1), (1, 1)]
 
+                        _birth_date_position_range = None
+                        _death_date_position_range = None
+                        if index == 0:
+                            _birth_date_position_range = birth_date_position_range
+                        if index == len(knots)-2:
+                            _death_date_position_range = death_date_position_range
+
                         data.append(
                             ({'type': 'CubicBezier', 'arguments': (
                                 interp_trans(*relative_spline_handles[0]),
@@ -534,8 +556,12 @@ class BaseSVGChart(BaseChart):
                                 interp_trans(*relative_spline_handles[2]),
                                 interp_trans(*relative_spline_handles[3]),
                             )},
-                                (_birth_position[1], self._map_y_position(
-                                    self._formatting['fade_individual_color_black_age']*365+birth_date_ov)),
+                            (
+                                _birth_position[1],
+                                self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)
+                            ),
+                            _birth_date_position_range if not cactus_chart else None,
+                            _death_date_position_range,
                             # connection to this knot is relevant
                             knots[index+1][2]# and index + 1 < len(knots) or knots[index + 1][2]
                             )
@@ -573,7 +599,7 @@ class BaseSVGChart(BaseChart):
             marriage_bezier(life_line_bezier_paths, knots)
 
             # create item setup
-            for path, color_pos, is_cross_connection in life_line_bezier_paths:
+            for path, age_color_fade_ordinal_values, _birth_date_position_range, _death_date_position_range, is_cross_connection in life_line_bezier_paths:
                 if True:
                     priority = 0 if is_cross_connection else 1
                 else:
@@ -582,7 +608,9 @@ class BaseSVGChart(BaseChart):
                     'type': 'path',
                     'config': path,
                     'color': gr_individual.color,
-                    'color_pos': color_pos,
+                    'age_color_fade_ordinal_values': age_color_fade_ordinal_values,
+                    'birth_date_position_range':_birth_date_position_range,
+                    'death_date_position_range':_death_date_position_range,
                     'stroke_width': line_thickness*gr_individual.weight,
                     'gir':gr_individual
                 }))
@@ -753,9 +781,11 @@ class BaseSVGChart(BaseChart):
                         stroke_dasharray = item['stroke_dasharray']
                     svg_path = Path(constructor_function(*arguments))
 
-                    if self._formatting['fade_individual_color'] and 'color_pos' in item:
-                        fill = svg_document.linearGradient(("0", str(
-                            item['color_pos'][0])+""), ("0", str(item['color_pos'][1])+""), gradientUnits='userSpaceOnUse')
+                    if self._formatting['fade_individual_color'] and 'age_color_fade_ordinal_values' in item:
+                        fill = svg_document.linearGradient(
+                            ("0", str(item['age_color_fade_ordinal_values'][0])+""),
+                            ("0", str(item['age_color_fade_ordinal_values'][1])+""),
+                            gradientUnits='userSpaceOnUse')
                         fill.add_stop_color(
                             0, "rgb({},{},{})".format(*item['color']))
                         fill.add_stop_color(1, "rgb({},{},{})".format(*self._colors['fade_to_death']))
@@ -765,10 +795,37 @@ class BaseSVGChart(BaseChart):
                         svg_document.add(svg_document.path(d=svg_path.d(), stroke=fill.get_paint_server(
                             default='currentColor'), fill='none', stroke_width=item['stroke_width'], stroke_dasharray=stroke_dasharray))
                     else:
-                        # arguments['fill'] = fill
-                        # gr_individual.color
-                        svg_document.add(svg_document.path(d=svg_path.d(), stroke="rgb({},{},{})".format(
-                            *item['color']), fill='none', stroke_width=item['stroke_width'], stroke_dasharray=stroke_dasharray))
+                        min_stops = []
+                        max_stops = []
+                        if 'birth_date_position_range' in item and item['birth_date_position_range'] \
+                                and item['birth_date_position_range'][0] != item['birth_date_position_range'][1]:
+                            min_stops.append((item['birth_date_position_range'][0], 0))
+                            max_stops.append((item['birth_date_position_range'][1], 1))
+                        if 'death_date_position_range' in item and item['death_date_position_range'] \
+                                and item['death_date_position_range'][0] != item['death_date_position_range'][1]:
+                            min_stops.append((item['death_date_position_range'][0], 1))
+                            max_stops.append((item['death_date_position_range'][1], 0))
+                        if min_stops or max_stops:
+                            min_ov = min([v[0][1] for v in min_stops])
+                            max_ov = max([v[0][1] for v in max_stops])
+
+                            fill = svg_document.linearGradient(
+                                ("0", str(min_ov)+""),
+                                ("0", str(max_ov)+""),
+                                gradientUnits='userSpaceOnUse')
+                            for stop in sorted(min_stops + max_stops):
+                                fill.add_stop_color(
+                                    (stop[0][1]-min_ov)/(max_ov-min_ov), "rgba({},{},{},{})".format(*(list(item['color']) + [stop[1]])))
+                            # fill.add_stop_color(0, "rgb({},{},{})".format(*item['colors'][1]))
+                            # fill.add_stop_color(1, "rgb({},{},{})".format(*item['colors'][0]))
+                            svg_document.defs.add(fill)
+                            svg_document.add(svg_document.path(d=svg_path.d(), stroke=fill.get_paint_server(
+                                default='currentColor'), fill='none', stroke_width=item['stroke_width'], stroke_dasharray=stroke_dasharray))
+                        else:
+                            # arguments['fill'] = fill
+                            # gr_individual.color
+                            svg_document.add(svg_document.path(d=svg_path.d(), stroke="rgb({},{},{})".format(
+                                *item['color']), fill='none', stroke_width=item['stroke_width'], stroke_dasharray=stroke_dasharray))
                 elif item['type'] == 'textPath':
                     args_path = item['path']
                     args_text = item['config']

@@ -14,19 +14,20 @@ def estimate_death_date(individual):
         max_age = 75
         if date.year > 1900:
             max_age = 100
-        date = datetime.datetime(date.year+max_age, 12, 31)
+        today = datetime.datetime.now()
+        date_min = datetime.datetime(date.year+max_age-25, 12, 31)
+        if date_min > today: date_min = today
+        date_max = datetime.datetime(date_min.year+25, 12, 31)
+        #if date_max > today: date_max = today
         individual.events['death_or_burial'] = {
             'tag_name': 'None',
-            'date': date,
-            'ordinal_value': date.toordinal(),
-            'comment': f'Estimated (max age {max_age})',
+            'date': date_max,
+            'ordinal_value': date_max.toordinal(),
+            'ordinal_value_min': date_min.toordinal(),
+            'ordinal_value_max': date_max.toordinal(),
+            'comment': f'Estimated (max age)',
             'precision': 'y'
         }
-        if date > datetime.datetime.now():
-            individual.events['death_or_burial']['date'] = datetime.datetime.now()
-            individual.events['death_or_burial']['ordinal_value'] = datetime.datetime.now(
-            ).toordinal()
-            individual.events['death_or_burial']['comment'] = 'Still alive'
 
 
 def estimate_birth_date(individual, instances):
@@ -50,21 +51,19 @@ def estimate_birth_date(individual, instances):
                         date = deepcopy(parents_marriage.marriage['date'])
                     else:
                         date = deepcopy(parents_marriage.marriage['date'])
-                    date = datetime.datetime(
-                        date.year, date.month, date.day, 0, 0, 0)
+                    date_min = datetime.datetime(
+                        date.year+1, date.month, date.day, 0, 0, 0)
+                    date_max = datetime.datetime(
+                        date.year+11, date.month, date.day, 0, 0, 0)
                     individual.events['birth_or_christening'] = {
                         'tag_name': 'MARR',
-                        'comment': 'Estimated (min 1 after parents marriage)',
-                        'date': date,
-                        'ordinal_value': date.toordinal(),
+                        'comment': 'Estimated (after parents marriage)',
+                        'date': date_min,
+                        'ordinal_value': date_min.toordinal(),
+                        'ordinal_value_min': date_min.toordinal(),
+                        'ordinal_value_max': date_max.toordinal(),
                         'precision': 'y'
                     }
-        if individual.events['birth_or_christening']:
-            date = individual.events['birth_or_christening']['date']
-            individual.events['birth_or_christening']['date'] = datetime.datetime(
-                date.year+1, date.month, date.day, 0, 0, 0)
-            individual.events['birth_or_christening']['ordinal_value'] = date.toordinal(
-            )
     if individual.events['birth_or_christening'] is None:
         # at least 15 at marriage
         for marriage in individual.marriages:
@@ -74,30 +73,35 @@ def estimate_birth_date(individual, instances):
                         date = deepcopy(marriage.marriage['date'])
                     else:
                         date = deepcopy(marriage.marriage['date'])
-                    date = datetime.datetime(
-                        date.year, date.month, date.day, 0, 0, 0)
+                    date_max = datetime.datetime(
+                        date.year-20, date.month, date.day, 0, 0, 0)
+                    date_min = datetime.datetime(
+                        date.year-30, date.month, date.day, 0, 0, 0)
                     individual.events['birth_or_christening'] = {
                         'tag_name': 'MARR',
-                        'comment': 'Estimated (min 25 at marriage)',
-                        'date': date,
-                        'ordinal_value': date.toordinal(),
+                        'comment': 'Estimated (min age at marriage)',
+                        'date': date_min,
+                        'ordinal_value': date_min.toordinal(),
+                        'ordinal_value_min': date_min.toordinal(),
+                        'ordinal_value_max': date_max.toordinal(),
                         'precision': 'y'
                     }
-        if individual.events['birth_or_christening'] and individual.events['birth_or_christening']['date'].year > 25:
-            date = individual.events['birth_or_christening']['date']
-            individual.events['birth_or_christening']['date'] = datetime.datetime(
-                date.year-25, 1, 1, 0, 0, 0)
-            individual.events['birth_or_christening']['ordinal_value'] = individual.events['birth_or_christening']['date'].toordinal()
     if individual.events['birth_or_christening'] is None and not individual.events['death_or_burial'] is None:
         # max 75 years, so in birth can be estimated
         if 'death_or_burial' in individual.events:
             date = individual.events['death_or_burial']['date']
-            date = datetime.datetime(date.year-75, 1, 1)
+            max_age = 75
+            if date.year > 1900:
+                max_age = 100
+            date_min = datetime.datetime(date.year-max_age, 1, 1)
+            date_max = datetime.datetime(date.year-(max_age-25), 1, 1)
             individual.events['birth_or_christening'] = {
                 'tag_name': 'None',
-                'date': date,
-                'ordinal_value': date.toordinal(),
-                'comment': 'Estimated (max age 75)',
+                'date': date_min,
+                'ordinal_value': date_min.toordinal(),
+                'ordinal_value_max': date_max.toordinal(),
+                'ordinal_value_min': date_min.toordinal(),
+                'comment': 'Estimated (max age)',
                 'precision': 'y'
             }
 
