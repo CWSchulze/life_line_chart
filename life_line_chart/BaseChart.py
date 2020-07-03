@@ -72,7 +72,7 @@ class BaseChart():
         'dark': {
             'descendant_chart_marriage_lines': (200, 200, 200),
             'fade_to_death': (255, 255, 255),
-            'grid_line': (20, 20, 20),
+            'grid_line': (120, 120, 120),
             'text_label': (200, 200, 200)
         }
     }
