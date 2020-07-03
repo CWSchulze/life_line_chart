@@ -490,7 +490,7 @@ class BaseSVGChart(BaseChart):
                         )},
                         (
                             _birth_position[1],
-                            self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)
+                            self._map_y_position(self._formatting['fade_individual_color_age']*365+birth_date_ov)
                         ),
                         birth_date_position_range if not cactus_chart else None,
                         death_date_position_range,
@@ -560,7 +560,7 @@ class BaseSVGChart(BaseChart):
                             )},
                             (
                                 _birth_position[1],
-                                self._map_y_position(self._formatting['fade_individual_color_black_age']*365+birth_date_ov)
+                                self._map_y_position(self._formatting['fade_individual_color_age']*365+birth_date_ov)
                             ),
                             _birth_date_position_range if not cactus_chart else None,
                             _death_date_position_range,
