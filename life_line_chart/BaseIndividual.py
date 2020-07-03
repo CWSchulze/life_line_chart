@@ -17,8 +17,8 @@ def estimate_death_date(individual):
         today = datetime.datetime.now()
         date_min = datetime.datetime(date.year+max_age-25, 12, 31)
         if date_min > today: date_min = today
-        date_max = datetime.datetime(date_min.year+25, 12, 31)
-        #if date_max > today: date_max = today
+        date_max = datetime.datetime(date.year+max_age, 12, 31)
+        if date_max > today: date_max = today
         individual.events['death_or_burial'] = {
             'tag_name': 'None',
             'date': date_max,
