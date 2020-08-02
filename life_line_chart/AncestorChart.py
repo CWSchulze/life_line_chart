@@ -69,7 +69,7 @@ class AncestorChart(BaseSVGChart):
             discovery_cache (list): list of discovered individuals
         """
 
-        if filter and filter(individual):
+        if individual is None or filter and filter(individual):
             return
         if discovery_cache is None:
             discovery_cache = []
@@ -714,7 +714,8 @@ class AncestorChart(BaseSVGChart):
                 generations = settings['generations']
                 root_individual = self._instances[(
                     'i', root_individual_id)]
-                if root_individual.has_graphical_representation() and root_individual.graphical_representations[0].get_position_dict() is not None:
+                if root_individual is None or \
+                        root_individual.has_graphical_representation() and root_individual.graphical_representations[0].get_position_dict() is not None:
                     continue
                 gr_root_individual = root_individual.graphical_representations[0]
                 cof_family_id = None

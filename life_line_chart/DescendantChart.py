@@ -61,7 +61,7 @@ class DescendantChart(BaseSVGChart):
             generations (int, optional): number of generations to go deeper. Defaults to None.
             filter (lambda, optional): filter for individuals. Defaults to None.
         """
-        if filter and filter(individual):
+        if individual is None or filter and filter(individual):
             return
 
         gr_individual = self._create_individual_graphical_representation(
@@ -397,6 +397,8 @@ class DescendantChart(BaseSVGChart):
                 generations = settings['generations']
                 root_individual = self._instances[(
                     'i', root_individual_id)]
+                if root_individual is None:
+                    continue
                 gr_root_individual = root_individual.graphical_representations[0]
                 cof_family_id = None
                 if root_individual.child_of_family_id:
