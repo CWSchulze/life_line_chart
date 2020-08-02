@@ -23,7 +23,7 @@ from .InstanceContainer import InstanceContainer
 
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected, LifeLineChartNotEnoughInformationToDisplay
 
-__version__ = "1.6.0"
+__version__ = "1.6.1"
 
 logging.basicConfig()
 logger = logging.getLogger("life_line_chart")
