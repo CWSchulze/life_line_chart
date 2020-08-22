@@ -11,12 +11,12 @@ def generate_gedcom_file():
     db['max_individuals'] = 8000
     db['n_families'] = 0
     db['yougest'] = None
-    gedcom_content = f"""
+    gedcom_content = """
     0 HEAD
 1 SOUR Gramps
 2 VERS 3.3.0
 2 NAME Gramps
-1 DATE {datetime.date.today()}
+1 DATE {}
 2 TIME 15:35:24
 1 SUBM @SUBM@
 1 COPR Copyright (c) 2020 Christian Schulze,,,.
@@ -24,7 +24,7 @@ def generate_gedcom_file():
 2 VERS 5.5
 1 CHAR UTF-8
 1 LANG German
-"""
+""".format(datetime.date.today())
 
     def generate_individual(db, birth_year, sex=None, last_name=None):
         if not sex:
@@ -39,7 +39,7 @@ def generate_gedcom_file():
         birth_place = 'Paris' if random() < 0.5 else 'Rome'
         death_place = 'Zorge' if random() < 0.5 else 'Bruegge'
         db['n_individuals'] += 1
-        individual_id = f'@I{db["n_individuals"]}@'
+        individual_id = '@I{}@'.format(db["n_individuals"])
         death_year = birth_year + 40 + int(random()*20)
         db[individual_id] = {
             'birth': birth_year,
@@ -47,14 +47,14 @@ def generate_gedcom_file():
             'sex': sex,
             'last_name': last_name
         }
-        birth_date = f'1 JUN {birth_year}'
-        death_date = f'1 JUN {death_year}'
+        birth_date = '1 JUN {}'.format(birth_year)
+        death_date = '1 JUN {}'.format(birth_year)
         if not db['yougest']:
             db['yougest'] = individual_id
         elif db[db['yougest']]['birth'] < birth_year:
             db['yougest'] = individual_id
 
-        db[individual_id]['string'] = f"""0 {individual_id} INDI
+        db[individual_id]['string'] = """0 {individual_id} INDI
 1 NAME {first_name} /{last_name}/
 1 SEX {sex}
 1 BIRT
@@ -63,24 +63,26 @@ def generate_gedcom_file():
 1 DEAT
 2 DATE {death_date}
 2 PLAC {death_place}
-"""
+""".format(**locals())
         return individual_id
 
     def generate_family(db, husband_id, wife_id, children_ids, marriage_year, marriage_place=None):
         if not marriage_place:
             marriage_place = 'London' if random() < 0.5 else 'Tokio'
         db['n_families'] += 1
-        marriage_date = f'1 MAY {marriage_year}'
-        family_id = f"@F{db['n_families']}@"
-        db[family_id] = {'string': f"""0 {family_id} FAM
+        marriage_date = '1 MAY {}'.format(marriage_year)
+        family_id = "@F{}@".format(db['n_families'])
+        db[family_id] = {'string': """0 {family_id} FAM
 1 HUSB {husband_id}
 1 WIFE {wife_id}
 1 MARR
 2 DATE {marriage_date}
 2 PLAC {marriage_place}
-"""}
+""".format(
+    **locals()
+)}
         for child_id in children_ids:
-            db[family_id]['string'] += f"1 CHIL {child_id}\n"
+            db[family_id]['string'] += "1 CHIL {}\n".format(child_id)
         return family_id
 
     def find_by_birth_date(db, from_year, to_year, sex, exclude=[]):
@@ -109,7 +111,7 @@ def generate_gedcom_file():
                 husband_id = generate_individual(
                     db, start_year + int(random()*5), sex='M')
             else:
-                print(f'reused {husband_id}')
+                print('reused {}'.format(husband_id))
         if not wife_id:
             if random() < 10.9:
                 exclude = siblings.copy() + [husband_id]
@@ -119,7 +121,7 @@ def generate_gedcom_file():
                 wife_id = generate_individual(
                     db, start_year + int(random()*5), sex='F')
             else:
-                print(f'reused {wife_id}')
+                print('reused {}'.format(wife_id))
         n_children = int((1+random()*(max_children-1)) *
                          (1 - db['n_individuals'] / db['max_individuals']))
         marriage_year = start_year + 20 + int(random()*5)
@@ -173,7 +175,11 @@ def generate_individual_images():
 
     for i in range(20):
         generate_one_image(
-            f'tests/images/individual_I6_image_age_{1+i*4}.png', f'Age {1+i*4}')
+            'tests/images/individual_I6_image_age_{}.png'.format(
+                1+i*4
+                ), 'Age {}'.format(
+                1+i*4,
+            ))
 
 
 generate_individual_images()

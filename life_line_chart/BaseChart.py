@@ -1,6 +1,7 @@
 import os
 from copy import deepcopy
 import logging
+from collections import OrderedDict
 
 from .GraphicalFamily import GraphicalFamily
 from .GraphicalIndividual import GraphicalIndividual
@@ -97,7 +98,7 @@ class BaseChart():
         self.gr_individuals = []
         self.gr_families = []
 
-        self.additional_graphical_items = {}
+        self.additional_graphical_items = OrderedDict()
         logger.debug('finished creating instances')
 
         self.min_x_index = 10000000
@@ -216,7 +217,7 @@ class BaseChart():
             tuple: (total_distance, list_of_linked_individuals)
         """
         total_distance = 0
-        list_of_linked_individuals = {}
+        list_of_linked_individuals = OrderedDict()
         for index, gr_individual in enumerate(self.gr_individuals):
             position_dict = gr_individual.get_position_dict()
             distance_of_this_individual = 0
@@ -332,7 +333,7 @@ class BaseChart():
             LifeLineChartCollisionDetected: overlapping found
         """
         self._debug_check_collision_counter += 1
-        v = {}
+        v = OrderedDict()
         collisions = []
         min_x = 999999
         max_x = 0
@@ -624,7 +625,7 @@ class BaseChart():
                 instance.graphical_representations.clear()
 
     def get_filtered_photos(self, birth_ordinal_value, original_images):
-        images = {}
+        images = OrderedDict()
         photo_width = self._formatting['relative_line_thickness'] * self._formatting['individual_photo_relative_size'] * self._formatting['horizontal_step_size'] # * (1 + self.max_x_index - self.min_x_index)
         photo_height = photo_width * self._formatting['individual_photo_relative_distance']
         photo_ov_height = abs(self._inverse_y_delta(photo_height))
@@ -663,7 +664,7 @@ class BaseChart():
         return images
 
     def get_filtered_photos_raster(self, birth_ordinal_value, original_images):
-        images = {}
+        images = OrderedDict()
         photo_width = self._formatting['relative_line_thickness'] * self._formatting['individual_photo_relative_size'] * self._formatting['horizontal_step_size'] # * (1 + self.max_x_index - self.min_x_index)
         photo_height = photo_width * self._formatting['individual_photo_relative_distance']
         photo_ov_height = abs(self._inverse_y_delta(photo_height))

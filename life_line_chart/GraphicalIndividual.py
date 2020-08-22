@@ -1,5 +1,6 @@
 from .GedcomIndividual import GedcomIndividual
 from .Exceptions import LifeLineChartUnknownPlacementError
+from collections import OrderedDict
 
 class GraphicalIndividual():
     """
@@ -329,10 +330,10 @@ class GraphicalIndividual():
             return self._x_position.get(gr_family.g_id)
 
     def get_parent_positions(self):
-        return dict([(k, v) for k, v in self._x_position.items() if v[3]])
+        return OrderedDict([(k, v) for k, v in self._x_position.items() if v[3]])
 
     def get_spouse_positions(self):
-        return dict([(k, v) for k, v in self._x_position.items() if not v[3]])
+        return OrderedDict([(k, v) for k, v in self._x_position.items() if not v[3]])
 
     def get_x_index(self, g_id):
         return self._x_position.get(g_id)[1]
@@ -386,12 +387,12 @@ class GraphicalIndividual():
         if overrule_ov:
             ov = overrule_ov
         if not self._x_position:
-            self._x_position = {}
+            self._x_position = OrderedDict()
         if g_id not in self._x_position:
             self._x_position[g_id] = (
                 (ov, x_position, gr_family, this_is_the_parent_family))
-        _x_position = {}
-        _x_position.update(dict(sorted(self._x_position.items(), key=lambda t: t[1][0])))
+        _x_position = OrderedDict()
+        _x_position.update(OrderedDict(sorted(self._x_position.items(), key=lambda t: t[1][0])))
         self._x_position = _x_position
 
     x_position = property(get_position_dict, set_position_vector)

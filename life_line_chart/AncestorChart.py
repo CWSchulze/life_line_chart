@@ -2,6 +2,7 @@ import os
 import logging
 import datetime
 import svgwrite
+from collections import OrderedDict
 from copy import deepcopy
 from .SimpleSVGItems import Line, Path, CubicBezier
 from .BaseSVGChart import BaseSVGChart
@@ -479,7 +480,7 @@ class AncestorChart(BaseSVGChart):
             try:
                 while i < 50000:
                     if (i+1)%1000 == 0:
-                        logger.warning(f'i {i} for gr_individual {gr_individual}')
+                        logger.warning('i {i} for gr_individual {gr_individual}'.format(**locals()))
                     i += 1
                     self._move_individual_and_ancestors(
                         gr_individual, gr_family, direction_factor*1)
@@ -552,7 +553,7 @@ class AncestorChart(BaseSVGChart):
             nSteps = int(abs(this_individual_x_pos - middle_x_pos))
             if nSteps > 0:
                 if nSteps > 1000:
-                    logger.error(f'nSteps {nSteps} for gr_individual {gr_individual}')
+                    logger.error('nSteps {nSteps} for gr_individual {gr_individual}'.format(**locals()))
                 direction = -1 if this_individual_x_pos > middle_x_pos else 1
                 self._compress_single_individual_position(
                     gr_individual, gr_cof, direction, nSteps)
@@ -625,7 +626,9 @@ class AncestorChart(BaseSVGChart):
                     break
 
             logger.info(
-                f"flipping reduced the cross connections by {old_width - width} (i.e. from {old_width} to {width})")
+                "flipping reduced the cross connections by {} (i.e. from {} to {})".format(
+                    old_width - width, old_width, width
+                ))
 
         # for gr_family in self.gr_families:
         if self._positioning['compress']:
@@ -658,7 +661,9 @@ class AncestorChart(BaseSVGChart):
             self.min_x_index = 0
             self.max_x_index = width
             logger.info(
-                f"compression reduced the total width by {old_width - width} (i.e. from {old_width} to {width})")
+                "compression reduced the total width by {} (i.e. from {} to {})".format(
+                    old_width - width, old_width, width
+                ))
         else:
             self._check_compressed_x_position(
                 False, self.position_to_person_map)
@@ -759,7 +764,7 @@ class AncestorChart(BaseSVGChart):
                 if images_lambda:
                     images = images_lambda(gir.individual)
                 else:
-                    images = {}
+                    images = OrderedDict()
                 gir.individual.images = images
 
             self.define_svg_items()
@@ -780,7 +785,7 @@ class AncestorChart(BaseSVGChart):
                 if images_lambda:
                     images = images_lambda(gir.individual)
                 else:
-                    images = {}
+                    images = OrderedDict()
                 gir.individual.images = images
 
             self.define_svg_items()

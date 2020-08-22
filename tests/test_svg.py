@@ -1,6 +1,7 @@
 from life_line_chart import AncestorChart, DescendantChart
 from life_line_chart.GedcomInstanceContainer import get_gedcom_instance_container
 import pytest
+from collections import OrderedDict
 import os
 try:
     from PIL import Image
@@ -174,7 +175,7 @@ def test_photos_in_chart():
     chart.select_individuals(
         chart._instances[('i', individual_id)], generations=max_generations)
 
-    images = {}
+    images = OrderedDict()
     import re
     import datetime
     expr = re.compile(r'individual_I6_image_age_(\d+)\.png')
@@ -244,14 +245,14 @@ def test_photos_in_chart_selection():
     chart.select_individuals(
         chart._instances[('i', individual_id)], generations=max_generations)
 
-    images = {}
+    images = OrderedDict()
     import re
     import datetime
     expr = re.compile(r'individual_I6_image_age_(\d+)\.png')
     birth_ordinal_value = chart._instances[(
         'i', individual_id)].events['birth_or_christening']['ordinal_value']
     sorted_list = []
-    original_images = {}
+    original_images = OrderedDict()
     for filename in os.listdir(os.path.join(os.path.dirname(__file__), 'images')):
         match = expr.match(filename)
         if match:
@@ -285,7 +286,7 @@ def test_photos_in_chart_selection():
 
 
     def get_filtered_photos(self, original_images):
-        images = {}
+        images = OrderedDict()
         photo_width = self._formatting['relative_line_thickness'] * self._formatting['individual_photo_relative_size'] * self._formatting['horizontal_step_size'] # * (1 + self.max_x_index - self.min_x_index)
         # photo_index_width = self._formatting['relative_line_thickness'] * self._formatting['individual_photo_relative_size']
         # photo_fraction_of_total_width = photo_index_width / (self.max_x_index - self.min_x_index)

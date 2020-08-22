@@ -1,6 +1,7 @@
 import os
 import logging
 import json
+from collections import OrderedDict
 
 from .GedcomIndividual import GedcomIndividual
 from .GedcomFamily import GedcomFamily
@@ -30,14 +31,16 @@ def get_gedcom_instance_container(filename='gramps_testdata.ged'):
             # open(os.path.join('..', os.path.dirname(__file__), 'indi.json'),'w').write(json.dumps(database_indi))
             # open(os.path.join('..', os.path.dirname(__file__), 'fam.json'),'w').write(json.dumps(database_fam))
         else:
-            database_indi = {}
-            database_fam = {}
+            database_indi = OrderedDict()
+            database_fam = OrderedDict()
     else:
         # read json
         database_indi = json.loads(
-            open(os.path.join('..', os.path.dirname(__file__), 'indi.json'), 'r').read())
+            open(os.path.join('..', os.path.dirname(__file__), 'indi.json'), 'r').read(),
+            object_pairs_hook=OrderedDict)
         database_fam = json.loads(
-            open(os.path.join('..', os.path.dirname(__file__), 'fam.json'), 'r').read())
+            open(os.path.join('..', os.path.dirname(__file__), 'fam.json'), 'r').read(),
+            object_pairs_hook=OrderedDict)
 
     def instantiate_all(self, database_fam, database_indi):
         for family_id in list(database_fam.keys()):

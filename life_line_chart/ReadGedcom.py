@@ -1,4 +1,4 @@
-
+from collections import OrderedDict
 
 def read_data(filename):
     """
@@ -16,7 +16,7 @@ def read_data(filename):
                       flags=re.DOTALL | re.MULTILINE)
     fam = re.compile(r'0 @F\d+@ FAM.*?(?=\n0)', flags=re.DOTALL | re.MULTILINE)
     content = open(filename, 'r', encoding='utf8').read()
-    indi_database = {}
+    indi_database = OrderedDict()
     for i in indi.finditer(content):
         ged_data = i.string[i.regs[0][0]:i.regs[0][1]]
         stack[0] = indi_database
@@ -25,13 +25,13 @@ def read_data(filename):
             tag_name = line.split(' ')[1]
             tag_data = " ".join(line.split(' ')[2:])
             if tag_name not in stack[level]:
-                stack[level][tag_name] = {'tag_data': tag_data}
+                stack[level][tag_name] = OrderedDict({'tag_data': tag_data})
             else:
                 stack[level][tag_name]['tag_data'] += '\n'+tag_data
             stack[level+1] = stack[level][tag_name]
         if len(indi_database) > 999000:
             break
-    fam_database = {}
+    fam_database = OrderedDict()
     for i in fam.finditer(content):
         ged_data = i.string[i.regs[0][0]:i.regs[0][1]]
         stack[0] = fam_database
@@ -40,7 +40,7 @@ def read_data(filename):
             tag_name = line.split(' ')[1]
             tag_data = " ".join(line.split(' ')[2:])
             if tag_name not in stack[level]:
-                stack[level][tag_name] = {'tag_data': tag_data}
+                stack[level][tag_name] = OrderedDict({'tag_data': tag_data})
             else:
                 stack[level][tag_name]['tag_data'] += '\n'+tag_data
             stack[level+1] = stack[level][tag_name]

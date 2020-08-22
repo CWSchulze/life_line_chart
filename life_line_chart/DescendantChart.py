@@ -4,6 +4,7 @@ import logging
 import datetime
 import svgwrite
 from copy import deepcopy
+from collections import OrderedDict
 from .BaseSVGChart import BaseSVGChart
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 from .Translation import get_strings, recursive_merge_dict_members
@@ -128,7 +129,7 @@ class DescendantChart(BaseSVGChart):
             discovery_cache = []
         individual = gr_individual.individual
         discovery_cache.append(gr_individual)
-        logger.info(f"discovering {individual.plain_name}")
+        logger.info("discovering {}".format(individual.plain_name))
 
         x_position = x_offset
         self.min_x_index = min(self.min_x_index, x_position)
@@ -140,7 +141,7 @@ class DescendantChart(BaseSVGChart):
                     marriage.descendant_chart_parent_family_placement == gr_child_of_family]
 
         # get childrens widths
-        child_widths = {}
+        child_widths = OrderedDict()
         total_number_of_descendants = 0
         for gr_marriage in reversed(visible_local_marriages):
             for gr_child in gr_marriage.visible_children:
@@ -152,7 +153,7 @@ class DescendantChart(BaseSVGChart):
 
         # get root position
         number_of_placed_descendants = 0
-        split_children = [{},{}]
+        split_children = [OrderedDict(), OrderedDict()]
         for gr_marriage in visible_local_marriages:
             split_children[0][gr_marriage.g_id] = []
             split_children[1][gr_marriage.g_id] = []
@@ -262,7 +263,7 @@ class DescendantChart(BaseSVGChart):
         """
         individual = gr_individual.individual
         discovery_cache.append(individual.plain_name)
-        logger.info(f"discovering {individual.plain_name}")
+        logger.info("discovering {}".format(individual.plain_name))
 
         x_position = x_offset
         self.min_x_index = min(self.min_x_index, x_position)
@@ -444,7 +445,7 @@ class DescendantChart(BaseSVGChart):
                 if images_lambda:
                     images = images_lambda(gir.individual)
                 else:
-                    images = {}
+                    images = OrderedDict()
                 gir.individual.images = images
 
             self.define_svg_items()
@@ -472,7 +473,7 @@ class DescendantChart(BaseSVGChart):
                 if images_lambda:
                     images = images_lambda(gir.individual)
                 else:
-                    images = {}
+                    images = OrderedDict()
                 gir.individual.images = images
 
             self.define_svg_items()

@@ -29,7 +29,7 @@ def new_text_item(self, text, pos_x, pos_y, font_size=None, color="default", tex
     data = {
             'type': 'text',
             'config': {
-                    'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
+                    'style': "font-size:{}px;font-family:{}".format(font_size, self._formatting['font_name']),
                     'text': text,
                     'text_anchor': text_anchor,
                     # 'align' : 'center',

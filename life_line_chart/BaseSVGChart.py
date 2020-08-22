@@ -3,13 +3,14 @@ import logging
 import datetime
 import svgwrite
 from copy import deepcopy
-from collections import defaultdict
+from collections import OrderedDict
 from math import floor, ceil, pi, e
 
 from .SimpleSVGItems import Line, Path, CubicBezier
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 from .BaseChart import BaseChart
 from .IntermediateGraphicalItems import new_text_item, new_image_item, new_path_item
+from .InstanceContainer import OrderedDefaultDict
 
 logger = logging.getLogger("life_line_chart")
 
@@ -110,7 +111,7 @@ class BaseSVGChart(BaseChart):
             tuple: (list of failures, min_x_index, max_x_index)
         """
         failed = []
-        v = {}
+        v = OrderedDict()
         full_index_list = []
         cactus_chart = (str(type(self)) == "<class 'life_line_chart.DescendantChart.DescendantChart'>" and self._positioning['chart_layout'] == 'cactus')
         for gr_individual in self.gr_individuals:
@@ -409,7 +410,7 @@ class BaseSVGChart(BaseChart):
                                         marriage_ring_index, marriage_ordinal)),
                                     self._colors['descendant_chart_marriage_lines'],
                                     stroke_width,
-                                    stroke_dasharray=f"{stroke_width*5},{stroke_width*5}",
+                                    stroke_dasharray="{},{}".format(stroke_width*5, stroke_width*5),
                                 )
                             ))
                         has_ring = True
@@ -623,7 +624,7 @@ class BaseSVGChart(BaseChart):
                         {
                             'type': 'textPath',
                             'config': {
-                                'style': f"font-size:{font_size}px;font-family:{self._formatting['font_name']}",
+                                'style': "font-size:{}px;font-family:{}".format(font_size, self._formatting['font_name']),
                                 'text': '',
                                 # 'transform':'rotate(90,%s, %s)' % _birth_position,
                                 # 'insert' : _birth_position,
@@ -743,7 +744,7 @@ class BaseSVGChart(BaseChart):
         sorted_individuals = [(gr.birth_date_ov, index, gr)
                               for index, gr in enumerate(self.gr_individuals)]
         sorted_individuals.sort()
-        sorted_individual_dict = defaultdict(list)
+        sorted_individual_dict = OrderedDefaultDict(list)
         for _, _, gr_individual in sorted_individuals:
             for key, item in gr_individual.items:
                 sorted_individual_dict[key].append(item)
@@ -882,7 +883,9 @@ class BaseSVGChart(BaseChart):
                     # height = this_def['size'][1]*factor
 
                     svg_document.add(svg_document.use(this_def['image_def'].get_iri(
-                    ), transform=f"translate({pos_x-width/2*0},{pos_y - height/2*0}) scale({width},{height})"))
+                    ), transform="translate({},{}) scale({},{})".format(
+                        pos_x-width/2*0, pos_y - height/2*0, width, height
+                    )))
                     pass
 
                 elif item['type'] == 'rect':

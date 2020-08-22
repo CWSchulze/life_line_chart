@@ -1,7 +1,16 @@
 import logging
 import hashlib
-from collections import defaultdict
-connection_container_type = lambda y=lambda x=list:defaultdict(x):defaultdict(y)
+from collections import OrderedDict
+class OrderedDefaultDict(OrderedDict):
+    def __init__(self, data_type=None, **kwargs):
+        self.data_type = data_type if data_type else OrderedDefaultDict
+        OrderedDict(self, **kwargs)
+
+    def __missing__(self, key):
+        value = self.data_type()
+        self[key] = value
+        return value
+connection_container_type = lambda y=lambda x=list:OrderedDefaultDict(x):OrderedDefaultDict(y)
 
 from .Exceptions import LifeLineChartNotEnoughInformationToDisplay
 
@@ -29,13 +38,13 @@ class InstanceContainer():
     }
 
     def __init__(self, family_constructor, individual_constructor, instantiate_all):
-        self._data = {('i', None): None, ('f', None): None}
+        self._data = OrderedDict(((('i', None), None), (('f', None), None)))
         self._family_constructor = family_constructor
         self._individual_constructor = individual_constructor
         self.instantiate_all = instantiate_all
-        self.ancestor_width_cache = {}
-        self.connection_container = {}
-        self.connection_container.update({'i': connection_container_type(), 'f': connection_container_type()})
+        self.ancestor_width_cache = OrderedDict()
+        self.connection_container = OrderedDict()
+        self.connection_container.update(OrderedDict((('i', connection_container_type()), ('f', connection_container_type()))))
         self.color_getters = {
             'unique': self.color_generator_unique,
             'surname': self.color_generator_surname
@@ -101,13 +110,13 @@ class InstanceContainer():
         clear all data
         """
         self._data.clear()
-        self._data.update({('i', None): None, ('f', None): None})
+        self._data.update(OrderedDict({('i', None): None, ('f', None): None}))
         self.ancestor_width_cache.clear()
         self.clear_connections()
 
     def clear_connections(self):
         self.connection_container.clear()
-        self.connection_container.update({'i': connection_container_type(), 'f': connection_container_type()})
+        self.connection_container.update(OrderedDict({'i': connection_container_type(), 'f': connection_container_type()}))
 
     def color_generator_unique(self, gr_individual):
         """

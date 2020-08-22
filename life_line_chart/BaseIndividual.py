@@ -1,4 +1,5 @@
 from copy import deepcopy
+from collections import OrderedDict
 import datetime
 
 
@@ -25,7 +26,7 @@ def estimate_death_date(individual):
             'ordinal_value': date_max.toordinal(),
             'ordinal_value_min': date_min.toordinal(),
             'ordinal_value_max': date_max.toordinal(),
-            'comment': f'Estimated (max age)',
+            'comment': 'Estimated (max age)',
             'precision': 'y'
         }
 
@@ -123,7 +124,7 @@ class BaseIndividual():
         self.child_of_family_id = []
         self.events = {}  # : events like birth or death
         self.graphical_representations = [] # : instances of graphical representations
-        self.images = {}  # : mapping of ordinal values to photos of this individual
+        self.images = OrderedDict()  # : mapping of ordinal values to photos of this individual
 
     def __repr__(self):
         return 'individual "' + self.plain_name + '" ' + self.birth_date
