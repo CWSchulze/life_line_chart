@@ -1,7 +1,7 @@
 import os
+import sys
 import logging
 import datetime
-import svgwrite
 from copy import deepcopy
 from collections import OrderedDict
 from math import floor, ceil, pi, e
@@ -727,6 +727,15 @@ class BaseSVGChart(BaseChart):
         """
 
         logger.debug('start creating document')
+
+        if sys.version_info.major == 3 and sys.version_info.minor <= 5:
+            logger.error('Failed to load svgwrite, at least python 3.6 is required to export svg files.')
+            return
+        try:
+            import svgwrite
+        except Exception as e:
+            logger.error('Failed to load svgwrite, but it is required to export svg files. \n\n'+str(e))
+            return
 
         svgwrite.utils.AutoID._nextid = 1
         svg_document = svgwrite.Drawing(filename=filename,
