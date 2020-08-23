@@ -1,7 +1,6 @@
 import os
 import logging
 import datetime
-import svgwrite
 from collections import OrderedDict
 from copy import deepcopy
 from .SimpleSVGItems import Line, Path, CubicBezier

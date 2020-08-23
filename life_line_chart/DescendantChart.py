@@ -2,7 +2,6 @@ import os
 from .SimpleSVGItems import Line, Path, CubicBezier
 import logging
 import datetime
-import svgwrite
 from copy import deepcopy
 from collections import OrderedDict
 from .BaseSVGChart import BaseSVGChart
