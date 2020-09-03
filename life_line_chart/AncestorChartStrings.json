@@ -26,6 +26,33 @@
         },
         "chart_configuration_root_individual": {}
     },
+    "nl_NL.UTF-8": {
+        "formatting": {
+            "fathers_have_the_same_color": {
+                "short_description": "Vaders hebben dezelfde kleur",
+                "long_description": "Beginnend bij de stampersoon heeft elke vader van een toegevoegd individu dezelfde kleur als dat individu."
+            }
+        },
+        "positioning": {
+            "debug_optimization_compression_steps": {
+                "short_description": "Maximaal aantal compressiestappen",
+                "long_description": "Debuggen van het compressie-algoritme. Afbreken na x stappen."
+            },
+            "debug_optimization_flipping_steps": {
+                "short_description": "Maximaal aantal omkerende stappen",
+                "long_description": "Foutopsporing van het flipping-algoritme. Afbreken na x stappen."
+            },
+            "compress": {
+                "short_description": "Comprimeer de grafiek horizontaal",
+                "long_description": "Standaard heeft ieder individu een uniek horizontaal slot. Dit kan met vele generaties inefficiënt zijn. Met dit algoritme kunnen meerdere mensen een horizontale sleuf delen, als ze elkaar niet overlappen."
+            },
+            "flip_to_optimize": {
+                "short_description": "Draai gezinnen om om horizontale verbindingen te verminderen",
+                "long_description": "Verander de positie van moeder en vader in een gezin om de algehele horizontale dwarsverbanden in grotere grafieken te verminderen. Dit is het geval als één persoon in meer dan één gezin voorkomt of het wordt veroorzaakt door kwartierherhaling."
+            }
+        },
+        "chart_configuration_root_individual": {}
+    },
     "de_DE.UTF-8": {
         "formatting": {
             "fathers_have_the_same_color": {

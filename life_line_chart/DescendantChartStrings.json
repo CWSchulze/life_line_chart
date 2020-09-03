@@ -28,6 +28,35 @@
         },
         "chart_configuration_root_individual": {}
     },
+    "nl_NL.UTF-8": {
+        "formatting": {
+            "highlight_descendants": {
+                "short_description": "Markeer afstammelingen",
+                "long_description": "Markeer de personen die afstammelingen zijn."
+            },
+            "line_weighting": {
+                "choices": {
+                    "number_of_descendants": "Aantal afstammelingen"
+                }
+            },
+            "family_shape": {
+                "choices": {
+                    "2": "Heel zacht"
+                }
+            }
+        },
+        "positioning": {
+            "chart_layout": {
+                "short_description": "Algemene diagramlay-out",
+                "long_description": "Er zijn verschillende lay-outs voor onderliggende diagrammen.",
+                "choices": {
+                    "enclosing": "Ouders omsluiten kinderen",
+                    "cactus": "Cactus"
+                }
+            }
+        },
+        "chart_configuration_root_individual": {}
+    },
     "de_DE.UTF-8": {
         "formatting": {
             "highlight_descendants": {

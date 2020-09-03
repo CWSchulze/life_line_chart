@@ -178,6 +178,185 @@
             }
         }
     },
+    "nl_NL.UTF-8": {
+        "formatting": {
+            "warp_shape": {
+                "short_description": "Vervorm de diagramvorm",
+                "long_description": "De algehele vorm van het diagram kan worden vervormd.",
+                "choices": {
+                    "normal": "Normale rastervorm",
+                    "sine": "Sinusvorm",
+                    "triangle": "Driehoekige vorm"
+                }
+            },
+            "individual_photo_active": {
+                "short_description": "Toon foto's",
+                "long_description": "Foto's van het individu worden getoond."
+            },
+            "individual_photo_relative_size": {
+                "short_description": "Foto grootte",
+                "long_description": "De getoonde foto's zijn in een vierkant van deze omvang ingepast. De maat wordt gegeven in verhouding tot de lijndikte."
+            },
+            "total_height": {
+                "short_description": "Totale hoogte",
+                "long_description": "Totale hoogte van de hele kaart."
+            },
+            "relative_line_thickness": {
+                "short_description": "Relatieve lijndikte",
+                "long_description": "De lijndikte van een individu wordt gegeven in verhouding tot de horizontale stapgrootte."
+            },
+            "horizontal_step_size": {
+                "short_description": "Horizontale stapgrootte",
+                "long_description": "Dit is de afstand van de ene lijn naar de andere. Deze waarde wordt ook gebruikt voor het schalen van andere items."
+            },
+            "birth_label_active": {
+                "short_description": "Laat het geboortelabel zien",
+                "long_description": "Activeer het geboortelabel."
+            },
+            "birth_label_along_path": {
+                "short_description": "Geboortelabel langs pad",
+                "long_description": "Het geboortelabel is uitgelijnd met de individuele lijn.",
+                "tab": "Labelconfiguratie"
+            },
+            "birth_label_rotation": {
+                "short_description": "Geboortelabel rotatie",
+                "long_description": "Het geboortelabel is geschreven in een tekstkader dat met deze waarde is geroteerd.",
+                "tab": "Labelconfiguratie"
+            },
+            "birth_label_letter_x_offset": {
+                "short_description": "Horizontale offset van geboortelabel",
+                "long_description": "Het geboortelabel wordt horizontaal verplaatst met deze waarde, die wordt gegeven in verhouding tot de lettergrootte.",
+                "tab": "Labelconfiguratie"
+            },
+            "birth_label_letter_y_offset": {
+                "short_description": "Verticale offset van geboortelabel",
+                "long_description": "Het geboortelabel wordt verticaal verplaatst met deze waarde, die wordt gegeven in verhouding tot de lettergrootte.",
+                "tab": "Labelconfiguratie"
+            },
+            "birth_label_wrapping_active": {
+                "short_description": "Verpak de woorden in een geboortelabel",
+                "long_description": "De inhoud van het geboortelabel is waar mogelijk verpakt.",
+                "tab": "Labelconfiguratie"
+            },
+            "birth_label_anchor": {
+                "short_description": "Geboortelabel anker",
+                "long_description": "Tekstuitlijning van het geboortelabel.",
+                "choices": {
+                    "start": "Links",
+                    "middle": "Midden",
+                    "end": "Rechts"
+                },
+                "tab": "Labelconfiguratie"
+            },
+            "death_label_active": {
+                "short_description": "Toon overlijdenslabel",
+                "long_description": "Activeer het overlijdenslabel."
+            },
+            "death_label_rotation": {
+                "short_description": "Rotatie overlijdenslabel",
+                "long_description": "Het overlijdenslabel wordt geschreven in een tekstkader dat met deze waarde wordt geroteerd.",
+                "tab": "Labelconfiguratie"
+            },
+            "death_label_letter_x_offset": {
+                "short_description": "Horizontale offset overlijdenslabel",
+                "long_description": "Het overlijdenslabel wordt horizontaal verplaatst met deze waarde, die wordt gegeven in verhouding tot de lettergrootte.",
+                "tab": "Labelconfiguratie"
+            },
+            "death_label_letter_y_offset": {
+                "short_description": "Verticale offset overlijdenslabel",
+                "long_description": "Het overlijdenslabel wordt verticaal verplaatst met deze waarde, die wordt gegeven in verhouding tot de lettergrootte.",
+                "tab": "Labelconfiguratie"
+            },
+            "death_label_wrapping_active": {
+                "short_description": "Verpak woorden in het overlijdenslabel",
+                "long_description": "De inhoud van het death label is waar mogelijk ingepakt.",
+                "tab": "Labelconfiguratie"
+            },
+            "death_label_anchor": {
+                "short_description": "Overlijdenslabel anker",
+                "long_description": "Tekstuitlijning van het overlijdenslabel.",
+                "choices": {
+                    "start": "Links",
+                    "middle": "Midden",
+                    "end": "Rechts"
+                },
+                "tab": "Labelconfiguratie"
+            },
+            "marriage_label_active": {
+                "short_description": "Toon huwelijkslabel",
+                "long_description": "Activeer het huwelijkslabel."
+            },
+            "fade_individual_color": {
+                "short_description": "Vervaag individuele kleur",
+                "long_description": "De kleur van de individuen vervaagt naar zwart met het ouder worden."
+            },
+            "font_name": {
+                "short_description": "Lettertypenaam",
+                "long_description": "Naam van de lettertypefamilie die voor labels wordt gebruikt.",
+                "tab": "Labelconfiguratie"
+            },
+            "font_size_description": {
+                "short_description": "Relatieve lettergrootte",
+                "long_description": "De lettergrootte wordt gegeven in verhouding tot de lijndikte.",
+                "tab": "Labelconfiguratie"
+            },
+            "family_shape": {
+                "short_description": "Gezinsvorm",
+                "long_description": "De vorm van de gezinnen kan worden gevarieerd.",
+                "choices": {
+                    "0": "Rechthoekig",
+                    "1": "Zachter"
+                }
+            },
+            "margin_year_max": {
+                "short_description": "Minimum marge boven jaar",
+                "long_description": "De bovengrens van het diagram wordt met minimaal dit aantal jaren verlengd."
+            },
+            "margin_year_min": {
+                "short_description": "Minimum marge voor een lager jaar",
+                "long_description": "De ondergrens van het diagram wordt met minimaal dit aantal jaren verlengd."
+            },
+            "debug_visualize_connections": {
+                "short_description": "Visualiseer verbindingen",
+                "long_description": "Visualiseer de verbindingen tussen families en individuen. Dit is voor foutopsporingsdoeleinden."
+            },
+            "debug_visualize_ambiguous_placement": {
+                "short_description": "Visualiseer dubbelzinnige plaatsing",
+                "long_description": "Visualiseer automatisch gedetecteerde fouten in het plaatsingsalgoritme."
+            },
+            "coloring_of_individuals": {
+                "short_description": "Inkleuren van individuen",
+                "long_description": "Er zijn verschillende manieren om de kleur van een persoon te bepalen.",
+                "choices": {
+                    "unique": "Uniek",
+                    "surname": "Gebaseerd op achternaam"
+                }
+            },
+            "flip_vertically": {
+                "short_description": "Verticaal spiegelen",
+                "long_description": "Indien actief, wordt het diagram verticaal gespiegeld."
+            },
+            "line_weighting": {
+                "short_description": "Lijnweging",
+                "long_description": "De lijndikte kan worden geconfigureerd.",
+                "choices": {
+                    "none": "geen"
+                }
+            }
+        },
+        "positioning": {
+            "unique_graphical_representation": {
+                "short_description": "Toon kwartierherhaling",
+                "long_description": "Door kwartierherhaling kan een persoon meerdere keren voorkomen in een eenvoudige vooroudergrafiek. Als dit actief is, komt elk individu maar één keer voor."
+            }
+        },
+        "chart_configuration_root_individual": {
+            "generations": {
+                "short_description": "Maximaal aantal generaties",
+                "long_description": "als dit aantal generaties is bereikt, gaat het algoritme niet dieper"
+            }
+        }
+    },
     "de_DE.UTF-8": {
         "formatting": {
             "warp_shape": {
