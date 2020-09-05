@@ -55,4 +55,4 @@ def test_instance_container_labels():
     assert str(
         individual_birth_labels[1:5]) == "['*\\xa011.08.1966', '*\\xa017.04.1904', '*\\xa029.01.1821', '*\\xa031.08.1889']"
     assert str(
-        individual_death_labels[1:5]) == "['†\\xa0geschätzt\\xa02020', '†\\xa029.01.1977', '†\\xa0geschätzt\\xa01896', '†\\xa01945']"
+        individual_death_labels[1:5]) == "['', '†\\xa029.01.1977', '†\\xa0geschätzt\\xa01896', '†\\xa01945']"
