@@ -29,6 +29,8 @@ def estimate_death_date(individual):
             'comment': 'Estimated (max age)',
             'precision': 'y'
         }
+        if date_max == today:
+            individual.events['death_or_burial']['comment'] = 'Still alive'
 
 
 def estimate_birth_date(individual, instances):

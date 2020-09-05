@@ -661,7 +661,7 @@ class BaseSVGChart(BaseChart):
                             dy=[str(float(font_size)/2.7 + font_size*float(self._formatting['birth_label_letter_y_offset']))+'px'],
                         )
                     ))
-            if self._formatting['death_label_active']:
+            if self._formatting['death_label_active'] and death_label:
                 if self._formatting['death_label_wrapping_active']:
                     death_label = death_label.strip().replace(' ', '\n')
                 gr_individual.items.append((
