@@ -347,7 +347,7 @@ class DescendantChart(BaseSVGChart):
         self._check_compressed_x_position(
                 False, self.position_to_person_map)
 
-    def update_chart(self, filter_lambda=None, color_lambda=None, images_lambda=None, rebuild_all=False, update_view=False):
+    def update_chart(self, filter_lambda=None, color_lambda=None, images_lambda=None, rebuild_all=False, update_view=False, clear_before_rebuild=True):
         """
         Update the chart, caching of positioning data is regarded
 
@@ -357,6 +357,7 @@ class DescendantChart(BaseSVGChart):
             images_lambda (lambda(BaseIndividual), optional): images of individuals. Defaults to None.
             rebuild_all (bool, optional): clear cache, rebuild everything. Defaults to False.
             update_view (bool, optional): update formatting only. Defaults to False.
+            clear_before_rebuild (bool, optional): clear instances before rebuilding the chart. Defaults to True.
 
         Returns:
             bool: view has changed
@@ -383,7 +384,8 @@ class DescendantChart(BaseSVGChart):
             return 1
 
         if rebuild_all:
-            self.clear_graphical_representations()
+            if clear_before_rebuild:
+                self.clear_graphical_representations()
             for settings in self._chart_configuration['root_individuals']:
                 root_individual_id = settings['individual_id']
                 generations = settings['generations']
@@ -393,6 +395,8 @@ class DescendantChart(BaseSVGChart):
 
             x_pos = 0
             for settings in self._chart_configuration['root_individuals']:
+                if 'x_offset' in settings:
+                    x_pos += settings['x_offset']
                 root_individual_id = settings['individual_id']
                 generations = settings['generations']
                 root_individual = self._instances[(

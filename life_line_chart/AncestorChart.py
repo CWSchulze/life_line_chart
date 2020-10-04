@@ -714,6 +714,8 @@ class AncestorChart(BaseSVGChart):
 
             x_pos = 0
             for settings in self._chart_configuration['root_individuals']:
+                if 'x_offset' in settings:
+                    x_pos += settings['x_offset']
                 root_individual_id = settings['individual_id']
                 generations = settings['generations']
                 root_individual = self._instances[(
