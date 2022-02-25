@@ -1,4 +1,8 @@
-from collections import MutableSequence
+try:
+    from collections.abc import MutableSequence
+except ImportError:
+    # Required for python versions < 3.9
+    from collections import MutableSequence
 
 
 class Line(object):
