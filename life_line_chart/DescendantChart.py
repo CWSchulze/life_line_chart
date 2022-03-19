@@ -1,11 +1,7 @@
-import os
-from .SimpleSVGItems import Line, Path, CubicBezier
 import logging
-import datetime
 from copy import deepcopy
 from collections import OrderedDict
 from .BaseSVGChart import BaseSVGChart
-from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 from .Translation import get_strings, recursive_merge_dict_members
 
 logger = logging.getLogger("life_line_chart")
@@ -38,8 +34,8 @@ class DescendantChart(BaseSVGChart):
     DEFAULT_POSITIONING.update(BaseSVGChart.DEFAULT_POSITIONING)
 
     DEFAULT_CHART_CONFIGURATION = {
-            'root_individuals': [],
-            'discovery_blacklist': []
+        'root_individuals': [],
+        'discovery_blacklist': []
     }
     DEFAULT_CHART_CONFIGURATION.update(BaseSVGChart.DEFAULT_CHART_CONFIGURATION)
 
@@ -72,7 +68,7 @@ class DescendantChart(BaseSVGChart):
 
         if gr_child_of_family is None and individual.child_of_families:
             gr_child_of_family = self._create_family_graphical_representation(
-                 individual.child_of_families[0], not self._positioning['unique_graphical_representation'])
+                individual.child_of_families[0], not self._positioning['unique_graphical_representation'])
 
         for marriage in individual.marriages:
             if self._positioning['chart_layout'] == 'enclosing':
@@ -92,7 +88,7 @@ class DescendantChart(BaseSVGChart):
                 if self._positioning['chart_layout'] == 'enclosing':
                     spouse = marriage.get_spouse(individual.individual_id)
                     if spouse is not None:
-                        if filter is None or filter(spouse) == False:
+                        if filter is None or not filter(spouse):
                             gr_spouse = self._create_individual_graphical_representation(
                                 spouse, not self._positioning['unique_graphical_representation'])
 
@@ -107,7 +103,7 @@ class DescendantChart(BaseSVGChart):
                             child, gr_marriage, generations - 1, filter=filter)
                         if gr_child:
                             gr_marriage.add_visible_children(gr_child)
-                            #gr_child.ancestor_chart_parent_family_placement = gr_marriage
+                            # gr_child.ancestor_chart_parent_family_placement = gr_marriage
                     cofs = individual.child_of_families
                     for cof in cofs[:1]:
                         gr_marriage.visual_placement_parent_family = gr_child_of_family
@@ -135,9 +131,9 @@ class DescendantChart(BaseSVGChart):
 
         # marriages which have been placed over this parent family
         visible_local_marriages = \
-            [marriage for marriage in gr_individual.visible_marriages \
-                if gr_child_of_family is None or \
-                    marriage.descendant_chart_parent_family_placement == gr_child_of_family]
+            [marriage for marriage in gr_individual.visible_marriages
+                if gr_child_of_family is None or
+             marriage.descendant_chart_parent_family_placement == gr_child_of_family]
 
         # get childrens widths
         child_widths = OrderedDict()
@@ -167,7 +163,7 @@ class DescendantChart(BaseSVGChart):
                     if len(sorted_vcs) % 2 == 0:
                         index2 += 1
                     reordered_vcs.append(sorted_vcs[index2])
-                #sorted_vcs[(2*i) % len(sorted_vcs)]
+                # sorted_vcs[(2*i) % len(sorted_vcs)]
             for gr_child in reordered_vcs:
                 this_step = len(child_widths[gr_child.g_id]) + 1
                 if max(2, total_number_of_descendants) / 2 + 0.5 >= number_of_placed_descendants + this_step:
@@ -213,11 +209,11 @@ class DescendantChart(BaseSVGChart):
             if not individual_has_been_placed and len(visible_local_marriages):
                 individual_has_been_placed = True
                 if not gr_individual.has_position_vector(gr_child_of_family):
-                    #x_offset_root = x_offset
+                    # x_offset_root = x_offset
                     if x_offset_root is None:
                         x_offset_root = root_individual_position
                     gr_individual.set_position_vector(
-                        x_offset_root, gr_child_of_family, True, overrule_ov = 1)
+                        x_offset_root, gr_child_of_family, True, overrule_ov=1)
                     for gr_marriage in gr_individual.visible_marriages:
                         if not gr_individual.has_position_vector(gr_marriage):
                             gr_individual.set_position_vector(
@@ -225,17 +221,17 @@ class DescendantChart(BaseSVGChart):
                     x_position += 1
 
         if not individual_has_been_placed:
-            #x_offset_root = x_offset
+            # x_offset_root = x_offset
             if x_offset_root is None:
                 x_offset_root = root_individual_position
             gr_individual.set_position_vector(
-                    x_offset_root, gr_child_of_family, True, overrule_ov = 1)
+                x_offset_root, gr_child_of_family, True, overrule_ov=1)
             for gr_marriage in gr_individual.visible_marriages:
                 gr_individual.set_position_vector(
-                        x_position, gr_marriage)
+                    x_position, gr_marriage)
             if not gr_individual.visible_marriages:
                 gr_individual.set_position_vector(
-                        x_position, None)
+                    x_position, None)
             x_position += 1
 
         self.max_x_index = max(self.max_x_index, x_position)
@@ -268,14 +264,14 @@ class DescendantChart(BaseSVGChart):
         self.min_x_index = min(self.min_x_index, x_position)
 
         # marriages which have been placed over this parent family
-        visible_local_marriages = \
-            [marriage for marriage in gr_individual.visible_marriages \
-                if gr_child_of_family is None or \
-                    marriage.descendant_chart_parent_family_placement == gr_child_of_family]
+        visible_local_marriages = [
+            marriage for marriage in gr_individual.visible_marriages
+            if gr_child_of_family is None or
+            marriage.descendant_chart_parent_family_placement == gr_child_of_family]
 
         if len(visible_local_marriages) == 0:
             gr_individual.set_position_vector(
-                    x_position, gr_child_of_family, True)
+                x_position, gr_child_of_family, True)
             x_position += 1
 
         total_number_of_descendants = len(gr_individual.get_all_descendants())
@@ -345,9 +341,13 @@ class DescendantChart(BaseSVGChart):
         """
         self.check_unique_x_position(False)
         self._check_compressed_x_position(
-                False, self.position_to_person_map)
+            False, self.position_to_person_map)
 
-    def update_chart(self, filter_lambda=None, color_lambda=None, images_lambda=None, rebuild_all=False, update_view=False, clear_before_rebuild=True):
+    def update_chart(
+        self, filter_lambda=None, color_lambda=None,
+        images_lambda=None, rebuild_all=False, update_view=False,
+        clear_before_rebuild=True
+    ):
         """
         Update the chart, caching of positioning data is regarded
 
@@ -365,12 +365,14 @@ class DescendantChart(BaseSVGChart):
         rebuild_all = rebuild_all or self._positioning != self._backup_positioning or \
             self._chart_configuration != self._backup_chart_configuration
         update_view = update_view or rebuild_all or self._formatting != self._backup_formatting
+
         def local_filter_lambda(individual, _filter_lambda=filter_lambda):
             if individual.individual_id in self._chart_configuration['discovery_blacklist']:
                 return True
             if _filter_lambda is not None:
                 return _filter_lambda(individual)
             return False
+
         if color_lambda:
             update_view = True
         if images_lambda:
@@ -425,7 +427,7 @@ class DescendantChart(BaseSVGChart):
                 generations = settings['generations']
                 try:
                     self.modify_layout(root_individual_id)
-                except Exception as e:
+                except Exception:
                     pass
 
             for gir in self.gr_individuals:
@@ -440,8 +442,11 @@ class DescendantChart(BaseSVGChart):
                             marriages = gir.visible_marriages
                             if marriages:
                                 gr_spouse = marriages[0].get_gr_spouse(gir)
-                                if gr_spouse and gr_spouse.individual.child_of_families and gr_spouse.individual.child_of_families[0].has_graphical_representation():
-                                    color = (225,225,225)
+                                if (
+                                    gr_spouse and gr_spouse.individual.child_of_families
+                                    and gr_spouse.individual.child_of_families[0].has_graphical_representation()
+                                ):
+                                    color = (225, 225, 225)
                     if color is None:
                         color = self._instances.color_getter(gir)
                 gir.color = color
@@ -468,8 +473,11 @@ class DescendantChart(BaseSVGChart):
                             marriages = gir.visible_marriages
                             if marriages:
                                 spouse = marriages[0].get_spouse(gir)
-                                if spouse and spouse.individual.child_of_families and spouse.individual.child_of_families[0].has_graphical_representation():
-                                    color = (225,225,225)
+                                if (
+                                    spouse and spouse.individual.child_of_families
+                                    and spouse.individual.child_of_families[0].has_graphical_representation()
+                                ):
+                                    color = (225, 225, 225)
                     if color is None:
                         color = self._instances.color_getter(gir)
                 gir.color = color

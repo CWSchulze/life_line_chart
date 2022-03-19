@@ -1,5 +1,5 @@
 from .BaseFamily import BaseFamily
-from .GedcomParsing import get_date_dict_from_tag, _get_relevant_events, estimate_marriage_date
+from .GedcomParsing import get_date_dict_from_tag, estimate_marriage_date
 from .Exceptions import LifeLineChartNotEnoughInformationToDisplay
 
 
@@ -82,4 +82,3 @@ class GedcomFamily(BaseFamily):
         except KeyError:
             name = "unknown"
         return name
-

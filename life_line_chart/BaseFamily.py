@@ -50,7 +50,7 @@ class BaseFamily():
             bool: has graphical representation of spouse
         """
         return (self.husb is not None and self.husb.has_graphical_representation()) or \
-                    (self.wife is not None and self.wife.has_graphical_representation())
+            (self.wife is not None and self.wife.has_graphical_representation())
 
     def has_children(self):
         """

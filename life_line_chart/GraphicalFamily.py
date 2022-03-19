@@ -1,5 +1,6 @@
 from .Exceptions import LifeLineChartUnknownPlacementError, LifeLineChartUnknownSelectionAndConnectionError
 
+
 class GraphicalFamily():
     """
     Class which represents one appearance of a family
@@ -93,7 +94,7 @@ class GraphicalFamily():
         if gr_child not in self.visible_children and gr_child.birth_date_ov:
             self.visible_children.append(gr_child)
             self.visible_children.sort()
-        if gr_child != None:
+        if gr_child is not None:
             self.__instances.connection_container['f'][self.g_id][gr_child.g_id].append('weak_child')
             self.__instances.connection_container['i'][gr_child.g_id][self.g_id].append('weak_child')
 
@@ -165,7 +166,7 @@ class GraphicalFamily():
 
     @gr_husb.setter
     def gr_husb(self, gr_husb):
-        if gr_husb != None:
+        if gr_husb is not None:
             self.__instances.connection_container['f'][self.g_id][gr_husb.g_id].append('gr_husb')
             self.__instances.connection_container['i'][gr_husb.g_id][self.g_id].append('gr_husb')
 
@@ -185,7 +186,7 @@ class GraphicalFamily():
 
     @gr_wife.setter
     def gr_wife(self, gr_wife):
-        if gr_wife != None:
+        if gr_wife is not None:
             self.__instances.connection_container['f'][self.g_id][gr_wife.g_id].append('gr_wife')
             self.__instances.connection_container['i'][gr_wife.g_id][self.g_id].append('gr_wife')
 
@@ -205,7 +206,7 @@ class GraphicalFamily():
 
     @descendant_chart_parent_family_placement.setter
     def descendant_chart_parent_family_placement(self, gr_strong_parent_family):
-        if gr_strong_parent_family != None:
+        if gr_strong_parent_family is not None:
             self.__instances.connection_container['f'][self.g_id][gr_strong_parent_family.g_id].append('gr_strong_parent_family')
             self.__instances.connection_container['f'][gr_strong_parent_family.g_id][self.g_id].append('gr_strong_spouse_family')
 
@@ -228,4 +229,3 @@ class GraphicalFamily():
     @property
     def marriage_label(self):
         return self.family.marriage_label
-

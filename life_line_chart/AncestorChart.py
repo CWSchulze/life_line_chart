@@ -1,9 +1,6 @@
-import os
 import logging
-import datetime
 from collections import OrderedDict
 from copy import deepcopy
-from .SimpleSVGItems import Line, Path, CubicBezier
 from .BaseSVGChart import BaseSVGChart
 from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 from .Translation import get_strings, recursive_merge_dict_members
@@ -43,10 +40,10 @@ class AncestorChart(BaseSVGChart):
     DEFAULT_FORMATTING.update(BaseSVGChart.DEFAULT_FORMATTING)
 
     DEFAULT_CHART_CONFIGURATION = {
-            'root_individuals': [],
-            'family_children': [],
-            'discovery_blacklist': [],
-            'ancestor_placement': {}
+        'root_individuals': [],
+        'family_children': [],
+        'discovery_blacklist': [],
+        'ancestor_placement': {}
     }
     DEFAULT_CHART_CONFIGURATION.update(BaseSVGChart.DEFAULT_CHART_CONFIGURATION)
 
@@ -140,7 +137,7 @@ class AncestorChart(BaseSVGChart):
                 if gr_child is None:
                     return
                 gr_child.qualified_for_placement = False
-                gr_child.color = (0,0,0)
+                gr_child.color = (0, 0, 0)
 
                 gr_family.add_visible_children(gr_child)
                 gr_child.ancestor_chart_parent_family_placement = gr_family, None
@@ -258,8 +255,8 @@ class AncestorChart(BaseSVGChart):
                         width = gr_parent.get_ancestor_width(
                             gr_local_child_of_family)
                         setattr(gr_local_child_of_family, parent_variable_name + '_width',
-                            lambda gr=gr_parent, cof=gr_local_child_of_family: gr.get_ancestor_width(cof)
-                            )
+                                lambda gr=gr_parent, cof=gr_local_child_of_family: gr.get_ancestor_width(cof)
+                                )
                         x_position += width
                     else:
                         logger.debug('Second try to add parent! This should not happen. '+str(gr_parent))
@@ -340,7 +337,19 @@ class AncestorChart(BaseSVGChart):
             xpos_h = []
             for gr_f, gr_i in gr_family.gr_husb.get_all_ancestors():
                 xpos_h.append(gr_i.get_position_dict(gr_f.family)[1])
-            return (max(xpos_w), min(xpos_w), max(xpos_w)- min(xpos_w), gr_family.gr_wife.get_ancestor_range(gr_family)),(max(xpos_h), min(xpos_h), max(xpos_h)- min(xpos_h), gr_family.gr_husb.get_ancestor_range(gr_family))
+            return (
+                (
+                    max(xpos_w),
+                    min(xpos_w),
+                    max(xpos_w) - min(xpos_w),
+                    gr_family.gr_wife.get_ancestor_range(gr_family)
+                ), (
+                    max(xpos_h),
+                    min(xpos_h),
+                    max(xpos_h) - min(xpos_h),
+                    gr_family.gr_husb.get_ancestor_range(gr_family)
+                )
+            )
         if gr_family.gr_husb is None and gr_family.gr_wife is None:
             return
         if gr_family.gr_husb is not None:
@@ -400,7 +409,7 @@ class AncestorChart(BaseSVGChart):
                     self._check_compressed_x_position(True, min_distance=1)
                 else:
                     self._check_compressed_x_position(True)
-        except LifeLineChartCollisionDetected as e:
+        except LifeLineChartCollisionDetected:
             # print(e)
             i2 = i
             while i2 >= 0:
@@ -408,7 +417,7 @@ class AncestorChart(BaseSVGChart):
                 try:
                     self._move_single_individual(gr_individual, gr_cof, -direction)
                     self._check_compressed_x_position(True)
-                except:
+                except Exception:
                     pass
                 else:
                     break
@@ -431,11 +440,11 @@ class AncestorChart(BaseSVGChart):
         gr_wife = gr_family.gr_wife
         if gr_husb:
             x_pos_husb = gr_husb.get_x_index(gr_family.g_id)
-            if gr_family.husb.child_of_families and gr_family.husb.child_of_families[0]:# \
+            if gr_family.husb.child_of_families and gr_family.husb.child_of_families[0]:  # \
                 gr_individuals.append((1, gr_husb))
         if gr_wife:
             x_pos_wife = gr_wife.get_x_index(gr_family.g_id)
-            if gr_family.wife.child_of_families and gr_family.wife.child_of_families[0]:# \
+            if gr_family.wife.child_of_families and gr_family.wife.child_of_families[0]:  # \
                 gr_individuals.append((-1, gr_wife))
 
         vcs = gr_family.visible_children
@@ -443,8 +452,10 @@ class AncestorChart(BaseSVGChart):
         children_x_positions = [gr_child.get_x_index(gr_family.g_id) for gr_child in vcs]
         children_x_center = sum(children_x_positions)*1.0/children_width
         blocked_positions = children_x_positions.copy()
-        if x_pos_husb: blocked_positions.append(x_pos_husb)
-        if x_pos_wife: blocked_positions.append(x_pos_wife)
+        if x_pos_husb:
+            blocked_positions.append(x_pos_husb)
+        if x_pos_wife:
+            blocked_positions.append(x_pos_wife)
 
         if x_pos_husb and children_x_center < x_pos_husb or x_pos_wife and x_pos_wife < children_x_center:
             family_was_flipped = True
@@ -454,7 +465,7 @@ class AncestorChart(BaseSVGChart):
             for gr_cof in gr_cofs:
                 try:
                     self._compress_chart_ancestor_graph(gr_cof)
-                except KeyError as e:
+                except KeyError:
                     pass
             if self.debug_optimization_compression_steps <= 0:
                 break
@@ -478,7 +489,7 @@ class AncestorChart(BaseSVGChart):
 
             try:
                 while i < 50000:
-                    if (i+1)%1000 == 0:
+                    if (i+1) % 1000 == 0:
                         logger.warning('i {i} for gr_individual {gr_individual}'.format(**locals()))
                     i += 1
                     self._move_individual_and_ancestors(
@@ -487,7 +498,7 @@ class AncestorChart(BaseSVGChart):
                     if self.debug_optimization_compression_steps <= 0:
                         break
                     self._check_compressed_x_position(True, min_distance=1)
-            except LifeLineChartCollisionDetected as e:
+            except LifeLineChartCollisionDetected:
                 # print(e)
                 i2 = i
                 while i2 >= 0:
@@ -499,16 +510,16 @@ class AncestorChart(BaseSVGChart):
                         if self.debug_optimization_compression_steps <= 0:
                             break
                         self._check_compressed_x_position(True)
-                    except:
+                    except Exception:
                         pass
                     else:
                         break
                 self.debug_optimization_compression_steps -= 1
                 if self.debug_optimization_compression_steps <= 0:
                     break
-            except LifeLineChartCannotMoveIndividual as e:
+            except LifeLineChartCannotMoveIndividual:
                 pass
-            except KeyError as e:
+            except KeyError:
                 pass
 
             if self.debug_optimization_compression_steps <= 0:
@@ -608,8 +619,9 @@ class AncestorChart(BaseSVGChart):
 
                         failed, _, _ = self.check_unique_x_position()
                         if len(failed) > 0:
-                            logger.error("failed flipping " +
-                                        str((gr_family, gr_family.family_id, ov)) + str(nSteps))
+                            logger.error(
+                                "failed flipping " +
+                                str((gr_family, gr_family.family_id, ov)) + str(nSteps))
                             break
 
                         new_width, _ = self._calculate_sum_of_distances()
@@ -685,6 +697,7 @@ class AncestorChart(BaseSVGChart):
         rebuild_all = rebuild_all or self._positioning != self._backup_positioning or \
             self._chart_configuration != self._backup_chart_configuration
         update_view = update_view or rebuild_all or self._formatting != self._backup_formatting
+
         def local_filter_lambda(individual, _filter_lambda=filter_lambda):
             if individual.individual_id in self._chart_configuration['discovery_blacklist']:
                 return True
@@ -749,7 +762,7 @@ class AncestorChart(BaseSVGChart):
                 generations = settings['generations']
                 try:
                     self.modify_layout(root_individual_id)
-                except Exception as e:
+                except Exception:
                     pass
 
             for gir in self.gr_individuals:

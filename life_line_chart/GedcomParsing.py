@@ -1,10 +1,5 @@
 import datetime
 import re
-import os
-import logging
-import json
-
-
 
 
 _months = [
@@ -31,19 +26,20 @@ _precision = [
 _date_expr = re.compile('(?:(' + '|'.join(_precision) + ') )?(?:(\\d+) )?(?:(' + '|'.join(_months) + ') )?(\\d{4})')
 _interval_expr = re.compile('(BET) (?:(\\d+) (' + '|'.join(_months) + ') )?(\\d{4}) AND (?:(\\d+) (' + '|'.join(_months) + ') )?(\\d{4})')
 _max_days = {
-    1:31,
-    2:29,
-    3:31,
-    4:30,
-    5:31,
-    6:30,
-    7:31,
-    8:31,
-    9:30,
-    10:31,
-    11:30,
-    12:31
+    1: 31,
+    2: 29,
+    3: 31,
+    4: 30,
+    5: 31,
+    6: 30,
+    7: 31,
+    8: 31,
+    9: 30,
+    10: 31,
+    11: 30,
+    12: 31
 }
+
 
 def get_date_dict_from_tag(parent_item, tag_name):
     """
@@ -116,18 +112,22 @@ def get_date_dict_from_tag(parent_item, tag_name):
         elif date_info.group(1) == 'BEF':
             year_min = year_max - 15
 
-        if not month_max: month_max = month_max_
-        if not month_min: month_min = month_min_
-        if not day_max: day_max = day_max_
-        if not day_min: day_min = day_min_
+        if not month_max:
+            month_max = month_max_
+        if not month_min:
+            month_min = month_min_
+        if not day_max:
+            day_max = day_max_
+        if not day_min:
+            day_min = day_min_
 
         day_max = min(_max_days[month_max], day_max)
 
         date_min = datetime.datetime(year_min, month_min, day_min, 0, 0, 0, 0)
         try:
             date_max = datetime.datetime(year_max, month_max, day_max, 0, 0, 0, 0)
-        except ValueError as e:
-            if month_max==2:
+        except ValueError:
+            if month_max == 2:
                 date_max = datetime.datetime(year_max, month_max, day_max, 0, 0, 0, 0)
             else:
                 raise
@@ -146,10 +146,10 @@ def get_date_dict_from_tag(parent_item, tag_name):
             'ordinal_value_max': date_max.toordinal(),
             'ordinal_value_min': date_min.toordinal(),
             'comment': comment,
-            'precision' : precision
+            'precision': precision
         }
 
-    except:
+    except Exception:
         pass
 
 
@@ -224,4 +224,3 @@ def estimate_marriage_date(family):
                 children_events)], children_events))
             sorted_pairs.sort()
             family.marriage = sorted_pairs[0][1]
-

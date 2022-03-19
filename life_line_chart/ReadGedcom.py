@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+
 def read_data(filename):
     """
     read a gedcom file and creates a structured data dict

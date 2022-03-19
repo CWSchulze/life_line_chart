@@ -2,6 +2,7 @@ from .GedcomIndividual import GedcomIndividual
 from .Exceptions import LifeLineChartUnknownPlacementError
 from collections import OrderedDict
 
+
 class GraphicalIndividual():
     """
     Class which represents one appearance of an individual
@@ -133,7 +134,7 @@ class GraphicalIndividual():
                 x_max.append(m_x_max)
             # add siblings
             x_v = [gr_c.get_x_index(strongly_connected_parent_family.g_id) for gr_c in strongly_connected_parent_family.visible_children
-                        if strongly_connected_parent_family.g_id in gr_c.get_position_dict()]
+                   if strongly_connected_parent_family.g_id in gr_c.get_position_dict()]
             x_min += x_v
             x_max += x_v
 
@@ -178,7 +179,7 @@ class GraphicalIndividual():
             # at least root node has None
         if (self.individual_id, family_id) in self.__instances.ancestor_width_cache:
             # caching
-            #return self.__instances.ancestor_width_cache[(self.individual_id, family_id)]
+            # return self.__instances.ancestor_width_cache[(self.individual_id, family_id)]
             pass
 
         x_min = []
@@ -186,36 +187,36 @@ class GraphicalIndividual():
 
         parent_family = self.__instances[('f', family_id)]
         if parent_family is None or not parent_family.has_graphical_representation():
-            #return 1
+            # return 1
             pass
 
         # marriages which have been placed over this parent family
-        visible_local_marriages = \
-            [marriage for marriage in self.visible_marriages \
-                if gr_family is None or \
-                    marriage.descendant_chart_parent_family_placement == gr_family]
+        visible_local_marriages = [
+            marriage for marriage in self.visible_marriages
+            if gr_family is None or
+            marriage.descendant_chart_parent_family_placement == gr_family
+        ]
 
         marriages = self.individual.marriages
         for vm in visible_local_marriages:
-                marriage = vm.family
-                gr_marriage = vm
-                if family_id is None or gr_marriage.visual_placement_parent_family is not None and \
-                    gr_marriage.visual_placement_parent_family.family_id == family_id:
+            marriage = vm.family
+            gr_marriage = vm
+            if (family_id is None or gr_marriage.visual_placement_parent_family is not None and
+                gr_marriage.visual_placement_parent_family.family_id == family_id
+                ):
+                x_min.append(self._x_position[gr_marriage.g_id][1])
+                x_max.append(self._x_position[gr_marriage.g_id][1])
 
-                    x_min.append(self._x_position[gr_marriage.g_id][1])
-                    x_max.append(self._x_position[gr_marriage.g_id][1])
+                for gr_child in gr_marriage.visible_children:
+                    c_x_min, c_x_max = gr_child.get_descendant_range(gr_marriage)
+                    x_min.append(c_x_min)
+                    x_max.append(c_x_max)
 
-                    for gr_child in gr_marriage.visible_children:
-                        c_x_min, c_x_max = gr_child.get_descendant_range(
-                            gr_marriage)
-                        x_min.append(c_x_min)
-                        x_max.append(c_x_max)
-
-                    gr_spouse = gr_marriage.get_gr_spouse(self)
-                    if gr_spouse:
-                        x_v = gr_spouse.get_x_index(gr_marriage.g_id)
-                        x_min.append(x_v)
-                        x_max.append(x_v)
+                gr_spouse = gr_marriage.get_gr_spouse(self)
+                if gr_spouse:
+                    x_v = gr_spouse.get_x_index(gr_marriage.g_id)
+                    x_min.append(x_v)
+                    x_max.append(x_v)
 
         if len(x_min) == 0 and len(x_max) == 0:
             x_v = [self._x_position[family_g_id][1]]
@@ -299,10 +300,10 @@ class GraphicalIndividual():
     @ancestor_chart_parent_family_placement.setter
     def ancestor_chart_parent_family_placement(self, gr_families):
         gr_parent_family, gr_spouse_family = gr_families
-        if gr_parent_family != None:
+        if gr_parent_family is not None:
             self.__instances.connection_container['i'][self.g_id][gr_parent_family.g_id].append('strong_child')
             self.__instances.connection_container['f'][gr_parent_family.g_id][self.g_id].append('strong_child')
-        if gr_spouse_family != None:
+        if gr_spouse_family is not None:
             self.__instances.connection_container['i'][self.g_id][gr_spouse_family.g_id].append('strong_marriage')
             self.__instances.connection_container['f'][gr_spouse_family.g_id][self.g_id].append('strong_marriage')
 
@@ -323,7 +324,7 @@ class GraphicalIndividual():
             return None
     death_date = property(__get_death_date)
 
-    def get_position_dict(self, gr_family = None):
+    def get_position_dict(self, gr_family=None):
         if gr_family is None:
             return self._x_position
         else:
@@ -452,7 +453,7 @@ class GraphicalIndividual():
                 return True
             return False
         # this happens in descendant charts. spouses dont have a visible parent family.
-        #raise LifeLineChartUnknownPlacementError("individual was not placed in requested family")
+        # raise LifeLineChartUnknownPlacementError("individual was not placed in requested family")
         return False
 
     def get_birth_event(self):
@@ -491,7 +492,7 @@ class GraphicalIndividual():
 
     @property
     def birth_label(self):
-        return self.individual.birth_label# + self.debug_label
+        return self.individual.birth_label  # + self.debug_label
 
     @property
     def death_label(self):

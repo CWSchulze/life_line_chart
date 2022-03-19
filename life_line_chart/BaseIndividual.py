@@ -17,9 +17,11 @@ def estimate_death_date(individual):
             max_age = 100
         today = datetime.datetime.now()
         date_min = datetime.datetime(date.year+max_age-25, 12, 31)
-        if date_min > today: date_min = today
+        if date_min > today:
+            date_min = today
         date_max = datetime.datetime(date.year+max_age, 12, 31)
-        if date_max > today: date_max = today
+        if date_max > today:
+            date_max = today
         individual.events['death_or_burial'] = {
             'tag_name': 'None',
             'date': date_max,
@@ -49,8 +51,14 @@ def estimate_birth_date(individual, instances):
         for family_id in individual.child_of_family_id:
             parents_marriage = instances[('f', family_id)]
             if parents_marriage and parents_marriage.marriage:
-                if not individual.events['birth_or_christening'] or individual.events['birth_or_christening']['ordinal_value'] < parents_marriage.marriage['ordinal_value']:
-                    if individual.events['birth_or_christening'] and individual.events['birth_or_christening']['ordinal_value'] < parents_marriage.marriage['ordinal_value']:
+                if (
+                    not individual.events['birth_or_christening']
+                    or individual.events['birth_or_christening']['ordinal_value'] < parents_marriage.marriage['ordinal_value']
+                ):
+                    if (
+                        individual.events['birth_or_christening']
+                        and individual.events['birth_or_christening']['ordinal_value'] < parents_marriage.marriage['ordinal_value']
+                    ):
                         date = deepcopy(parents_marriage.marriage['date'])
                     else:
                         date = deepcopy(parents_marriage.marriage['date'])
@@ -71,8 +79,14 @@ def estimate_birth_date(individual, instances):
         # at least 15 at marriage
         for marriage in individual.marriages:
             if marriage.marriage:
-                if not individual.events['birth_or_christening'] or individual.events['birth_or_christening']['ordinal_value'] < marriage.marriage['ordinal_value']:
-                    if individual.events['birth_or_christening'] and individual.events['birth_or_christening']['ordinal_value'] < marriage.marriage['ordinal_value']:
+                if (
+                    not individual.events['birth_or_christening']
+                    or individual.events['birth_or_christening']['ordinal_value'] < marriage.marriage['ordinal_value']
+                ):
+                    if (
+                        individual.events['birth_or_christening']
+                        and individual.events['birth_or_christening']['ordinal_value'] < marriage.marriage['ordinal_value']
+                    ):
                         date = deepcopy(marriage.marriage['date'])
                     else:
                         date = deepcopy(marriage.marriage['date'])
@@ -125,7 +139,7 @@ class BaseIndividual():
         self.marriages = []
         self.child_of_family_id = []
         self.events = {}  # : events like birth or death
-        self.graphical_representations = [] # : instances of graphical representations
+        self.graphical_representations = []  # : instances of graphical representations
         self.images = OrderedDict()  # : mapping of ordinal values to photos of this individual
 
     def __repr__(self):
@@ -265,7 +279,8 @@ class BaseIndividual():
 
     @property
     def child_of_families(self):
-        families = [self._instances[('f', family_id)] for family_id in self.child_of_family_id
+        families = [
+            self._instances[('f', family_id)] for family_id in self.child_of_family_id
             if self._instances[('f', family_id)]]
         return families
 

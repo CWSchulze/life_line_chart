@@ -18,6 +18,7 @@ import json
 
 logger = logging.getLogger("life_line_chart")
 
+
 def translate_strings(data, source_language='en_EN.UTF-8', destination_language='de_DE.UTF-8', translator=None):
     """
     automatic translation of strings in a dict
@@ -46,6 +47,7 @@ def translate_strings(data, source_language='en_EN.UTF-8', destination_language=
             data[k] = translate_strings(v, source_language, destination_language)
     return data
 
+
 def recursive_merge_dict_members(a, b, translate_function=None, remove_unknown_keys=True):
     """
     merge b into reference a, return merged dict
@@ -73,7 +75,7 @@ def recursive_merge_dict_members(a, b, translate_function=None, remove_unknown_k
             changed = changed or b_index != a_index
             if type(v) == dict:
                 sub_changed, sub_dict = recursive_merge_dict_members(v, b[k], translate_function, remove_unknown_keys)
-                changed =  sub_changed or changed
+                changed = sub_changed or changed
                 c[k] = sub_dict
             else:
                 c[k] = deepcopy(b[k])
@@ -83,6 +85,7 @@ def recursive_merge_dict_members(a, b, translate_function=None, remove_unknown_k
                 c[k] = deepcopy(b[k])
     return changed, c
 
+
 def get_strings(class_name, default_language='en_US.UTF-8'):
     """
     Read strings from file and fill missing translations
@@ -91,9 +94,8 @@ def get_strings(class_name, default_language='en_US.UTF-8'):
         class_name (str): name of the class (used as filename)
     """
     strings = {}
-    with open(os.path.join(os.path.dirname(__file__), class_name + 'Strings.json'),'r',encoding='utf-8') as f:
+    with open(os.path.join(os.path.dirname(__file__), class_name + 'Strings.json'), 'r', encoding='utf-8') as f:
         strings = json.load(f)
-
 
     changed = {}
     for lang, data in strings.items():
@@ -108,8 +110,7 @@ def get_strings(class_name, default_language='en_US.UTF-8'):
         # auto update string file!
         logger.warn('Updating string file.')
         file_content = json.dumps(strings, indent=4)
-        with open(os.path.join(os.path.dirname(__file__), class_name + 'Strings.json'),'w',encoding='utf-8') as f:
+        with open(os.path.join(os.path.dirname(__file__), class_name + 'Strings.json'), 'w', encoding='utf-8') as f:
             f.write(file_content)
 
     return strings
-

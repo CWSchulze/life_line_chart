@@ -78,9 +78,7 @@ def generate_gedcom_file():
 1 MARR
 2 DATE {marriage_date}
 2 PLAC {marriage_place}
-""".format(
-    **locals()
-)}
+""".format(**locals())}
         for child_id in children_ids:
             db[family_id]['string'] += "1 CHIL {}\n".format(child_id)
         return family_id
@@ -177,7 +175,7 @@ def generate_individual_images():
         generate_one_image(
             'tests/images/individual_I6_image_age_{}.png'.format(
                 1+i*4
-                ), 'Age {}'.format(
+            ), 'Age {}'.format(
                 1+i*4,
             ))
 

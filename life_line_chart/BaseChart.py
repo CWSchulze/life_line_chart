@@ -1,4 +1,3 @@
-import os
 from copy import deepcopy
 import logging
 from collections import OrderedDict
@@ -158,7 +157,7 @@ class BaseChart():
         """
         return deepcopy(self._chart_configuration)
 
-    def _create_individual_graphical_representation(self, individual, always_instantiate_new = False):
+    def _create_individual_graphical_representation(self, individual, always_instantiate_new=False):
         """
         Create a graphical representation for an individual
 
@@ -177,7 +176,7 @@ class BaseChart():
                 del new_instance
                 return None
             new_instance.g_id = (len(individual.graphical_representations) - 1, individual.individual_id)
-            new_instance.color = (0,0,0)
+            new_instance.color = (0, 0, 0)
             self.gr_individuals.append(new_instance)
         else:
             # reuse instance
@@ -185,7 +184,7 @@ class BaseChart():
 
         return new_instance
 
-    def _create_family_graphical_representation(self, family, always_instantiate_new = False):
+    def _create_family_graphical_representation(self, family, always_instantiate_new=False):
         """
         Create a graphical representation for a family
 
@@ -223,7 +222,7 @@ class BaseChart():
             distance_of_this_individual = 0
             if position_dict:
                 all_x_indices = [p[1] for k, p in position_dict.items()]
-                distance_of_this_individual += sum([abs(a-b) for a, b in zip(all_x_indices[:-1],all_x_indices[1:])])
+                distance_of_this_individual += sum([abs(a-b) for a, b in zip(all_x_indices[:-1], all_x_indices[1:])])
             total_distance += distance_of_this_individual
             if distance_of_this_individual > 0:
                 list_of_linked_individuals[(
@@ -275,7 +274,7 @@ class BaseChart():
                 'This family does not exist')
         return position_dict
 
-    def _move_individual_and_ancestors(self, gr_individual, gr_family, x_index_offset, discovery_cache = None):
+    def _move_individual_and_ancestors(self, gr_individual, gr_family, x_index_offset, discovery_cache=None):
         """
         Move an individual and its ancestors horizontally. Only ancestors are moved,
         which are strongly coupled with the individual.
@@ -299,17 +298,21 @@ class BaseChart():
             return
         gr_cof = gr_cofs[0]
 
-        #for strongly_connected_parent_family in gr_individual.connected_parent_families:
+        # for strongly_connected_parent_family in gr_individual.connected_parent_families:
         strongly_connected_parent_family, strongly_connected_spouse_family = gr_individual.ancestor_chart_parent_family_placement
-        if strongly_connected_parent_family and (strongly_connected_spouse_family == strongly_connected_parent_family or gr_family == strongly_connected_spouse_family or strongly_connected_spouse_family == None):
+        if strongly_connected_parent_family and (
+            strongly_connected_spouse_family == strongly_connected_parent_family
+            or gr_family == strongly_connected_spouse_family
+            or strongly_connected_spouse_family is None
+        ):
             if strongly_connected_parent_family.gr_husb:
                 # if cof.gr_husb.get_position_dict() and len(cof.gr_husb.get_position_dict()) == 1:
-                    self._move_individual_and_ancestors(
-                        strongly_connected_parent_family.gr_husb, strongly_connected_parent_family, x_index_offset, discovery_cache)
+                self._move_individual_and_ancestors(
+                    strongly_connected_parent_family.gr_husb, strongly_connected_parent_family, x_index_offset, discovery_cache)
             if strongly_connected_parent_family.gr_wife:
                 # if cof.gr_wife.get_position_dict() and len(cof.gr_wife.get_position_dict()) == 1:
-                    self._move_individual_and_ancestors(
-                        strongly_connected_parent_family.gr_wife, strongly_connected_parent_family, x_index_offset, discovery_cache)
+                self._move_individual_and_ancestors(
+                    strongly_connected_parent_family.gr_wife, strongly_connected_parent_family, x_index_offset, discovery_cache)
             # print (gr_individual.get)
             if True or gr_cof and gr_cof.gr_husb is None and gr_cof.gr_wife is None:
                 for gr_child_individual in gr_cof.visible_children:
@@ -355,7 +358,7 @@ class BaseChart():
                 * (start_position_b - end_position_a) < 0 or
                 (end_position_b - start_position_a)
                     * (end_position_b - end_position_a) < 0):
-                    return True
+                return True
             return False
 
         line_bend_orientation = 0 if (str(type(self)) == "<class 'life_line_chart.DescendantChart.DescendantChart'>" and self._positioning['chart_layout'] == 'cactus') else 1
@@ -402,7 +405,7 @@ class BaseChart():
                         'family': marriage
                     })
 
-                v[x_index].append((gr_individual, start_y, end_y))#, gr_individual.birth_date_ov, gr_individual.death_date_ov))
+                v[x_index].append((gr_individual, start_y, end_y))  # , gr_individual.birth_date_ov, gr_individual.death_date_ov))
                 max_x = max(max_x, x_index)
                 min_x = min(min_x, x_index)
         if len(collisions) > 0:
@@ -626,7 +629,8 @@ class BaseChart():
 
     def get_filtered_photos(self, birth_ordinal_value, original_images):
         images = OrderedDict()
-        photo_width = self._formatting['relative_line_thickness'] * self._formatting['individual_photo_relative_size'] * self._formatting['horizontal_step_size'] # * (1 + self.max_x_index - self.min_x_index)
+        photo_width = self._formatting['relative_line_thickness'] * self._formatting['individual_photo_relative_size'] * \
+            self._formatting['horizontal_step_size']  # * (1 + self.max_x_index - self.min_x_index)
         photo_height = photo_width * self._formatting['individual_photo_relative_distance']
         photo_ov_height = abs(self._inverse_y_delta(photo_height))
         ov_list = list(original_images.keys())
@@ -665,7 +669,8 @@ class BaseChart():
 
     def get_filtered_photos_raster(self, birth_ordinal_value, original_images):
         images = OrderedDict()
-        photo_width = self._formatting['relative_line_thickness'] * self._formatting['individual_photo_relative_size'] * self._formatting['horizontal_step_size'] # * (1 + self.max_x_index - self.min_x_index)
+        photo_width = self._formatting['relative_line_thickness'] * self._formatting['individual_photo_relative_size'] * \
+            self._formatting['horizontal_step_size']  # * (1 + self.max_x_index - self.min_x_index)
         photo_height = photo_width * self._formatting['individual_photo_relative_distance']
         photo_ov_height = abs(self._inverse_y_delta(photo_height))
         image_step_size = photo_ov_height
@@ -677,5 +682,5 @@ class BaseChart():
                 max_ordinal = -1
             if round((ordinal_value-birth_ordinal_value)/image_step_size) > round((max_ordinal-birth_ordinal_value)/image_step_size):
                 images[birth_ordinal_value + round((ordinal_value-birth_ordinal_value)/image_step_size)
-                        * image_step_size] = settings
+                       * image_step_size] = settings
         return images

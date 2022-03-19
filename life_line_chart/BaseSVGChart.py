@@ -7,7 +7,6 @@ from collections import OrderedDict
 from math import floor, ceil, pi, e
 
 from .SimpleSVGItems import Line, Path, CubicBezier
-from .Exceptions import LifeLineChartCannotMoveIndividual, LifeLineChartCollisionDetected
 from .BaseChart import BaseChart
 from .IntermediateGraphicalItems import new_text_item, new_image_item, new_path_item
 from .InstanceContainer import OrderedDefaultDict
@@ -23,6 +22,7 @@ class Cardano:
     """
     J = None
     Jc = None
+
     def __init__(self):
         self.J = e**(2j*pi/3)
         self.Jc = 1/self.J
@@ -49,7 +49,8 @@ class Cardano:
             v *= self.J
         return u+v-z0, u*self.J+v*self.Jc-z0, u*self.Jc+v*self.J-z0
 
-def cardano(a,b,c,d):
+
+def cardano(a, b, c, d):
     """
     Use cardano class with singleton.
 
@@ -63,9 +64,10 @@ def cardano(a,b,c,d):
         list: list of roots
     """
     global cardano_instance
-    if cardano_instance == None:
+    if cardano_instance is None:
         cardano_instance = Cardano()
-    return cardano_instance.solve(a,b,c,d)
+    return cardano_instance.solve(a, b, c, d)
+
 
 def intersection_polynomial(coeffs, y_pos):
     """
@@ -113,7 +115,10 @@ class BaseSVGChart(BaseChart):
         failed = []
         v = OrderedDict()
         full_index_list = []
-        cactus_chart = (str(type(self)) == "<class 'life_line_chart.DescendantChart.DescendantChart'>" and self._positioning['chart_layout'] == 'cactus')
+        cactus_chart = (
+            str(type(self)) == "<class 'life_line_chart.DescendantChart.DescendantChart'>"
+            and self._positioning['chart_layout'] == 'cactus'
+        )
         for gr_individual in self.gr_individuals:
             x_pos = gr_individual.get_position_dict()
             x_index = None
@@ -130,17 +135,21 @@ class BaseSVGChart(BaseChart):
                         failed.append(x_index)
                         # value = index_map[x_index]
                         logger.error(
-                            "check_unique_x_position failed, index was used more than once: " + str((x_index, value[2].family_id, gr_individual.individual.plain_name, v[x_index])))
+                            "check_unique_x_position failed, index was used more than once: "
+                            + str((x_index, value[2].family_id, gr_individual.individual.plain_name, v[x_index]))
+                        )
                         # raise RuntimeError((x_index, key, gr_individual.individual.plain_name))
         full_index_list = list(sorted(v.keys()))
         for i in range(max(full_index_list)):
             if i not in full_index_list:
                 if self._formatting['debug_visualize_ambiguous_placement']:
-                    gr_individual.items.append(((99, 'layer_debug'),{
+                    gr_individual.items.append(((99, 'layer_debug'), {
                         'type': 'rect',
                         'config': {
                             'insert': (self._map_x_position(i), 0),
-                            'size': (self._formatting['relative_line_thickness']*self._formatting['horizontal_step_size'], self._formatting['total_height']),
+                            'size': (
+                                self._formatting['relative_line_thickness'] * self._formatting['horizontal_step_size'],
+                                self._formatting['total_height']),
                             'fill': 'black',
                             'fill-opacity': "0.5"
                         }
@@ -174,8 +183,8 @@ class BaseSVGChart(BaseChart):
             # settings for empty graphs
             self.min_x_index = 0
             self.max_x_index = 1
-            self.min_ordinal = datetime.date(1900,1,1).toordinal()
-            self.max_ordinal = datetime.date(2000,1,1).toordinal()
+            self.min_ordinal = datetime.date(1900, 1, 1).toordinal()
+            self.max_ordinal = datetime.date(2000, 1, 1).toordinal()
 
         # calculate outer chart bounds
         min_year = datetime.date.fromordinal(self.min_ordinal).year - self._formatting['margin_year_min']
@@ -239,7 +248,10 @@ class BaseSVGChart(BaseChart):
         self.min_x_index = min_x_index  # -1000
         self.max_x_index = max_x_index + 1  # +200
 
-        cactus_chart = (str(type(self)) == "<class 'life_line_chart.DescendantChart.DescendantChart'>" and self._positioning['chart_layout'] == 'cactus')
+        cactus_chart = (
+            str(type(self)) == "<class 'life_line_chart.DescendantChart.DescendantChart'>"
+            and self._positioning['chart_layout'] == 'cactus'
+        )
         line_bend_orientation = 0 if cactus_chart else 1
 
         for gr_individual in self.gr_individuals:
@@ -251,13 +263,13 @@ class BaseSVGChart(BaseChart):
             birth_date_ov_range = [
                 birth_event['ordinal_value_min'],
                 birth_event['ordinal_value_max']
-                ]
+            ]
             birth_date_position_range = [(v, self._map_y_position(v)) for v in birth_date_ov_range]
             death_event = gr_individual.get_death_event()
             death_date_ov_range = [
                 death_event['ordinal_value_min'],
                 death_event['ordinal_value_max']
-                ]
+            ]
             death_date_position_range = [(v, self._map_y_position(v)) for v in death_date_ov_range]
             individual_name = gr_individual.get_name()
 
@@ -282,27 +294,28 @@ class BaseSVGChart(BaseChart):
             def coordinate_transformation(x, y):
                 new_x, new_y = self._map_position(x, y)
                 return new_x + new_y*1j
+
             def calculate_ring_position(gr_family):
                 h_pos = gr_family.gr_husb.get_position_dict(gr_family) if gr_family.gr_husb else None
                 w_pos = gr_family.gr_wife.get_position_dict(gr_family) if gr_family.gr_wife else None
                 if (str(type(self)) == "<class 'life_line_chart.DescendantChart.DescendantChart'>" and self._positioning['chart_layout'] == 'cactus'):
                     if h_pos and not w_pos:
                         return (h_pos[1],
-                            gr_family.marriage['ordinal_value'])
+                                gr_family.marriage['ordinal_value'])
                     if w_pos and not h_pos:
                         return (w_pos[1],
-                            gr_family.marriage['ordinal_value'])
+                                gr_family.marriage['ordinal_value'])
                 if h_pos is None or w_pos is None:
                     vcs = gr_family.visible_children
                     if vcs:
                         vcs_pos = [vc.get_position_dict(gr_family)[1] for vc in vcs]
                         return (
-                                sum(vcs_pos)/len(vcs_pos),
-                                gr_family.marriage['ordinal_value'])
+                            sum(vcs_pos)/len(vcs_pos),
+                            gr_family.marriage['ordinal_value'])
                 else:
                     return (
-                            (h_pos[1] + w_pos[1])/2,
-                            gr_family.marriage['ordinal_value'])
+                        (h_pos[1] + w_pos[1])/2,
+                        gr_family.marriage['ordinal_value'])
                 return None
             gr_cof = gr_individual.connected_parent_families[0] if gr_individual.connected_parent_families else None
             gr_most_recently_handled_family = gr_cof
@@ -338,12 +351,11 @@ class BaseSVGChart(BaseChart):
                 marriage_labels.append(
                     str(gr_marriage_family.marriage_label))
 
-
             if self._formatting['debug_visualize_connections']:
                 # show items to help debugging the algorithms
                 individual_connections = self._instances.connection_container['i'][gr_individual.g_id]
                 for f_g_id, connections in individual_connections.items():
-                    marriage_ring_index, marriage_ordinal = calculate_ring_position(self._instances[('f',f_g_id[1])].graphical_representations[f_g_id[0]])
+                    marriage_ring_index, marriage_ordinal = calculate_ring_position(self._instances[('f', f_g_id[1])].graphical_representations[f_g_id[0]])
                     for connection in connections:
                         if connection == 'weak_child':
                             thickness = 0.5*self._formatting['horizontal_step_size']*0.1
@@ -377,9 +389,9 @@ class BaseSVGChart(BaseChart):
                             new_path_item(
                                 self, 'Line',
                                 points=[coordinate_transformation(
-                                            marriage_ring_index, new_marriage_ordinal),
-                                        coordinate_transformation(
-                                            x_p, l_i.birth_date_ov)],
+                                    marriage_ring_index, new_marriage_ordinal),
+                                    coordinate_transformation(
+                                    x_p, l_i.birth_date_ov)],
                                 color=color, stroke_width=thickness
                             )
                         ))
@@ -393,9 +405,22 @@ class BaseSVGChart(BaseChart):
             _birth_position = self._map_position(*_birth_original_location)
             _death_position = self._map_position(*_death_original_location)
             knots.append((x_pos_list[0][1], birth_date_ov, None))
-            for index, ((marriage_ring_index, marriage_ordinal), new_x_index_after_marriage, label, gr_family, has_ring, is_cross_connected) in enumerate(zip(marriage_ring_positions, new_x_indices_after_marriage, marriage_labels, marriage_families, marriage_has_ring, marriage_is_crossconnected)):
+            for index, (
+                    (marriage_ring_index, marriage_ordinal),
+                    new_x_index_after_marriage,
+                    label,
+                    gr_family,
+                    has_ring,
+                    is_cross_connected) in enumerate(zip(
+                        marriage_ring_positions,
+                        new_x_indices_after_marriage,
+                        marriage_labels,
+                        marriage_families,
+                        marriage_has_ring,
+                        marriage_is_crossconnected
+                    )):
                 if cactus_chart:
-                    spouse_index =  (new_x_index_after_marriage-marriage_ring_index)*(-1) + marriage_ring_index
+                    spouse_index = (new_x_index_after_marriage-marriage_ring_index)*(-1) + marriage_ring_index
                     marriage_ring_index = new_x_index_after_marriage
                     if spouse_index != marriage_ring_index:
                         stroke_width = line_thickness*0.1
@@ -403,11 +428,11 @@ class BaseSVGChart(BaseChart):
                             gr_individual.items.append((
                                 (0, 'layer_marriage_connections'),
                                 new_path_item(
-                                    self, 'Line',
-                                    (coordinate_transformation(
-                                        spouse_index, marriage_ordinal),
-                                    coordinate_transformation(
-                                        marriage_ring_index, marriage_ordinal)),
+                                    self, 'Line', (
+                                        coordinate_transformation(
+                                            spouse_index, marriage_ordinal),
+                                        coordinate_transformation(
+                                            marriage_ring_index, marriage_ordinal)),
                                     self._colors['descendant_chart_marriage_lines'],
                                     stroke_width,
                                     stroke_dasharray="{},{}".format(stroke_width*5, stroke_width*5),
@@ -421,14 +446,14 @@ class BaseSVGChart(BaseChart):
                         (2, 'layer_ring_image'),
                         new_image_item(
                             self=self,
-                            pos_x = ring_position[0] - line_thickness*1,
-                            pos_y = ring_position[1] - line_thickness*1,
-                            size_x = line_thickness*2,
-                            size_y = line_thickness*2,
-                            filename = os.path.join(os.path.dirname(__file__), "ringe.png"),
-                            original_size = (119,75),
-                            gir = gr_individual,
-                            gfr = gr_family
+                            pos_x=ring_position[0] - line_thickness*1,
+                            pos_y=ring_position[1] - line_thickness*1,
+                            size_x=line_thickness*2,
+                            size_y=line_thickness*2,
+                            filename=os.path.join(os.path.dirname(__file__), "ringe.png"),
+                            original_size=(119, 75),
+                            gir=gr_individual,
+                            gfr=gr_family
                         )
                     ))
                 if self._formatting['marriage_label_active']:
@@ -489,13 +514,13 @@ class BaseSVGChart(BaseChart):
                             coordinate_transformation(
                                 knots[0+1][0], knots[0+1][1]),
                         )},
-                        (
+                            (
                             _birth_position[1],
                             self._map_y_position(self._formatting['fade_individual_color_age']*365+birth_date_ov)
                         ),
-                        birth_date_position_range if not cactus_chart else None,
-                        death_date_position_range,
-                        False # not cross connected
+                            birth_date_position_range if not cactus_chart else None,
+                            death_date_position_range,
+                            False  # not cross connected
                         )
                     )
                     if self._formatting['individual_photo_active'] and len(gr_individual.individual.images) > 0:
@@ -520,12 +545,12 @@ class BaseSVGChart(BaseChart):
                                     (4, 'layer_photos'),
                                     new_image_item(
                                         self=self,
-                                        pos_x = xpos.real - photo_size/2,
-                                        pos_y = xpos.imag - photo_size/2,
-                                        size_x = photo_size,
-                                        size_y = photo_size,
-                                        filename = image_filename,
-                                        original_size = image_size
+                                        pos_x=xpos.real - photo_size/2,
+                                        pos_y=xpos.imag - photo_size/2,
+                                        size_x=photo_size,
+                                        size_y=photo_size,
+                                        filename=image_filename,
+                                        original_size=image_size
                                     )
                                 ))
                 else:
@@ -536,13 +561,14 @@ class BaseSVGChart(BaseChart):
                                 val = [val[1], val[0]]
                             return (knots[index][0]*(1-val[0]) + knots[index+1][0]*val[0],
                                     knots[index][1]*(1-val[1]) + knots[index+1][1]*val[1])
+
                         def interp_trans(*val):
                             return coordinate_transformation(*interp(*val))
                         if self._formatting['family_shape'] == 0:
                             relative_spline_handles = [(0, 0), (0, 1), (0, 1), (1, 1)]
                         elif self._formatting['family_shape'] == 1:
                             relative_spline_handles = [(0, 0), (0, 0.7), (0.5, 0.9), (1, 1)]
-                        else:#if self._formatting['family_shape'] == 2:
+                        else:  # if self._formatting['family_shape'] == 2:
                             relative_spline_handles = [(0, 0), (0.1, 0.3), (0.3, 1), (1, 1)]
 
                         _birth_date_position_range = None
@@ -559,14 +585,14 @@ class BaseSVGChart(BaseChart):
                                 interp_trans(*relative_spline_handles[2]),
                                 interp_trans(*relative_spline_handles[3]),
                             )},
-                            (
+                                (
                                 _birth_position[1],
                                 self._map_y_position(self._formatting['fade_individual_color_age']*365+birth_date_ov)
                             ),
-                            _birth_date_position_range if not cactus_chart else None,
-                            _death_date_position_range,
-                            # connection to this knot is relevant
-                            knots[index+1][2]# and index + 1 < len(knots) or knots[index + 1][2]
+                                _birth_date_position_range if not cactus_chart else None,
+                                _death_date_position_range,
+                                # connection to this knot is relevant
+                                knots[index+1][2]  # and index + 1 < len(knots) or knots[index + 1][2]
                             )
                         )
 
@@ -590,12 +616,12 @@ class BaseSVGChart(BaseChart):
                                         (4, 'layer_photos'),
                                         new_image_item(
                                             self=self,
-                                            pos_x = xpos.real - photo_size/2,
-                                            pos_y = xpos.imag - photo_size/2,
-                                            size_x = photo_size,
-                                            size_y = photo_size,
-                                            filename = image_filename,
-                                            original_size = image_size
+                                            pos_x=xpos.real - photo_size/2,
+                                            pos_y=xpos.imag - photo_size/2,
+                                            size_x=photo_size,
+                                            size_y=photo_size,
+                                            filename=image_filename,
+                                            original_size=image_size
                                         )
                                     ))
             life_line_bezier_paths = []
@@ -607,15 +633,15 @@ class BaseSVGChart(BaseChart):
                     priority = 0 if is_cross_connection else 1
                 else:
                     priority = 3 if is_cross_connection else 0
-                gr_individual.items.append(((priority, 'layer_life_lines'),{
+                gr_individual.items.append(((priority, 'layer_life_lines'), {
                     'type': 'path',
                     'config': path,
                     'color': gr_individual.color,
                     'age_color_fade_ordinal_values': age_color_fade_ordinal_values,
-                    'birth_date_position_range':_birth_date_position_range,
-                    'death_date_position_range':_death_date_position_range,
+                    'birth_date_position_range': _birth_date_position_range,
+                    'death_date_position_range': _death_date_position_range,
                     'stroke_width': line_thickness*gr_individual.weight,
-                    'gir':gr_individual
+                    'gir': gr_individual
                 }))
             if self._formatting['birth_label_active']:
                 if self._formatting['birth_label_along_path']:
@@ -653,9 +679,8 @@ class BaseSVGChart(BaseChart):
                             pos_x=_birth_position[0],
                             pos_y=_birth_position[1],
                             text_anchor=self._formatting['birth_label_anchor'],
-                            transform=
-                                'rotate(%s,%s, %s)' % (self._formatting['birth_label_rotation']+self._orientation_angle(*_birth_original_location), *_birth_position)
-                                if self._formatting['birth_label_rotation'] != 0 else None,
+                            transform='rotate(%s,%s, %s)' % (self._formatting['birth_label_rotation']+self._orientation_angle(*_birth_original_location), *_birth_position)
+                            if self._formatting['birth_label_rotation'] != 0 else None,
                             insert=_birth_position,
                             dx=[str(font_size*float(self._formatting['birth_label_letter_x_offset']))],
                             dy=[str(float(font_size)/2.7 + font_size*float(self._formatting['birth_label_letter_y_offset']))+'px'],
@@ -672,9 +697,8 @@ class BaseSVGChart(BaseChart):
                         pos_x=_death_position[0],
                         pos_y=_death_position[1],
                         text_anchor=self._formatting['death_label_anchor'],
-                        transform=
-                            'rotate(%g,%s, %s)' % (self._formatting['death_label_rotation']+self._orientation_angle(*_death_original_location), *_death_position)
-                            if self._formatting['death_label_rotation'] != 0 else None,
+                        transform='rotate(%g,%s, %s)' % (self._formatting['death_label_rotation']+self._orientation_angle(*_death_original_location), *_death_position)
+                        if self._formatting['death_label_rotation'] != 0 else None,
                         dy=[str(float(font_size)/2.7 + font_size*float(self._formatting['death_label_letter_y_offset']))+'px'],
                         dx=[str(font_size*float(self._formatting['death_label_letter_x_offset']))],
                     )
@@ -699,7 +723,7 @@ class BaseSVGChart(BaseChart):
                                 continue
                                 thickness = 0.5*self._formatting['horizontal_step_size']*1
                                 color = (25, 25, 25)
-                            gr_other_family = self._instances[('f',f_g_id[1])].graphical_representations[f_g_id[0]]
+                            gr_other_family = self._instances[('f', f_g_id[1])].graphical_representations[f_g_id[0]]
                             if gr_other_family is None:
                                 continue
                             marriage_pos_a = calculate_ring_position(gr_family)
@@ -716,7 +740,6 @@ class BaseSVGChart(BaseChart):
                                     color=color, stroke_width=thickness
                                 )
                             ))
-
 
     def paint_and_save(self, filename):
         """
@@ -762,146 +785,146 @@ class BaseSVGChart(BaseChart):
             sorted_individual_flat_item_list += sorted_individual_dict[key]
 
         for item in additional_items + sorted_individual_flat_item_list:
-                if item['type'] == 'text':
-                    if '\n' in item['config']['text']:
-                        font_size = item['font_size']
-                        if 'dy' in item['config']:
-                            dy = float(item['config']['dy'][0][:-2])
-                        else:
-                            dy = 0
-                        for index, line in enumerate([v for v in item['config']['text'].split('\n') if v]):
-                            args = deepcopy(item['config'])
-                            args['text'] = line
-                            args['dy'] = [str(dy + 1.2*index*font_size) + 'px']
-                            svg_text = svg_document.text(
-                                **args)
-                            svg_document.add(svg_text)
+            if item['type'] == 'text':
+                if '\n' in item['config']['text']:
+                    font_size = item['font_size']
+                    if 'dy' in item['config']:
+                        dy = float(item['config']['dy'][0][:-2])
                     else:
-                        args = item['config']
+                        dy = 0
+                    for index, line in enumerate([v for v in item['config']['text'].split('\n') if v]):
+                        args = deepcopy(item['config'])
+                        args['text'] = line
+                        args['dy'] = [str(dy + 1.2*index*font_size) + 'px']
                         svg_text = svg_document.text(
                             **args)
                         svg_document.add(svg_text)
-                elif item['type'] == 'path':
-                    arguments = deepcopy(item['config']['arguments'])
-                    arguments = [individual_id for individual_id in arguments]
-                    if item['config']['type'] == 'Line':
-                        constructor_function = Line
-                    elif item['config']['type'] == 'CubicBezier':
-                        constructor_function = CubicBezier
-                    stroke_dasharray = None
-                    if 'stroke_dasharray' in item:
-                        stroke_dasharray = item['stroke_dasharray']
-                    svg_path = Path(constructor_function(*arguments))
+                else:
+                    args = item['config']
+                    svg_text = svg_document.text(
+                        **args)
+                    svg_document.add(svg_text)
+            elif item['type'] == 'path':
+                arguments = deepcopy(item['config']['arguments'])
+                arguments = [individual_id for individual_id in arguments]
+                if item['config']['type'] == 'Line':
+                    constructor_function = Line
+                elif item['config']['type'] == 'CubicBezier':
+                    constructor_function = CubicBezier
+                stroke_dasharray = None
+                if 'stroke_dasharray' in item:
+                    stroke_dasharray = item['stroke_dasharray']
+                svg_path = Path(constructor_function(*arguments))
 
-                    if self._formatting['fade_individual_color'] and 'age_color_fade_ordinal_values' in item:
+                if self._formatting['fade_individual_color'] and 'age_color_fade_ordinal_values' in item:
+                    fill = svg_document.linearGradient(
+                        ("0", str(item['age_color_fade_ordinal_values'][0])+""),
+                        ("0", str(item['age_color_fade_ordinal_values'][1])+""),
+                        gradientUnits='userSpaceOnUse')
+                    fill.add_stop_color(
+                        0, "rgb({},{},{})".format(*item['color']))
+                    fill.add_stop_color(1, "rgb({},{},{})".format(*self._colors['fade_to_death']))
+                    # fill.add_stop_color(0, "rgb({},{},{})".format(*item['colors'][1]))
+                    # fill.add_stop_color(1, "rgb({},{},{})".format(*item['colors'][0]))
+                    svg_document.defs.add(fill)
+                    svg_document.add(svg_document.path(d=svg_path.d(), stroke=fill.get_paint_server(
+                        default='currentColor'), fill='none', stroke_width=item['stroke_width'], stroke_dasharray=stroke_dasharray))
+                else:
+                    min_stops = []
+                    max_stops = []
+                    if 'birth_date_position_range' in item and item['birth_date_position_range'] \
+                            and item['birth_date_position_range'][0] != item['birth_date_position_range'][1]:
+                        min_stops.append((item['birth_date_position_range'][0], 0))
+                        max_stops.append((item['birth_date_position_range'][1], 1))
+                    if 'death_date_position_range' in item and item['death_date_position_range'] \
+                            and item['death_date_position_range'][0] != item['death_date_position_range'][1]:
+                        min_stops.append((item['death_date_position_range'][0], 1))
+                        max_stops.append((item['death_date_position_range'][1], 0))
+                    if min_stops or max_stops:
+                        min_ov = min([v[0][1] for v in min_stops])
+                        max_ov = max([v[0][1] for v in max_stops])
+
                         fill = svg_document.linearGradient(
-                            ("0", str(item['age_color_fade_ordinal_values'][0])+""),
-                            ("0", str(item['age_color_fade_ordinal_values'][1])+""),
+                            ("0", str(min_ov)+""),
+                            ("0", str(max_ov)+""),
                             gradientUnits='userSpaceOnUse')
-                        fill.add_stop_color(
-                            0, "rgb({},{},{})".format(*item['color']))
-                        fill.add_stop_color(1, "rgb({},{},{})".format(*self._colors['fade_to_death']))
+                        for stop in sorted(min_stops + max_stops):
+                            fill.add_stop_color(
+                                (stop[0][1]-min_ov)/(max_ov-min_ov), "rgba({},{},{},{})".format(*(list(item['color']) + [stop[1]])))
                         # fill.add_stop_color(0, "rgb({},{},{})".format(*item['colors'][1]))
                         # fill.add_stop_color(1, "rgb({},{},{})".format(*item['colors'][0]))
                         svg_document.defs.add(fill)
                         svg_document.add(svg_document.path(d=svg_path.d(), stroke=fill.get_paint_server(
                             default='currentColor'), fill='none', stroke_width=item['stroke_width'], stroke_dasharray=stroke_dasharray))
                     else:
-                        min_stops = []
-                        max_stops = []
-                        if 'birth_date_position_range' in item and item['birth_date_position_range'] \
-                                and item['birth_date_position_range'][0] != item['birth_date_position_range'][1]:
-                            min_stops.append((item['birth_date_position_range'][0], 0))
-                            max_stops.append((item['birth_date_position_range'][1], 1))
-                        if 'death_date_position_range' in item and item['death_date_position_range'] \
-                                and item['death_date_position_range'][0] != item['death_date_position_range'][1]:
-                            min_stops.append((item['death_date_position_range'][0], 1))
-                            max_stops.append((item['death_date_position_range'][1], 0))
-                        if min_stops or max_stops:
-                            min_ov = min([v[0][1] for v in min_stops])
-                            max_ov = max([v[0][1] for v in max_stops])
+                        # arguments['fill'] = fill
+                        # gr_individual.color
+                        svg_document.add(svg_document.path(d=svg_path.d(), stroke="rgb({},{},{})".format(
+                            *item['color']), fill='none', stroke_width=item['stroke_width'], stroke_dasharray=stroke_dasharray))
+            elif item['type'] == 'textPath':
+                args_path = item['path']
+                args_text = item['config']
+                svg_text = svg_document.text(
+                    **args_text)
+                if args_path['type'] == 'Line':
+                    constructor_function = Line
+                elif args_path['type'] == 'CubicBezier':
+                    constructor_function = CubicBezier
+                svg_path = Path(constructor_function(
+                    *args_path['arguments']))
+                y = svg_document.path(svg_path.d(), fill='none')
+                svg_document.add(y)
+                # x = svg_document.add(svg_text)
+                x = svg_document.add(svgwrite.text.Text(
+                    '', dy=[args_text['dy']], style=args_text['style']))
+                t = svgwrite.text.TextPath(y, text=args_text['text'])
+                for span in item['spans']:
+                    t.add(svg_document.tspan(span[0], **span[1]))
+                x.add(t)
 
-                            fill = svg_document.linearGradient(
-                                ("0", str(min_ov)+""),
-                                ("0", str(max_ov)+""),
-                                gradientUnits='userSpaceOnUse')
-                            for stop in sorted(min_stops + max_stops):
-                                fill.add_stop_color(
-                                    (stop[0][1]-min_ov)/(max_ov-min_ov), "rgba({},{},{},{})".format(*(list(item['color']) + [stop[1]])))
-                            # fill.add_stop_color(0, "rgb({},{},{})".format(*item['colors'][1]))
-                            # fill.add_stop_color(1, "rgb({},{},{})".format(*item['colors'][0]))
-                            svg_document.defs.add(fill)
-                            svg_document.add(svg_document.path(d=svg_path.d(), stroke=fill.get_paint_server(
-                                default='currentColor'), fill='none', stroke_width=item['stroke_width'], stroke_dasharray=stroke_dasharray))
-                        else:
-                            # arguments['fill'] = fill
-                            # gr_individual.color
-                            svg_document.add(svg_document.path(d=svg_path.d(), stroke="rgb({},{},{})".format(
-                                *item['color']), fill='none', stroke_width=item['stroke_width'], stroke_dasharray=stroke_dasharray))
-                elif item['type'] == 'textPath':
-                    args_path = item['path']
-                    args_text = item['config']
-                    svg_text = svg_document.text(
-                        **args_text)
-                    if args_path['type'] == 'Line':
-                        constructor_function = Line
-                    elif args_path['type'] == 'CubicBezier':
-                        constructor_function = CubicBezier
-                    svg_path = Path(constructor_function(
-                        *args_path['arguments']))
-                    y = svg_document.path(svg_path.d(), fill='none')
-                    svg_document.add(y)
-                    # x = svg_document.add(svg_text)
-                    x = svg_document.add(svgwrite.text.Text(
-                        '', dy=[args_text['dy']], style=args_text['style']))
-                    t = svgwrite.text.TextPath(y, text=args_text['text'])
-                    for span in item['spans']:
-                        t.add(svg_document.tspan(span[0], **span[1]))
-                    x.add(t)
+            elif item['type'] == 'image':
+                # marriage_pos and 'spouse' in positions[individual_id]['marriage']:
+                # m_pos_x = (positions[positions[individual_id]['marriage']['spouse']]['x_position'] + x_pos)/2
+                # image_data = img.tobytes()# img.make_blob(format='png')
+                this_def = {}
+                pos_x = item['config']['insert'][0]
+                pos_y = item['config']['insert'][1]
+                width = item['config']['size'][0]
+                height = item['config']['size'][1]
+                key = 'image_' + str(width) + '_' + \
+                    str(height) + item['filename']
+                if key in image_defs:
+                    this_def = image_defs[key]
+                else:
+                    image_defs[key] = this_def
+                    this_def['image_data'] = open(
+                        item['filename'], 'rb').read()
+                    this_def['encoded'] = base64.b64encode(
+                        this_def['image_data']).decode()
+                    this_def['pngdata'] = 'data:image/png;base64,{}'.format(
+                        this_def['encoded'])
+                    this_def['size'] = item['size']
+                    this_def['image_content'] = svg_document.image(
+                        href=(this_def['pngdata']), preserveAspectRatio='xMidYMid', size=(1, 1))
+                    this_def['image_def'] = svg_document.defs.add(
+                        this_def['image_content'])
+                # factor_w = width/this_def['size'][0]
+                # factor_h = height/this_def['size'][1]
+                # factor = min(factor_w, factor_h)
+                # width = this_def['size'][0]*factor
+                # height = this_def['size'][1]*factor
 
-                elif item['type'] == 'image':
-                    # marriage_pos and 'spouse' in positions[individual_id]['marriage']:
-                    # m_pos_x = (positions[positions[individual_id]['marriage']['spouse']]['x_position'] + x_pos)/2
-                    # image_data = img.tobytes()# img.make_blob(format='png')
-                    this_def = {}
-                    pos_x = item['config']['insert'][0]
-                    pos_y = item['config']['insert'][1]
-                    width = item['config']['size'][0]
-                    height = item['config']['size'][1]
-                    key = 'image_' + str(width) + '_' + \
-                        str(height) + item['filename']
-                    if key in image_defs:
-                        this_def = image_defs[key]
-                    else:
-                        image_defs[key] = this_def
-                        this_def['image_data'] = open(
-                            item['filename'], 'rb').read()
-                        this_def['encoded'] = base64.b64encode(
-                            this_def['image_data']).decode()
-                        this_def['pngdata'] = 'data:image/png;base64,{}'.format(
-                            this_def['encoded'])
-                        this_def['size'] = item['size']
-                        this_def['image_content'] = svg_document.image(
-                            href=(this_def['pngdata']), preserveAspectRatio='xMidYMid', size=(1, 1))
-                        this_def['image_def'] = svg_document.defs.add(
-                            this_def['image_content'])
-                    # factor_w = width/this_def['size'][0]
-                    # factor_h = height/this_def['size'][1]
-                    # factor = min(factor_w, factor_h)
-                    # width = this_def['size'][0]*factor
-                    # height = this_def['size'][1]*factor
+                svg_document.add(svg_document.use(this_def['image_def'].get_iri(
+                ), transform="translate({},{}) scale({},{})".format(
+                    pos_x-width/2*0, pos_y - height/2*0, width, height
+                )))
+                pass
 
-                    svg_document.add(svg_document.use(this_def['image_def'].get_iri(
-                    ), transform="translate({},{}) scale({},{})".format(
-                        pos_x-width/2*0, pos_y - height/2*0, width, height
-                    )))
-                    pass
+            elif item['type'] == 'rect':
+                this_rect = svg_document.rect(**item['config'])
 
-                elif item['type'] == 'rect':
-                    this_rect = svg_document.rect(**item['config'])
-
-                    # insert=(rect[0], rect[1]), size = (rect[2]-rect[0], rect[3]-rect[1]), fill = 'none')
-                    svg_document.add(this_rect)
+                # insert=(rect[0], rect[1]), size = (rect[2]-rect[0], rect[3]-rect[1]), fill = 'none')
+                svg_document.add(this_rect)
 
         logger.debug('start saving document')
         svg_document.save(True)

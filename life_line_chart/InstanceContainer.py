@@ -1,6 +1,9 @@
+from .Exceptions import LifeLineChartNotEnoughInformationToDisplay
 import logging
 import hashlib
 from collections import OrderedDict
+
+
 class OrderedDefaultDict(OrderedDict):
     def __init__(self, data_type=None, **kwargs):
         self.data_type = data_type if data_type else OrderedDefaultDict
@@ -10,9 +13,15 @@ class OrderedDefaultDict(OrderedDict):
         value = self.data_type()
         self[key] = value
         return value
-connection_container_type = lambda y=lambda x=list:OrderedDefaultDict(x):OrderedDefaultDict(y)
 
-from .Exceptions import LifeLineChartNotEnoughInformationToDisplay
+
+connection_container_type = (
+    lambda y=(
+        lambda x=list: OrderedDefaultDict(x)
+    ):
+    OrderedDefaultDict(y)
+)
+
 
 logging.basicConfig()  # level=20)
 logger = logging.getLogger("life_line_chart")
@@ -79,7 +88,7 @@ class InstanceContainer():
         if key[1] is None:
             return self._data[key]
         elif key[0] == 'i':
-            item = self._data.get(key,'none')
+            item = self._data.get(key, 'none')
             if item == 'none':
                 try:
                     item = self._individual_constructor(self, key)
@@ -90,7 +99,7 @@ class InstanceContainer():
                     self._data[key] = item
             return item
         elif key[0] == 'f':
-            item = self._data.get(key,'none')
+            item = self._data.get(key, 'none')
             if item == 'none':
                 try:
                     item = self._family_constructor(self, key)
@@ -146,7 +155,7 @@ class InstanceContainer():
         seed = ""
         try:
             seed = "".join(individual.get_name()[1:])
-        except Exception as e:
+        except Exception:
             pass
         i = int(hashlib.sha1(seed.encode(
             'utf8')).hexdigest(), 16) % (10 ** 8)
@@ -169,7 +178,7 @@ class InstanceContainer():
             gr_husb = parent_family.gr_husb
             parent_family, spouse_family = gr_husb.ancestor_chart_parent_family_placement
         if gr_husb:
-            if gr_husb.color == (0,0,0):
+            if gr_husb.color == (0, 0, 0):
                 gr_husb.color = self.color_getter(gr_husb)
             return gr_husb.color
         return self.color_getter(gr_individual)
@@ -197,10 +206,10 @@ class InstanceContainer():
         for cof in individual.child_of_families:
             if cof.husb:
                 content.append('Vater: {} ({})'.format(cof.wife.plain_name,
-                    cof.wife.birth_label))
+                                                       cof.wife.birth_label))
             if cof.wife:
                 content.append('Mutter: {} ({})'.format(cof.wife.plain_name,
-                    cof.wife.birth_label))
+                                                        cof.wife.birth_label))
 
         content.append('')
         for marriage in individual.marriages:
@@ -276,4 +285,3 @@ class InstanceContainer():
         if family.location:
             return family.location
         return None
-
