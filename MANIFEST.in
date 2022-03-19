@@ -1,0 +1,2 @@
+include versioneer.py
+include life_line_chart/_version.py
