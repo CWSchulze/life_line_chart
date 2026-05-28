@@ -29,6 +29,11 @@ setup(
     url="https://github.com/CWSchulze/life_line_chart",
     classifiers=[
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Development Status :: 4 - Beta",
@@ -48,6 +53,7 @@ setup(
     ])],
     include_package_data=True,
     packages=['life_line_chart'],
+    python_requires=">=3.9",
     extras_require={
         "photo_tests": ["pillow"],
         "data_generator": ["names"],
